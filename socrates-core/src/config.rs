@@ -2,7 +2,7 @@
 use std::path::Path;
 
 pub struct Config<'a> {
-    directory: &'a Path,
+    pub directory: &'a Path,
 }
 
 impl<'a> Config<'a> {

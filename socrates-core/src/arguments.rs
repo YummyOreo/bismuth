@@ -2,6 +2,7 @@ use std::env;
 use std::path::Path;
 
 pub fn get_str_args() -> Vec<String> {
+    // skips the first because the first will be the file
     env::args().skip(1).collect()
 }
 
@@ -24,15 +25,19 @@ pub fn parse_args(str_args: &[String]) -> Vec<Args> {
             _ => {}
         }
     }
+    // checks if they have supplied a dir because if they have, then we may not get a correct dir
+    // at the end of the arguments
     let has_dir = res.iter().any(|s| matches!(s, Args::Dir(_)));
 
+    // gets the last argument
     let last = match str_args.last() {
         Some(s) => s,
-        None => "./"
+        None => "./",
     };
     if !has_dir && !last.starts_with("--") {
         res.push(Args::Dir(Path::new(last)));
     }
+
     res
 }
 

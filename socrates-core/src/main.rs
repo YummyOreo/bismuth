@@ -1,5 +1,5 @@
-mod config;
 mod arguments;
+mod config;
 
 fn main() {
     let str_args = arguments::get_str_args();
@@ -16,5 +16,7 @@ fn main() {
         }
     };
 
-    let _config = config::Config::new(path);
+    let config = config::Config::new(path);
+    let md = socrates_md::MarkdownFile::load_file(config.directory);
+    println!("{:?}", md)
 }
