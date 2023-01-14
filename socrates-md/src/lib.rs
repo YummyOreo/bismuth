@@ -1,3 +1,4 @@
+#![allow(dead_code)]
 use std::fs;
 use std::path::Path;
 
@@ -16,10 +17,6 @@ pub enum MarkdownFileError<'a> {
     ErrorLoadingFile(&'a Path),
 }
 
-fn get_content(path: &'_ Path) -> String {
-    fs::read_to_string(path).expect("file should be there")
-}
-
 impl<'a> MarkdownFile<'a> {
     pub fn load_file(path: &'a Path) -> Result<Self, MarkdownFileError> {
         if !path.is_file() {
@@ -33,7 +30,7 @@ impl<'a> MarkdownFile<'a> {
             if matches!(s, "md" | "markdown") {
                 return Ok(MarkdownFile {
                     path,
-                    content: get_content(path),
+                    content: fs::read_to_string(path).expect("file should be there"),
                 });
             }
         }
