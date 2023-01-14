@@ -34,10 +34,12 @@ pub fn load_from_dir(path: &PathBuf) -> Result<Vec<MarkdownFile>, MarkdownFileEr
     Ok(files)
 }
 
+// # Tests:
+
 #[test]
-fn test_loading() {
+fn test_load_md() {
     let content: String = {
-        let files = load_from_dir(&PathBuf::from("../docs/example/")).unwrap();
+        let files = load_from_dir(&PathBuf::from("../docs/")).unwrap();
         let mut s = "".to_string();
 
         for file in files {
@@ -49,7 +51,17 @@ fn test_loading() {
         s
     };
     insta::assert_snapshot!(&content, @r###"
-    ../docs/example/blog-list.md
+    ../docs/architecture.md
+    | Crate   | Description    |
+    |--------------- | --------------- |
+    | socrates-core | The entry point |
+
+    # Socrates-core
+
+    The entry point for the app.
+
+
+    ../docs/example\blog-list.md
     ---
     title: "Blogs"
     type: "list"
@@ -62,7 +74,7 @@ fn test_loading() {
     ```
 
 
-    ../docs/example/post.md
+    ../docs/example\post.md
     ---
     title: "This is a test post"
     description: "Lorem ipsum dolor sit amet, qui minim labore adipisicing minim sint cillum sint consectetur cupidatat."

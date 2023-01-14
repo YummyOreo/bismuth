@@ -44,6 +44,8 @@ impl MarkdownFile {
     }
 }
 
+// # Tests:
+
 #[test]
 fn test_md_file() {
     insta::assert_snapshot!(MarkdownFile::load_file(&PathBuf::from("../docs/example/post.md"))
