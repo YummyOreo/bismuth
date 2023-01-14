@@ -17,6 +17,6 @@ fn main() {
     };
 
     let config = config::Config::new(path);
-    let md = socrates_md::MarkdownFile::load_file(config.directory);
+    let md = socrates_md::MarkdownFile::load_file(&config.directory.to_path_buf());
     println!("{:?}", md)
 }

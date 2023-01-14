@@ -1,26 +1,30 @@
 #![allow(dead_code)]
 use std::fs;
-use std::path::Path;
+use std::path::PathBuf;
 
 pub mod load;
 
 #[derive(Debug)]
-pub struct MarkdownFile<'a> {
+pub struct MarkdownFile {
     pub content: String,
-    path: &'a Path,
+    path: PathBuf,
 }
 
 #[derive(Debug)]
-pub enum MarkdownFileError<'a> {
-    IsFileError(&'a Path),
-    NotMarkdownError(&'a Path),
-    ErrorLoadingFile(&'a Path),
+pub enum MarkdownFileError {
+    IsFileError(String),
+    NotMarkdownError(String),
+    ErrorLoadingFile(String),
+
+    NotDirectoryError(String),
 }
 
-impl<'a> MarkdownFile<'a> {
-    pub fn load_file(path: &'a Path) -> Result<Self, MarkdownFileError> {
+impl MarkdownFile {
+    pub fn load_file(path: &PathBuf) -> Result<Self, MarkdownFileError> {
         if !path.is_file() {
-            return Err(MarkdownFileError::IsFileError(path));
+            return Err(MarkdownFileError::IsFileError(
+                path.to_string_lossy().to_string(),
+            ));
         }
 
         if let Some(s) = path.extension() {
@@ -29,18 +33,20 @@ impl<'a> MarkdownFile<'a> {
 
             if matches!(s, "md" | "markdown") {
                 return Ok(MarkdownFile {
-                    path,
+                    path: path.to_path_buf(),
                     content: fs::read_to_string(path).expect("file should be there"),
                 });
             }
         }
-        return Err(MarkdownFileError::NotMarkdownError(path));
+        return Err(MarkdownFileError::NotMarkdownError(
+            path.to_string_lossy().to_string(),
+        ));
     }
 }
 
 #[test]
 fn test_md_file() {
-    insta::assert_snapshot!(MarkdownFile::load_file(Path::new("../docs/example/post.md"))
+    insta::assert_snapshot!(MarkdownFile::load_file(&PathBuf::from("../docs/example/post.md"))
         .unwrap()
         .content
         .as_str(),
