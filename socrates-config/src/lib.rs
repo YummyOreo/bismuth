@@ -10,3 +10,6 @@ impl<'a> Config<'a> {
         Config { directory: dir }
     }
 }
+
+pub struct Markdown {
+}
