@@ -1,5 +1,4 @@
-use socrates_config::Config;
-
+mod config;
 mod arguments;
 
 fn main() {
@@ -17,5 +16,5 @@ fn main() {
         }
     };
 
-    let _config = Config::new(path);
+    let _config = config::Config::new(path);
 }
