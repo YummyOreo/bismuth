@@ -48,15 +48,18 @@ pub fn md_file_error(_description: &str) -> Option<PathBuf> {
         1 => {
             execute!(
                 stdout(),
+                cursor::MoveUp(u16::try_from(options.len()).unwrap() + 1_u16),
                 terminal::Clear(terminal::ClearType::CurrentLine),
                 cursor::SavePosition
             );
-            execute!(
-                stdout(),
-                cursor::MoveDown(1),
-                terminal::Clear(terminal::ClearType::CurrentLine),
-                cursor::RestorePosition,
-            );
+            for i in 0..options.len() + 1 {
+                execute!(
+                    stdout(),
+                    cursor::MoveDown(1),
+                    terminal::Clear(terminal::ClearType::CurrentLine),
+                    cursor::RestorePosition,
+                );
+            }
 
             execute!(
                 stdout(),

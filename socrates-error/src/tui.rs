@@ -18,6 +18,7 @@ pub fn init_options(options: &[String]) -> Result<()> {
     // set the foreground
     execute!(
         stdout(),
+        Print("There was a error:\n"),
         SetForegroundColor(Color::Green),
         Print(format!("> {}\n", options.get(0).unwrap())),
         ResetColor,
