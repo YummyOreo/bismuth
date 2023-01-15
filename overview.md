@@ -10,6 +10,7 @@
 
 # Support:
 ## Langs:
+- Wasm
 - Rust (compile the rust down to wasm)
 - Python ([pystript](https://pyscript.net/))
 - Js/Ts

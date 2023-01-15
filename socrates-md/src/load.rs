@@ -44,7 +44,7 @@ mod test {
 
     fn snapshot(path: &str) -> String {
         let path = PathBuf::from(path);
-        format!("{:?}", load_from_dir(&path).unwrap())
+        format!("{:#?}", load_from_dir(&path).unwrap())
     }
 
     macro_rules! snapshot {

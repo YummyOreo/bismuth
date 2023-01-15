@@ -53,7 +53,7 @@ mod test {
 
     fn snapshot(path: &str) -> String {
         let path = PathBuf::from(path);
-        format!("{:?}", MarkdownFile::load_file(&path).unwrap())
+        format!("{:#?}", MarkdownFile::load_file(&path).unwrap())
     }
 
     macro_rules! snapshot {
