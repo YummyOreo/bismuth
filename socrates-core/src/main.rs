@@ -17,6 +17,11 @@ fn main() {
     };
 
     let config = config::Config::new(path);
-    let md = socrates_md::MarkdownFile::load_file(&config.directory.to_path_buf());
-    println!("{:?}", md)
+    let md_files = match socrates_md::load::load_from_dir(&config.directory.to_path_buf()) {
+        Ok(files) => files,
+        Err(_e) => {
+            panic!("There was a error");
+        }
+    };
+    println!("{:?}", md_files);
 }

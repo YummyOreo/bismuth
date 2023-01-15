@@ -4,6 +4,7 @@ use std::path::PathBuf;
 use crate::{MarkdownFile, MarkdownFileError};
 
 pub fn load_from_dir(path: &PathBuf) -> Result<Vec<MarkdownFile>, MarkdownFileError> {
+    println!("{:?}", path.canonicalize());
     let mut files = vec![];
     if !path.is_dir() {
         return Err(MarkdownFileError::NotDirectoryError(
@@ -36,54 +37,18 @@ pub fn load_from_dir(path: &PathBuf) -> Result<Vec<MarkdownFile>, MarkdownFileEr
 
 // # Tests:
 
-#[test]
-fn test_load_md() {
-    let content: String = {
-        let files = load_from_dir(&PathBuf::from("../docs/")).unwrap();
-        let mut s = "".to_string();
+#[cfg(test)]
+mod test {
+    use super::*;
+    use std::path::PathBuf;
 
-        for file in files {
-            s.push_str(file.path.to_str().unwrap());
-            s.push('\n');
-            s.push_str(&file.content);
-            s.push_str("\n\n");
-        }
-        s
-    };
-    insta::assert_snapshot!(&content, @r###"
-    ../docs/architecture.md
-    | Crate   | Description    |
-    |--------------- | --------------- |
-    | socrates-core | The entry point |
-
-    # Socrates-core
-
-    The entry point for the app.
-
-
-    ../docs/example\blog-list.md
-    ---
-    title: "Blogs"
-    type: "list"
-    ---
-
-    # Blog Posts:
-
-    ```list
-    directory: "./posts/"
-    ```
-
-
-    ../docs/example\post.md
-    ---
-    title: "This is a test post"
-    description: "Lorem ipsum dolor sit amet, qui minim labore adipisicing minim sint cillum sint consectetur cupidatat."
-    type: "article"
-    ---
-
-    # This is a test post
-    Lorem ipsum dolor sit amet, officia excepteur ex fugiat reprehenderit enim labore culpa sint ad nisi Lorem pariatur mollit ex esse exercitation amet. Nisi anim cupidatat excepteur officia. Reprehenderit nostrud nostrud ipsum Lorem est aliquip amet voluptate voluptate dolor minim nulla est proident. Nostrud officia pariatur ut officia. Sit irure elit esse ea nulla sunt ex occaecat reprehenderit commodo officia dolor Lorem duis laboris cupidatat officia voluptate. Culpa proident adipisicing id nulla nisi laboris ex in Lorem sunt duis officia eiusmod. Aliqua reprehenderit commodo ex non excepteur duis sunt velit enim. Voluptate laboris sint cupidatat ullamco ut ea consectetur et est culpa et culpa duis.
-
-
-    "###);
+    #[test]
+    fn test_load_files() {
+        let mut settings = insta::Settings::clone_current();
+        settings.set_snapshot_path("./testdata/output/");
+        let snapshot = load_from_dir(&PathBuf::from("./testdata/tests/")).unwrap();
+        settings.bind(|| {
+            insta::assert_snapshot!(format!("{:?}", snapshot));
+        });
+    }
 }

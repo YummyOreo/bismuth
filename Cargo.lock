@@ -66,6 +66,10 @@ dependencies = [
 ]
 
 [[package]]
+name = "socrates-error"
+version = "0.1.0"
+
+[[package]]
 name = "socrates-md"
 version = "0.1.0"
 dependencies = [

@@ -31,4 +31,4 @@
 - project file for info on site
 - init project using charm stuff and go (tui)
 
-- widgets/components support
+- ~~widgets/components support~~

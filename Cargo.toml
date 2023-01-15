@@ -1,4 +1,4 @@
 [workspace]
 
-members = ["socrates-core", "socrates-md"]
+members = ["socrates-core", "socrates-md", "socrates-error"]
 
