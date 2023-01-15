@@ -42,13 +42,24 @@ mod test {
     use super::*;
     use std::path::PathBuf;
 
-    #[test]
-    fn test_load_files() {
-        let mut settings = insta::Settings::clone_current();
-        settings.set_snapshot_path("./testdata/output/");
-        let snapshot = load_from_dir(&PathBuf::from("./testdata/tests/")).unwrap();
-        settings.bind(|| {
-            insta::assert_snapshot!(format!("{:?}", snapshot));
-        });
+    fn snapshot(path: &str) -> String {
+        let path = PathBuf::from(path);
+        format!("{:?}", load_from_dir(&path).unwrap())
+
     }
+
+    macro_rules! snapshot {
+        ($name:tt, $path:tt) => {
+            #[test]
+            fn $name() {
+                let mut settings = insta::Settings::clone_current();
+                settings.set_snapshot_path("../testdata/output/");
+                settings.bind(|| {
+                    insta::assert_snapshot!(snapshot($path));
+                });
+            }
+        };
+    }
+
+    snapshot!(test_load, "./testdata/tests/");
 }

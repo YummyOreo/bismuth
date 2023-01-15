@@ -1,5 +1,0 @@
----
-source: socrates-md/src/load.rs
-expression: "format!(\"{:?}\", snapshot)"
----
-[MarkdownFile { content: "# this is test 0\r\n", path: "./testdata/tests/test.markdown" }, MarkdownFile { content: "# this is test 1\r\n", path: "./testdata/tests/test1.MARKDOWN" }, MarkdownFile { content: "# this is test 3\r\n", path: "./testdata/tests/test3.md" }, MarkdownFile { content: "# This is test 4\r\n", path: "./testdata/tests/TEST4.MD" }]

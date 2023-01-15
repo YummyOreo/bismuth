@@ -1,0 +1,5 @@
+---
+source: socrates-md/src/load.rs
+expression: "snapshot(\"./testdata/tests/\")"
+---
+[MarkdownFile { content: "# this is test 0\r\n", path: "./testdata/tests/test.markdown" }, MarkdownFile { content: "# this is test 1\r\n", path: "./testdata/tests/test1.MARKDOWN" }, MarkdownFile { content: "# this is test 2\r\n", path: "./testdata/tests/test2.md" }, MarkdownFile { content: "# This is test 3\r\n", path: "./testdata/tests/TEST3.MD" }]

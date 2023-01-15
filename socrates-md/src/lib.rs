@@ -51,47 +51,29 @@ mod test {
     use super::*;
     use std::path::PathBuf;
 
-    #[test]
-    fn test_load() {
-        let mut settings = insta::Settings::clone_current();
-        settings.set_snapshot_path("./testdata/output/");
-        let snapshot =
-            MarkdownFile::load_file(&PathBuf::from("./testdata/tests/test.markdown")).unwrap();
-        settings.bind(|| {
-            insta::assert_snapshot!(format!("{:?}", snapshot));
-        });
+    fn snapshot(path: &str) -> String {
+        let path = PathBuf::from(path);
+        format!("{:?}", MarkdownFile::load_file(&path).unwrap())
     }
 
-    #[test]
-    fn test_load_1() {
-        let mut settings = insta::Settings::clone_current();
-        settings.set_snapshot_path("./testdata/output/");
-        let snapshot =
-            MarkdownFile::load_file(&PathBuf::from("./testdata/tests/test1.MARKDOWN")).unwrap();
-        settings.bind(|| {
-            insta::assert_snapshot!(format!("{:?}", snapshot));
-        });
+    macro_rules! snapshot {
+        ($name:tt, $path:tt) => {
+            #[test]
+            fn $name() {
+                let mut settings = insta::Settings::clone_current();
+                settings.set_snapshot_path("../testdata/output/");
+                settings.bind(|| {
+                    insta::assert_snapshot!(snapshot($path));
+                });
+            }
+        };
     }
 
-    #[test]
-    fn test_load_2() {
-        let mut settings = insta::Settings::clone_current();
-        settings.set_snapshot_path("./testdata/output/");
-        let snapshot =
-            MarkdownFile::load_file(&PathBuf::from("./testdata/tests/test3.md")).unwrap();
-        settings.bind(|| {
-            insta::assert_snapshot!(format!("{:?}", snapshot));
-        });
-    }
+    snapshot!(test_load_file, "./testdata/tests/test.markdown");
 
-    #[test]
-    fn test_load_3() {
-        let mut settings = insta::Settings::clone_current();
-        settings.set_snapshot_path("./testdata/output/");
-        let snapshot =
-            MarkdownFile::load_file(&PathBuf::from("./testdata/tests/TEST4.MD")).unwrap();
-        settings.bind(|| {
-            insta::assert_snapshot!(format!("{:?}", snapshot));
-        });
-    }
+    snapshot!(test_load_file_1, "./testdata/tests/test1.MARKDOWN");
+
+    snapshot!(test_load_file_2, "./testdata/tests/test2.md");
+
+    snapshot!(test_load_file_3, "./testdata/tests/TEST3.MD");
 }
