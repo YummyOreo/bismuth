@@ -4,7 +4,6 @@ use std::path::PathBuf;
 use crate::{MarkdownFile, MarkdownFileError};
 
 pub fn load_from_dir(path: &PathBuf) -> Result<Vec<MarkdownFile>, MarkdownFileError> {
-    println!("{:?}", path.canonicalize());
     let mut files = vec![];
     if !path.is_dir() {
         return Err(MarkdownFileError::NotDirectoryError(

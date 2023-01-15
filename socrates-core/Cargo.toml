@@ -7,6 +7,7 @@ edition = "2021"
 
 [dependencies]
 socrates-md = {version = "0.1.0", path = "../socrates-md"}
+socrates-error = {version = "0.1.0", path = "../socrates-error"}
 
 [dev-dependencies]
 insta = "1.26.0"

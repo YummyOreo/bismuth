@@ -19,6 +19,7 @@ pub enum MarkdownFileError {
     NotDirectoryError(String),
 }
 
+
 impl MarkdownFile {
     pub fn load_file(path: &PathBuf) -> Result<Self, MarkdownFileError> {
         if !path.is_file() {

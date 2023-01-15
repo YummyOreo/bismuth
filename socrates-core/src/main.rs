@@ -1,3 +1,5 @@
+use socrates_md::MarkdownFileError;
+
 mod arguments;
 mod config;
 
@@ -19,9 +21,15 @@ fn main() {
     let config = config::Config::new(path);
     let md_files = match socrates_md::load::load_from_dir(&config.directory.to_path_buf()) {
         Ok(files) => files,
-        Err(_e) => {
-            panic!("There was a error");
-        }
+        Err(e) => match e {
+            MarkdownFileError::IsFileError(_) | MarkdownFileError::NotDirectoryError(_) => {
+                socrates_md::load::load_from_dir(&socrates_error::path::md_file_error("").unwrap())
+                    .unwrap()
+            }
+            _ => {
+                panic!("{:#?}", e)
+            }
+        },
     };
     println!("{:?}", md_files);
 }
