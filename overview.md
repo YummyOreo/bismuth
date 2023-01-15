@@ -1,6 +1,6 @@
 # Steps:
 
-- Get a list of all the markdown files and their paths
+- Get a list of all the markdown files and their paths [Done]
 - Parse markdown files and update path based on info in markdown
     - This will be stored in a File struct with a Markdown struct and a Metadata struct
     - For this you can use [insta.rs](https://insta.rs/) for testing the parsing
