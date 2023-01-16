@@ -37,14 +37,12 @@ fn update_input(path: &mut String) -> Option<()> {
 
 pub fn md_file_error(_description: &str) -> Option<PathBuf> {
     let options = vec![
-        // "Make folder at path.".to_string(),
         "Chose another path".to_string(),
     ];
 
     let option = error_ui(&options)?;
 
     match option {
-        // 1 => {}
         1 => {
             execute!(
                 stdout(),

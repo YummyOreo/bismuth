@@ -229,6 +229,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "socrates-lexer"
+version = "0.1.0"
+dependencies = [
+ "insta",
+ "socrates-md",
+]
+
+[[package]]
 name = "socrates-md"
 version = "0.1.0"
 dependencies = [
