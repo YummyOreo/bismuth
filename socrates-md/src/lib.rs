@@ -7,7 +7,7 @@ pub mod load;
 #[derive(Debug)]
 pub struct MarkdownFile {
     pub content: String,
-    path: PathBuf,
+    pub path: PathBuf,
 }
 
 #[derive(Debug)]
