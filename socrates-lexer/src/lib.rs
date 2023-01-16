@@ -1,6 +1,6 @@
 #![allow(unused)]
 use socrates_md::MarkdownFile;
-use std::ops::Range;
+use std::ops::RangeInclusive;
 
 pub struct Token {
     start: [usize; 2],
@@ -61,18 +61,19 @@ impl<'a> Lexer<'a> {
         self.chars.get(self.position + next)
     }
 
-    pub fn peek_till_diff(&self) -> usize {
+    pub fn peek_till_diff(&self) -> std::ops::RangeInclusive<usize> {
         let mut chars = self.chars.split_at(self.position).1.iter();
-        println!("{:#?}", chars);
         let len = chars.len();
 
-        chars
-            .position(|c| c != self.chars.get(self.position).unwrap())
-            .unwrap_or(len)
-            + self.position
+        self.position
+            ..=chars
+                .position(|c| c != self.chars.get(self.position).unwrap())
+                .unwrap_or(len)
+                + self.position
+                - 1
     }
 
-    pub fn get_range(&self, range: Range<usize>) -> Vec<char> {
+    pub fn get_range(&self, range: RangeInclusive<usize>) -> Vec<char> {
         self.chars[range].to_vec()
     }
 }
@@ -82,54 +83,48 @@ mod test {
     use super::*;
     use std::path::PathBuf;
 
+    fn setup(content: &str) -> MarkdownFile {
+        let content = content.to_string();
+        MarkdownFile {
+            content,
+            path: PathBuf::new(),
+        }
+    }
+
     #[test]
     fn test_peek_till() {
-        let file = MarkdownFile {
-            content: "this is a test: aaaaab".to_string(),
-            path: PathBuf::new(),
-        };
+        let file = &setup("this is a test aaaaab");
+        let mut lexer = Lexer::new(file);
+        lexer.move_to(15);
 
-        let mut lexer = Lexer::new(&file);
-        lexer.move_to(16);
+        assert_eq!(lexer.peek_till_diff(), 15..=lexer.chars.len() - 2);
 
-        assert_eq!(lexer.peek_till_diff(), lexer.chars.len() - 1);
+        let file = &setup("this is a test aaaaaa");
+        let mut lexer = Lexer::new(file);
+        lexer.move_to(15);
 
-        let file = MarkdownFile {
-            content: "this is a test: aaaaaa".to_string(),
-            path: PathBuf::new(),
-        };
-
-        let mut lexer = Lexer::new(&file);
-        lexer.move_to(16);
-
-        assert_eq!(lexer.peek_till_diff(), lexer.chars.len());
+        assert_eq!(lexer.peek_till_diff(), 15..=lexer.chars.len() - 1);
     }
 
     #[test]
     fn test_range() {
-        let file = MarkdownFile {
-            content: "this is a test: aaaaaa".to_string(),
-            path: PathBuf::new(),
-        };
-
-        let mut lexer = Lexer::new(&file);
-        lexer.move_to(16);
+        let file = &setup("this is a test aaaaaa");
+        let mut lexer = Lexer::new(file);
+        lexer.move_to(15);
 
         assert_eq!(
-            lexer.get_range(16..lexer.peek_till_diff()),
+            lexer.get_range(lexer.peek_till_diff()),
             vec!['a', 'a', 'a', 'a', 'a', 'a']
         );
 
-        let file = MarkdownFile {
-            content: "this is a test: aaaaab".to_string(),
-            path: PathBuf::new(),
-        };
+        let file = &setup("this is a test aaaaab");
+        let mut lexer = Lexer::new(file);
+        lexer.move_to(15);
 
-        let mut lexer = Lexer::new(&file);
-        lexer.move_to(16);
+        let num = lexer.peek_till_diff();
 
         assert_eq!(
-            lexer.get_range(16..lexer.peek_till_diff()),
+            lexer.get_range(lexer.peek_till_diff()),
             vec!['a', 'a', 'a', 'a', 'a']
         );
     }
