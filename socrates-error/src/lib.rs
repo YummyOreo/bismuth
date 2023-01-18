@@ -26,10 +26,10 @@ impl State {
     pub fn handle_option(&self, _index: usize) {}
 }
 
-pub fn error_ui(options: &[String]) -> Option<usize> {
+pub fn error_ui(options: &[String], description: &str) -> Option<usize> {
     let mut state = State::new(options.to_vec());
 
-    tui::init_options(&state.options).unwrap();
+    tui::init_options(&state.options, description).unwrap();
 
     loop {
         if let Some(s) = tui::update_options(&mut state) {

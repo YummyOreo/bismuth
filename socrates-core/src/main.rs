@@ -1,5 +1,5 @@
-use std::path::Path;
 use socrates_md::MarkdownFileError;
+use std::path::Path;
 
 mod arguments;
 mod config;
@@ -9,13 +9,13 @@ fn get_files(path: &Path) -> Vec<socrates_md::MarkdownFile> {
     match socrates_md::load::load_from_dir(&config.directory.to_path_buf()) {
         Ok(files) => files,
         Err(e) => match e {
-            MarkdownFileError::IsFileError(_) | MarkdownFileError::NotDirectoryError(_) => {
-                socrates_md::load::load_from_dir(&socrates_error::path::md_file_error("").unwrap())
-                    .unwrap()
-            }
-            _ => {
-                panic!("{:#?}", e)
-            }
+            MarkdownFileError::NotDirectoryError(_) => get_files(
+                &socrates_error::path::md_file_error("Directory specified does not exist").unwrap(),
+            ),
+            MarkdownFileError::IsFileError(_) => get_files(
+                &socrates_error::path::md_file_error("Directory specified is a file").unwrap(),
+            ),
+            _ => panic!("{e:#?}"),
         },
     }
 }

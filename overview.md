@@ -4,6 +4,8 @@
 - Parse markdown files and update path based on info in markdown
     - This will be stored in a File struct with a Markdown struct and a Metadata struct
     - For this you can use [insta.rs](https://insta.rs/) for testing the parsing
+    - For "reactive" files (ie. lists of blogs), they will be parsed. Just put a place holder for the reactive list
+    - Then re-parse the list ones
 - Make html files using the tree
     - The html file template is basted no the File struct `type` field (or in Metadat)
 - Make Rss based on the markdown files

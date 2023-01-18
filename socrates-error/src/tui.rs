@@ -11,14 +11,17 @@ use crossterm::{
 
 use crate::State;
 
-pub fn init_options(options: &[String]) -> Result<()> {
+pub fn init_options(options: &[String], description: &str) -> Result<()> {
     // init cursor
     execute!(stdout(), cursor::Hide, cursor::SavePosition,)?;
+    let message = format!(
+        "There was a error! {} Here are some options that might fix this:\n",
+        description
+    );
 
-    // set the foreground
     execute!(
         stdout(),
-        Print("There was a error:\n"),
+        Print(message),
         SetForegroundColor(Color::Green),
         Print(format!("> {}\n", options.get(0).unwrap())),
         ResetColor,
