@@ -27,44 +27,55 @@ impl<'a> Lexer<'a> {
         }
     }
 
-    pub fn new_token(&mut self, t: token::Token<'a>) {
+    fn current(&self) -> Option<&char> {
+        self.chars.get(self.position)
+    }
+
+    fn new_token(&mut self, t: token::Token<'a>) {
         self.tokens.push(self.current_token.clone());
         self.current_token = t;
     }
 
-    pub fn move_to(&mut self, pos: usize) -> Option<&char> {
+    fn move_to(&mut self, pos: usize) -> Option<&char> {
         if pos >= self.chars.len() {
             return None;
         }
 
         self.position = pos;
-        return self.peek(0);
+        return self.current();
     }
 
-    pub fn next(&mut self) -> Option<&char> {
+    fn next(&mut self) -> Option<&char> {
         if self.position >= self.chars.len() {
             return None;
         }
 
         self.position += 1;
-        return self.peek(0);
+        return self.current();
     }
 
-    pub fn next_line(&mut self) -> usize {
+    fn next_line(&mut self) -> usize {
         let mut chars = self.chars.split_at(self.position).1.iter();
         let len = chars.len();
         chars.position(|c| c == &'\n').unwrap_or(len) + self.position
     }
 
-    pub fn peek(&self, next: usize) -> Option<&char> {
+    fn peek(&self, next: usize) -> Option<&char> {
         self.peek_at(self.position + next)
     }
 
-    pub fn peek_at(&self, index: usize) -> Option<&char> {
+    fn peek_at(&self, index: usize) -> Option<&char> {
         self.chars.get(index)
     }
 
-    pub fn peek_till_diff(&self) -> std::ops::RangeInclusive<usize> {
+    fn peek_till(&self, c: &char) -> std::ops::RangeInclusive<usize> {
+        let mut chars = self.chars.split_at(self.position).1.iter();
+        let len = chars.len();
+
+        self.position..=chars.position(|s| s == c).unwrap_or(len) + self.position - 1
+    }
+
+    fn peek_till_diff(&self) -> std::ops::RangeInclusive<usize> {
         let mut chars = self.chars.split_at(self.position).1.iter();
         let len = chars.len();
 
@@ -76,7 +87,7 @@ impl<'a> Lexer<'a> {
                 - 1
     }
 
-    pub fn peek_regex(&self, re: Regex) -> std::ops::RangeInclusive<usize> {
+    fn peek_regex(&self, re: Regex) -> std::ops::RangeInclusive<usize> {
         //! something that from the current position
         //! will match regex to the chars going forward
         //! (get thi first match)
@@ -88,14 +99,14 @@ impl<'a> Lexer<'a> {
         }
     }
 
-    pub fn get_range(&self, range: RangeInclusive<usize>) -> Vec<char> {
+    fn get_range(&self, range: RangeInclusive<usize>) -> Vec<char> {
         self.chars[range].to_vec()
     }
 
     fn new_token_at_pos(&self, kind: token::TokenType) -> token::Token {
         token::Token::new(
             kind,
-            vec![self.peek(0).unwrap()],
+            vec![self.current().unwrap()],
             self.position,
             self.position,
         )
@@ -114,6 +125,7 @@ impl<'a> Lexer<'a> {
     }
 
     fn handle_fontmatter(&self) -> token::Token {
+        // use self.peek_till_diff and self.peek_till
         unimplemented!()
     }
 
@@ -122,8 +134,8 @@ impl<'a> Lexer<'a> {
         unimplemented!()
     }
 
-    pub fn match_char(&self) -> token::Token {
-        let c = self.peek(0).unwrap();
+    fn match_char(&self) -> token::Token {
+        let c = self.current().unwrap();
         match c {
             '\n' => self.new_token_at_pos(token::TokenType::EndOfLine),
 
@@ -156,7 +168,7 @@ impl<'a> Lexer<'a> {
         }
     }
 
-    pub fn read_char(&mut self) -> Result<(), error::LexerError> {
+    fn read_char(&mut self) -> Result<(), error::LexerError> {
         // get the token (this will get edge cases, ie. `# ` is different from `#t` (one is text,
         // one is Hash))
         // if the token type is the same as the current token type
@@ -164,7 +176,7 @@ impl<'a> Lexer<'a> {
         unimplemented!()
     }
 
-    pub fn read_until_eof(&mut self) -> Result<(), error::LexerError> {
+    fn read_until_eof(&mut self) -> Result<(), error::LexerError> {
         while self.current_token.kind != token::TokenType::EndOfFile {
             self.read_char()?;
 
@@ -210,6 +222,21 @@ mod test_utils {
 
     #[test]
     fn test_peek_till() {
+        let file = &setup("this is a test aaaaabc");
+        let mut lexer = Lexer::new(file);
+        lexer.move_to(15);
+
+        assert_eq!(lexer.peek_till(&'c'), 15..=lexer.chars.len() - 2);
+
+        let file = &setup("this is a test aaaaaab");
+        let mut lexer = Lexer::new(file);
+        lexer.move_to(15);
+
+        assert_eq!(lexer.peek_till(&'b'), 15..=lexer.chars.len() - 2);
+    }
+
+    #[test]
+    fn test_peek_till_diff() {
         let file = &setup("this is a test aaaaab");
         let mut lexer = Lexer::new(file);
         lexer.move_to(15);
