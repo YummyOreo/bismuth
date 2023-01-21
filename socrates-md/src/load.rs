@@ -14,19 +14,17 @@ pub fn load_from_dir(path: &PathBuf) -> Result<Vec<MarkdownFile>, MarkdownFileEr
     let paths = fs::read_dir(path).expect("Should be directory");
     for file in paths {
         let file_path = file.unwrap().path();
+        let rel = file_path
+            .to_string_lossy()
+            .replace(&path.to_string_lossy().to_string(), ".");
+        let file_rel = PathBuf::from(rel);
         if file_path.is_dir() {
-            match load_from_dir(&file_path) {
-                Ok(mut m) => files.append(&mut m),
-                Err(e) => {
-                    return Err(e);
-                }
+            if let Ok(mut m) = load_from_dir(&file_path) {
+                files.append(&mut m)
             }
         } else if file_path.is_file() {
-            match MarkdownFile::load_file(&file_path) {
-                Ok(m) => files.push(m),
-                Err(e) => {
-                    return Err(e);
-                }
+            if let Ok(m) = MarkdownFile::load_file(&file_path, &file_rel) {
+                files.push(m)
             }
         }
     }
@@ -42,7 +40,8 @@ mod test {
     use std::path::PathBuf;
 
     fn snapshot(path: &str) -> String {
-        let path = PathBuf::from(path);
+        let path = PathBuf::from(path).canonicalize().unwrap();
+        println!("{:?}", path);
         format!("{:#?}", load_from_dir(&path).unwrap())
     }
 

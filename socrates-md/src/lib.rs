@@ -20,7 +20,7 @@ pub enum MarkdownFileError {
 }
 
 impl MarkdownFile {
-    pub fn load_file(path: &PathBuf) -> Result<Self, MarkdownFileError> {
+    pub fn load_file(path: &PathBuf, rel: &PathBuf) -> Result<Self, MarkdownFileError> {
         if !path.is_file() {
             return Err(MarkdownFileError::IsFileError(
                 path.to_string_lossy().to_string(),
@@ -33,7 +33,7 @@ impl MarkdownFile {
 
             if matches!(s, "md" | "markdown") {
                 return Ok(MarkdownFile {
-                    path: path.to_path_buf(),
+                    path: rel.to_path_buf(),
                     content: fs::read_to_string(path).expect("file should be there"),
                 });
             }
@@ -53,7 +53,7 @@ mod test {
 
     fn snapshot(path: &str) -> String {
         let path = PathBuf::from(path);
-        format!("{:#?}", MarkdownFile::load_file(&path).unwrap())
+        format!("{:#?}", MarkdownFile::load_file(&path, &path).unwrap())
     }
 
     macro_rules! snapshot {

@@ -1,41 +1,28 @@
-use socrates_md::MarkdownFileError;
 use std::path::Path;
 
 mod arguments;
 mod config;
 
+// TODO: change this to remove --dir and just take a dir. Also, make it so there has to be a
+// socrates.toml file
 fn get_files(path: &Path) -> Vec<socrates_md::MarkdownFile> {
-    let config = config::Config::new(path);
-    match socrates_md::load::load_from_dir(&config.directory.to_path_buf()) {
+    match socrates_md::load::load_from_dir(&path.to_path_buf()) {
         Ok(files) => files,
-        Err(e) => match e {
-            MarkdownFileError::NotDirectoryError(_) => get_files(
-                &socrates_error::path::md_file_error("Directory specified does not exist").unwrap(),
-            ),
-            MarkdownFileError::IsFileError(_) => get_files(
-                &socrates_error::path::md_file_error("Directory specified is a file").unwrap(),
-            ),
-            _ => panic!("{e:#?}"),
-        },
+        Err(e) =>  panic!("{e:#?}"),
     }
 }
 
 fn main() {
-    let str_args = arguments::get_str_args();
-    let args = arguments::parse_args(&str_args);
+    let args = arguments::parse_args();
 
-    let path = {
-        match args
-            .iter()
-            .find(|p| matches!(p, arguments::Args::Dir(_)))
-            .expect("There should be a dir")
-        {
-            arguments::Args::Dir(s) => s,
-            _ => panic!("Something has gone wrong"),
+    match args.command {
+        arguments::Commands::Run => {
+            let path = Path::new("./").canonicalize().unwrap();
+
+            let _config = config::Config::new(&path);
+            let md_files = get_files(&path);
+
+            println!("{:#?}", md_files);
         }
-    };
-
-    let md_files = get_files(path);
-
-    println!("{:?}", md_files);
+    }
 }

@@ -8,6 +8,7 @@ edition = "2021"
 [dependencies]
 socrates-md = {version = "0.1.0", path = "../socrates-md"}
 socrates-error = {version = "0.1.0", path = "../socrates-error"}
+clap = { version="4.1.1", features = ["derive", "cargo"] }
 
 [dev-dependencies]
 insta = "1.26.0"

@@ -1,0 +1,155 @@
+---
+source: socrates-lexer/src/lib.rs
+expression: "snapshot(\"./testdata/tests/test1.md\")"
+---
+[
+    Token {
+        start: 0,
+        end: 0,
+        kind: StartOfFile,
+        text: [],
+    },
+    Token {
+        start: 0,
+        end: 0,
+        kind: Hash,
+        text: [
+            '#',
+        ],
+    },
+    Token {
+        start: 1,
+        end: 17,
+        kind: Text,
+        text: [
+            ' ',
+            'T',
+            'h',
+            'i',
+            's',
+            ' ',
+            'i',
+            's',
+            ' ',
+            'a',
+            ' ',
+            'h',
+            'e',
+            'a',
+            'd',
+            'e',
+            'r',
+        ],
+    },
+    Token {
+        start: 18,
+        end: 18,
+        kind: EndOfLine,
+        text: [
+            '\n',
+        ],
+    },
+    Token {
+        start: 19,
+        end: 19,
+        kind: Asterisk,
+        text: [
+            '*',
+        ],
+    },
+    Token {
+        start: 20,
+        end: 30,
+        kind: Text,
+        text: [
+            's',
+            'o',
+            'm',
+            'e',
+            ' ',
+            'i',
+            't',
+            'a',
+            'l',
+            'i',
+            'c',
+        ],
+    },
+    Token {
+        start: 31,
+        end: 31,
+        kind: Asterisk,
+        text: [
+            '*',
+        ],
+    },
+    Token {
+        start: 32,
+        end: 32,
+        kind: EndOfLine,
+        text: [
+            '\n',
+        ],
+    },
+    Token {
+        start: 33,
+        end: 36,
+        kind: Text,
+        text: [
+            'T',
+            'e',
+            'x',
+            't',
+        ],
+    },
+    Token {
+        start: 37,
+        end: 37,
+        kind: EndOfLine,
+        text: [
+            '\n',
+        ],
+    },
+    Token {
+        start: 38,
+        end: 58,
+        kind: Text,
+        text: [
+            '#',
+            'T',
+            'h',
+            'i',
+            's',
+            ' ',
+            'i',
+            's',
+            ' ',
+            'n',
+            'o',
+            't',
+            ' ',
+            'a',
+            ' ',
+            'h',
+            'e',
+            'a',
+            'd',
+            'e',
+            'r',
+        ],
+    },
+    Token {
+        start: 59,
+        end: 59,
+        kind: EndOfLine,
+        text: [
+            '\n',
+        ],
+    },
+    Token {
+        start: 60,
+        end: 60,
+        kind: EndOfFile,
+        text: [],
+    },
+]

@@ -5,18 +5,18 @@ expression: "snapshot(\"./testdata/tests/\")"
 [
     MarkdownFile {
         content: "# this is test 0\r\n",
-        path: "./testdata/tests/test.markdown",
+        path: ".\\test.markdown",
     },
     MarkdownFile {
         content: "# this is test 1\r\n",
-        path: "./testdata/tests/test1.MARKDOWN",
+        path: ".\\test1.MARKDOWN",
     },
     MarkdownFile {
         content: "# this is test 2\r\n",
-        path: "./testdata/tests/test2.md",
+        path: ".\\test2.md",
     },
     MarkdownFile {
         content: "# This is test 3\r\n",
-        path: "./testdata/tests/TEST3.MD",
+        path: ".\\TEST3.MD",
     },
 ]
