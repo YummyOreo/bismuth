@@ -67,5 +67,6 @@ pub enum TokenType {
     CurlybraceRight,
 
     FontmatterStart,
+    FontmatterInside,
     FontmatterEnd,
 }

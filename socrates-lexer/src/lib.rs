@@ -66,6 +66,10 @@ impl Lexer {
         self.peek_at(self.position + next)
     }
 
+    fn peek_back(&self, next: usize) -> Option<&char> {
+        self.peek_at(self.position - next)
+    }
+
     fn peek_at(&self, index: usize) -> Option<&char> {
         self.chars.get(index)
     }
@@ -146,20 +150,87 @@ impl Lexer {
         }
     }
 
-    fn handle_fontmatter(&self) -> token::Token {
+    fn handle_fontmatter(&mut self) -> token::Token {
+        // TODO: CLEAN THIS UP
         // use self.peek_till_diff and self.peek_till
-        unimplemented!()
+
+        // ie self.peek_till_diff to know when the --- end and to test if there are 3
+        // and self.regex("^---$") to know when the end is there (and get how far away it is)
+
+        // and self.get_range to get the stuff inbetween, from the end of the first ---, and the
+        // start of the last ---
+        let diff = self.peek_till_diff();
+        let diff_end = *diff.end();
+        if diff_end == self.position + 2 {
+            let fontmatter_start_token = token::Token {
+                start: self.position,
+                end: diff_end,
+                kind: token::TokenType::FontmatterStart,
+                text: vec!['-', '-', '-'],
+            };
+            self.new_token(fontmatter_start_token);
+            self.move_to(self.position + 2);
+
+            let fontmatter_end =
+                self.peek_regex(Regex::new("---\n").expect("Should be valid regex"));
+            println!("{fontmatter_end:?}");
+            let start_fontmatter_end = *fontmatter_end.start();
+
+            let fm_txt = self.get_range(diff_end + 1..=start_fontmatter_end - 1);
+            let t = token::Token {
+                start: diff_end,
+                end: start_fontmatter_end - 1,
+                kind: token::TokenType::FontmatterInside,
+                text: fm_txt,
+            };
+
+            self.new_token(t);
+            self.move_to(*fontmatter_end.end());
+
+            return token::Token {
+                start: start_fontmatter_end,
+                end: *fontmatter_end.end() - 1,
+                kind: token::TokenType::FontmatterEnd,
+                text: vec!['-', '-', '-'],
+            };
+        }
+        token::Token {
+            start: self.position,
+            end: self.position,
+            kind: token::TokenType::Text,
+            text: vec![*self.current().unwrap()],
+        }
     }
 
-    fn handle_dash(&self) -> token::Token {
-        // this will include fontmatter thing
+    fn handle_dash(&mut self) -> token::Token {
         if self.current_token.kind == token::TokenType::StartOfFile {
             return self.handle_fontmatter();
         }
-        unimplemented!()
+
+        let before_after = (self.peek_back(1).unwrap(), self.peek(1).unwrap());
+        if let (&'\n', &'\n') = before_after {
+            let diff = *self.peek_till_diff().end();
+            if diff == self.position + 2 {
+                let t = token::Token {
+                    start: self.position,
+                    end: diff,
+                    kind: token::TokenType::Dash,
+                    text: vec!['-', '-', '-'],
+                };
+                self.move_to(self.position + 2);
+                return t;
+            }
+        }
+        // self.make_token_at_postoken::TokenType::Text
+        token::Token {
+            start: self.position,
+            end: self.position,
+            kind: token::TokenType::Text,
+            text: vec![*self.current().unwrap()],
+        }
     }
 
-    fn match_char(&self) -> token::Token {
+    fn match_char(&mut self) -> token::Token {
         let c = self.current().unwrap();
         match c {
             '\n' => self.make_token_at_pos(token::TokenType::EndOfLine),
@@ -200,7 +271,7 @@ impl Lexer {
         // append it the the current token
         let token = self.match_char();
         if token.kind == self.current_token.kind {
-            self.current_token.append(token.text.clone());
+            self.current_token.append(token.text);
         } else {
             self.new_token(token);
         }
@@ -321,12 +392,12 @@ mod test_utils {
         let re = Regex::new("([a-zA-Z0-9]+)@([a-zA-Z]*).([a-z]+)").unwrap();
         assert_eq!(lexer.peek_regex(re), 28..=41);
 
-        let file = setup("This is a test for myttest, email@test.com");
+        let file = setup("This is a test \n for myttest, ");
         let mut lexer = Lexer::new(file);
         lexer.move_to(21);
 
-        let re = Regex::new(r"(est,\s)").unwrap();
-        assert_eq!(lexer.peek_regex(re), 23..=27);
+        let re = Regex::new(r"(est,\s$)").unwrap();
+        assert_eq!(lexer.peek_regex(re), 25..=29);
     }
 }
 
@@ -367,4 +438,6 @@ mod test {
     }
 
     snapshot!(test_load_file, "./testdata/tests/test1.md");
+    snapshot!(fontmatter_test, "./testdata/tests/test_fontmatter.md");
+    snapshot!(fontmatter_test_1, "./testdata/tests/test_fontmatter_2.md");
 }
