@@ -5,6 +5,7 @@ use std::ops::RangeInclusive;
 
 pub mod error;
 pub mod token;
+use crate::error::LexerError;
 
 pub struct Lexer {
     file: MarkdownFile,
@@ -29,8 +30,10 @@ impl Lexer {
         }
     }
 
-    fn current(&self) -> Option<&char> {
-        self.chars.get(self.position)
+    fn current(&self) -> Result<&char, LexerError> {
+        self.chars
+            .get(self.position)
+            .ok_or(LexerError::GetCharError)
     }
 
     fn new_token(&mut self, t: token::Token) {
@@ -38,18 +41,18 @@ impl Lexer {
         self.current_token = t;
     }
 
-    fn move_to(&mut self, pos: usize) -> Option<&char> {
+    fn move_to(&mut self, pos: usize) -> Result<&char, LexerError> {
         if pos >= self.chars.len() {
-            return None;
+            return Err(LexerError::MoveError(pos));
         }
 
         self.position = pos;
         return self.current();
     }
 
-    fn next(&mut self) -> Option<&char> {
+    fn next(&mut self) -> Result<&char, LexerError> {
         if self.position >= self.chars.len() {
-            return None;
+            return Err(LexerError::MoveError(self.position + 1));
         }
 
         self.position += 1;
@@ -62,16 +65,16 @@ impl Lexer {
         chars.position(|c| c == &'\n').unwrap_or(len) + self.position
     }
 
-    fn peek(&self, next: usize) -> Option<&char> {
+    fn peek(&self, next: usize) -> Result<&char, LexerError> {
         self.peek_at(self.position + next)
     }
 
-    fn peek_back(&self, next: usize) -> Option<&char> {
+    fn peek_back(&self, next: usize) -> Result<&char, LexerError> {
         self.peek_at(self.position - next)
     }
 
-    fn peek_at(&self, index: usize) -> Option<&char> {
-        self.chars.get(index)
+    fn peek_at(&self, index: usize) -> Result<&char, LexerError> {
+        self.chars.get(index).ok_or(LexerError::PeekError(index))
     }
 
     fn peek_till(&self, c: &char) -> std::ops::RangeInclusive<usize> {
@@ -109,16 +112,16 @@ impl Lexer {
         self.chars[range].to_vec()
     }
 
-    fn make_token_at_pos(&self, kind: token::TokenType) -> token::Token {
-        token::Token::new(
+    fn make_token_at_pos(&self, kind: token::TokenType) -> Result<token::Token, LexerError> {
+        Ok(token::Token::new(
             kind,
-            vec![*self.current().unwrap()],
+            vec![*self.current()?],
             self.position,
             self.position,
-        )
+        ))
     }
 
-    fn handle_hash(&self) -> token::Token {
+    fn handle_hash(&self) -> Result<token::Token, LexerError> {
         let diff = self.peek_till_diff();
         let next = self.peek_at(diff.end() + 1).unwrap_or(&'a');
 
@@ -129,7 +132,7 @@ impl Lexer {
         }
     }
 
-    fn handle_exclamation(&self) -> token::Token {
+    fn handle_exclamation(&self) -> Result<token::Token, LexerError> {
         let diff = self.peek_till_diff();
         let next = self.peek_at(diff.end() + 1).unwrap_or(&'a');
 
@@ -140,7 +143,7 @@ impl Lexer {
         }
     }
 
-    fn handle_greaterthan(&self) -> token::Token {
+    fn handle_greaterthan(&self) -> Result<token::Token, LexerError> {
         let peeked = (self.peek(1).unwrap_or(&'a'), self.peek(2).unwrap_or(&'a'));
 
         match peeked {
@@ -150,8 +153,8 @@ impl Lexer {
         }
     }
 
-    fn handle_fontmatter(&mut self) -> token::Token {
-        // TODO: CLEAN THIS UP
+    fn handle_fontmatter(&mut self) -> Result<token::Token, LexerError> {
+        // TODO: CLEAN THIS UP and comment it, because it is very confusing
         // use self.peek_till_diff and self.peek_till
 
         // ie self.peek_till_diff to know when the --- end and to test if there are 3
@@ -169,7 +172,7 @@ impl Lexer {
                 text: vec!['-', '-', '-'],
             };
             self.new_token(fontmatter_start_token);
-            self.move_to(self.position + 2);
+            self.move_to(self.position + 2)?;
 
             let fontmatter_end =
                 self.peek_regex(Regex::new("---\n").expect("Should be valid regex"));
@@ -185,29 +188,30 @@ impl Lexer {
             };
 
             self.new_token(t);
-            self.move_to(*fontmatter_end.end());
+            self.move_to(*fontmatter_end.end())?;
 
-            return token::Token {
+            return Ok(token::Token {
                 start: start_fontmatter_end,
                 end: *fontmatter_end.end() - 1,
                 kind: token::TokenType::FontmatterEnd,
                 text: vec!['-', '-', '-'],
-            };
+            });
         }
-        token::Token {
-            start: self.position,
-            end: self.position,
-            kind: token::TokenType::Text,
-            text: vec![*self.current().unwrap()],
-        }
+        // Ok(token::Token {
+        //     start: self.position,
+        //     end: self.position,
+        //     kind: token::TokenType::Text,
+        //     text: vec![*self.current().unwrap()],
+        // })
+        self.make_token_at_pos(token::TokenType::Text)
     }
 
-    fn handle_dash(&mut self) -> token::Token {
+    fn handle_dash(&mut self) -> Result<token::Token, LexerError> {
         if self.current_token.kind == token::TokenType::StartOfFile {
             return self.handle_fontmatter();
         }
 
-        let before_after = (self.peek_back(1).unwrap(), self.peek(1).unwrap());
+        let before_after = (self.peek_back(1)?, self.peek(1)?);
         if let (&'\n', &'\n') = before_after {
             let diff = *self.peek_till_diff().end();
             if diff == self.position + 2 {
@@ -217,21 +221,22 @@ impl Lexer {
                     kind: token::TokenType::Dash,
                     text: vec!['-', '-', '-'],
                 };
-                self.move_to(self.position + 2);
-                return t;
+                self.move_to(self.position + 2)?;
+                return Ok(t);
             }
         }
         // self.make_token_at_postoken::TokenType::Text
-        token::Token {
-            start: self.position,
-            end: self.position,
-            kind: token::TokenType::Text,
-            text: vec![*self.current().unwrap()],
-        }
+        // token::Token {
+        //     start: self.position,
+        //     end: self.position,
+        //     kind: token::TokenType::Text,
+        //     text: vec![*self.current().unwrap()],
+        // }
+        self.make_token_at_pos(token::TokenType::Text)
     }
 
-    fn match_char(&mut self) -> token::Token {
-        let c = self.current().unwrap();
+    fn match_char(&mut self) -> Result<token::Token, LexerError> {
+        let c = self.current()?;
         match c {
             '\n' => self.make_token_at_pos(token::TokenType::EndOfLine),
 
@@ -269,7 +274,7 @@ impl Lexer {
         // one is Hash))
         // if the token type is the same as the current token type
         // append it the the current token
-        let token = self.match_char();
+        let token = self.match_char()?;
         if token.kind == self.current_token.kind {
             self.current_token.append(token.text);
         } else {
@@ -284,7 +289,7 @@ impl Lexer {
 
             // checks if we are at the end of the file.
             // If we are, then set our current token to EndOfFile
-            if self.next().is_none() {
+            if self.next().is_err() {
                 self.new_token(token::Token::new(
                     token::TokenType::EndOfFile,
                     vec![],
@@ -326,13 +331,13 @@ mod test_utils {
     fn test_peek_till() {
         let file = setup("this is a test aaaaabc");
         let mut lexer = Lexer::new(file);
-        lexer.move_to(15);
+        lexer.move_to(15).unwrap();
 
         assert_eq!(lexer.peek_till(&'c'), 15..=lexer.chars.len() - 2);
 
         let file = setup("this is a test aaaaaab");
         let mut lexer = Lexer::new(file);
-        lexer.move_to(15);
+        lexer.move_to(15).unwrap();
 
         assert_eq!(lexer.peek_till(&'b'), 15..=lexer.chars.len() - 2);
     }
@@ -341,13 +346,13 @@ mod test_utils {
     fn test_peek_till_diff() {
         let file = setup("this is a test aaaaab");
         let mut lexer = Lexer::new(file);
-        lexer.move_to(15);
+        lexer.move_to(15).unwrap();
 
         assert_eq!(lexer.peek_till_diff(), 15..=lexer.chars.len() - 2);
 
         let file = setup("this is a test aaaaaa");
         let mut lexer = Lexer::new(file);
-        lexer.move_to(15);
+        lexer.move_to(15).unwrap();
 
         assert_eq!(lexer.peek_till_diff(), 15..=lexer.chars.len() - 1);
     }
@@ -356,7 +361,7 @@ mod test_utils {
     fn test_range() {
         let file = setup("this is a test aaaaaa");
         let mut lexer = Lexer::new(file);
-        lexer.move_to(15);
+        lexer.move_to(15).unwrap();
 
         assert_eq!(
             lexer.get_range(lexer.peek_till_diff()),
@@ -365,7 +370,7 @@ mod test_utils {
 
         let file = setup("this is a test aaaaab");
         let mut lexer = Lexer::new(file);
-        lexer.move_to(15);
+        lexer.move_to(15).unwrap();
 
         assert_eq!(
             lexer.get_range(lexer.peek_till_diff()),
@@ -377,7 +382,7 @@ mod test_utils {
     fn test_nexn_line() {
         let file = setup("this is a test aaaaaa \n this is a test");
         let mut lexer = Lexer::new(file);
-        lexer.move_to(15);
+        lexer.move_to(15).unwrap();
 
         let num = lexer.next_line();
         assert_eq!(22, num);
@@ -387,14 +392,14 @@ mod test_utils {
     fn test_regex() {
         let file = setup("This is a test for my test, email@test.com");
         let mut lexer = Lexer::new(file);
-        lexer.move_to(27);
+        lexer.move_to(27).unwrap();
 
         let re = Regex::new("([a-zA-Z0-9]+)@([a-zA-Z]*).([a-z]+)").unwrap();
         assert_eq!(lexer.peek_regex(re), 28..=41);
 
         let file = setup("This is a test \n for myttest, ");
         let mut lexer = Lexer::new(file);
-        lexer.move_to(21);
+        lexer.move_to(21).unwrap();
 
         let re = Regex::new(r"(est,\s$)").unwrap();
         assert_eq!(lexer.peek_regex(re), 25..=29);

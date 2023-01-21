@@ -1,2 +1,6 @@
 #[derive(Debug)]
-pub enum LexerError {}
+pub enum LexerError {
+    GetCharError,
+    MoveError(usize),
+    PeekError(usize),
+}
