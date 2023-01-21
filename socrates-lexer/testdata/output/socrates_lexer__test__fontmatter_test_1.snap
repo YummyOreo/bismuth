@@ -20,7 +20,7 @@ expression: "snapshot(\"./testdata/tests/test_fontmatter_2.md\")"
         ],
     },
     Token {
-        start: 2,
+        start: 3,
         end: 42,
         kind: FontmatterInside,
         text: [

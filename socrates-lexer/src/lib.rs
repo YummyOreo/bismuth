@@ -1,4 +1,4 @@
-#![allow(dead_code, clippy::should_implement_trait)]
+#![allow(dead_code, clippy::should_implement_trait, unused_doc_comments)]
 use regex::Regex;
 use socrates_md::MarkdownFile;
 use std::ops::RangeInclusive;
@@ -153,6 +153,68 @@ impl Lexer {
         }
     }
 
+    // Fontmatter
+
+    fn get_fm_start(&self) -> Option<RangeInclusive<usize>> {
+        /// Checks if the current position is the start of the fontmatter
+        /// if it is, it will return the range of the fontmatter
+        // gets till change in char
+        let diff = self.peek_till_diff();
+        let diff_end = *diff.end();
+
+        if diff_end - self.position == 2 {
+            return Some(diff);
+        }
+        None
+    }
+
+    fn append_fm_start_token(&mut self, start: usize, end: usize) -> Result<(), LexerError> {
+        // makes the fontmatter start token
+        let fontmatter_start_token = token::Token {
+            start,
+            end,
+            kind: token::TokenType::FontmatterStart,
+            text: vec!['-', '-', '-'],
+        };
+
+        // appends the token
+        self.new_token(fontmatter_start_token);
+
+        // moves past the token
+        self.move_to(end + 1)?;
+
+        Ok(())
+    }
+
+    fn append_fm_inside(&mut self, inside: RangeInclusive<usize>) -> Result<(), LexerError> {
+        let start = *inside.start();
+        let end = *inside.end();
+
+        let fm_txt = self.get_range(start..=end);
+        let t = token::Token {
+            start,
+            end,
+            kind: token::TokenType::FontmatterInside,
+            text: fm_txt,
+        };
+
+        // appends the token
+        self.new_token(t);
+
+        // moves to after the inside of the fontmatter
+        self.move_to(end + 1)?;
+        Ok(())
+    }
+
+    fn get_fm_end(&self) -> Option<RangeInclusive<usize>> {
+        let fontmatter_end = self.peek_regex(Regex::new("---\n").expect("Should be valid regex"));
+        if fontmatter_end.start() == fontmatter_end.end() {
+            None
+        } else {
+            Some(fontmatter_end)
+        }
+    }
+
     fn handle_fontmatter(&mut self) -> Result<token::Token, LexerError> {
         // TODO: CLEAN THIS UP and comment it, because it is very confusing
         // use self.peek_till_diff and self.peek_till
@@ -162,47 +224,25 @@ impl Lexer {
 
         // and self.get_range to get the stuff inbetween, from the end of the first ---, and the
         // start of the last ---
-        let diff = self.peek_till_diff();
-        let diff_end = *diff.end();
-        if diff_end == self.position + 2 {
-            let fontmatter_start_token = token::Token {
-                start: self.position,
-                end: diff_end,
-                kind: token::TokenType::FontmatterStart,
-                text: vec!['-', '-', '-'],
-            };
-            self.new_token(fontmatter_start_token);
-            self.move_to(self.position + 2)?;
+        if let Some(diff) = self.get_fm_start() {
+            let diff_end = *diff.end();
 
-            let fontmatter_end =
-                self.peek_regex(Regex::new("---\n").expect("Should be valid regex"));
-            println!("{fontmatter_end:?}");
-            let start_fontmatter_end = *fontmatter_end.start();
+            self.append_fm_start_token(self.position, diff_end)?;
 
-            let fm_txt = self.get_range(diff_end + 1..=start_fontmatter_end - 1);
-            let t = token::Token {
-                start: diff_end,
-                end: start_fontmatter_end - 1,
-                kind: token::TokenType::FontmatterInside,
-                text: fm_txt,
-            };
+            let fontmatter_end = self.get_fm_end().ok_or(LexerError::FontmatterError)?;
 
-            self.new_token(t);
+            self.append_fm_inside(diff_end+1..=*fontmatter_end.start() - 1)?;
+
+            // Moves to the end of the fontmatter
             self.move_to(*fontmatter_end.end())?;
 
             return Ok(token::Token {
-                start: start_fontmatter_end,
+                start: *fontmatter_end.start(),
                 end: *fontmatter_end.end() - 1,
                 kind: token::TokenType::FontmatterEnd,
                 text: vec!['-', '-', '-'],
             });
         }
-        // Ok(token::Token {
-        //     start: self.position,
-        //     end: self.position,
-        //     kind: token::TokenType::Text,
-        //     text: vec![*self.current().unwrap()],
-        // })
         self.make_token_at_pos(token::TokenType::Text)
     }
 
