@@ -7,7 +7,6 @@ edition = "2021"
 
 [dependencies]
 socrates-error = { version = "0.1.0", path = "../socrates-error" }
-serde = { version = "1.0", features = ["derive"] }
 
 [dev-dependencies]
-insta = { version = "1.26.0", features = ["yaml"] }
+insta = "1.26.0"

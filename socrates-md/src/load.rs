@@ -42,14 +42,15 @@ mod test {
     use super::*;
     use std::path::PathBuf;
 
-    fn snapshot(path: &str) -> Vec<MarkdownFile> {
+    fn snapshot(path: &str) -> String {
         let path = PathBuf::from(path).canonicalize().unwrap();
         let mut files = load_from_dir(&path).unwrap();
         for mut file in &mut files {
             let new_path = file.path.to_string_lossy().replace('\\', "/").to_lowercase();
             file.path = PathBuf::from(new_path);
         }
-        files
+        files.sort_by(|a,b| a.path.cmp(&b.path));
+        format!("{files:#?}")
     }
 
     macro_rules! snapshot {
@@ -59,7 +60,7 @@ mod test {
                 let mut settings = insta::Settings::clone_current();
                 settings.set_snapshot_path("../testdata/output/");
                 settings.bind(|| {
-                    insta::assert_yaml_snapshot!(snapshot($path));
+                    insta::assert_snapshot!(snapshot($path));
                 });
             }
         };
