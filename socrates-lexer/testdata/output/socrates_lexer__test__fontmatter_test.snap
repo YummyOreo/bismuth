@@ -5,7 +5,8 @@ expression: "snapshot(\"./testdata/tests/test_fontmatter.md\")"
 ---↲
 ^^^ Token(FontmatterStart, "---", 0 -> 2)
 this: "font matter"↲
-^^^^^^^^^^^^^^^^^^^^ Token(FontmatterInside, "this: \"font matter\"\n", 4 -> 23)
+^^^^^^^^^^^^^^^^^^^ Token(FontmatterInside, "this: \"font matter\"", 4 -> 22)
+                   ^ Token(EndOfLine, "\n", 23 -> 23)
 ---↲
 ^^^ Token(FontmatterEnd, "---", 24 -> 26)
    ^ Token(EndOfLine, "\n", 27 -> 27)

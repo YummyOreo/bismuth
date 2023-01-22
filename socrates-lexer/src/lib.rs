@@ -208,17 +208,47 @@ impl Lexer {
     fn append_fm_inside(&mut self, inside: RangeInclusive<usize>) -> Result<(), LexerError> {
         let start = *inside.start();
         let end = *inside.end();
+        self.move_to(start)?;
 
-        let fm_txt = self.get_range(start..=end);
-        let t = token::Token {
-            start,
-            end,
-            kind: token::TokenType::FontmatterInside,
-            text: fm_txt,
-        };
+        // let fm_txt = self.get_range(start..=end);
+
+        loop {
+            let next_line = self.next_line();
+
+            if next_line > end {
+                break;
+            }
+
+            let inside_text = self.get_range(self.position..=next_line - 1);
+            if !inside_text.is_empty() {
+                let t = token::Token {
+                    start: self.position,
+                    end: next_line - 1,
+                    kind: token::TokenType::FontmatterInside,
+                    text: inside_text,
+                };
+                self.new_token(t);
+            }
+
+            let eol = token::Token {
+                start: next_line,
+                end: next_line,
+                kind: token::TokenType::EndOfLine,
+                text: vec!['\n'],
+            };
+            self.new_token(eol);
+            self.move_to(next_line + 1)?;
+        }
+
+        // let t = token::Token {
+        //     start,
+        //     end,
+        //     kind: token::TokenType::FontmatterInside,
+        //     text: fm_txt,
+        // };
 
         // appends the token
-        self.new_token(t);
+        // self.new_token(t);
 
         // moves to after the inside of the fontmatter
         self.move_to(end + 1)?;
@@ -285,6 +315,8 @@ impl Lexer {
                 self.move_to(self.position + 2)?;
                 return Ok(t);
             }
+        } else if let (&' ', &' ') = before_after {
+            return self.make_token_at_pos(token::TokenType::Dash);
         }
 
         self.make_token_at_pos(token::TokenType::Text)
@@ -470,7 +502,6 @@ mod test {
     use std::path::PathBuf;
 
     fn snapshot(path: &str) -> String {
-        // TODO: rewrite this please
         let path = PathBuf::from(path);
         let file = MarkdownFile::load_file(&path, &path).unwrap();
 
@@ -504,9 +535,7 @@ mod test {
                 output += &format!(" {t}");
                 output += "\n";
                 match t.kind {
-                    token::TokenType::EndOfLine
-                    | token::TokenType::FontmatterInside
-                    | token::TokenType::FontmatterStart => {
+                    token::TokenType::EndOfLine | token::TokenType::FontmatterStart => {
                         break;
                     }
                     _ => {}
