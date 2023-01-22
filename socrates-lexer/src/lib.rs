@@ -1,4 +1,4 @@
-#![allow(dead_code, clippy::should_implement_trait, unused_doc_comments)]
+#![allow(unused_doc_comments, dead_code)]
 use regex::Regex;
 use socrates_md::MarkdownFile;
 use std::ops::RangeInclusive;
@@ -240,16 +240,6 @@ impl Lexer {
             self.move_to(next_line + 1)?;
         }
 
-        // let t = token::Token {
-        //     start,
-        //     end,
-        //     kind: token::TokenType::FontmatterInside,
-        //     text: fm_txt,
-        // };
-
-        // appends the token
-        // self.new_token(t);
-
         // moves to after the inside of the fontmatter
         self.move_to(end + 1)?;
         Ok(())
@@ -265,7 +255,6 @@ impl Lexer {
     }
 
     fn handle_fontmatter(&mut self) -> Result<token::Token, LexerError> {
-        // TODO: CLEAN THIS UP and comment it, because it is very confusing
         // use self.peek_till_diff and self.peek_till
 
         // ie self.peek_till_diff to know when the --- end and to test if there are 3
@@ -332,7 +321,7 @@ impl Lexer {
             token::TokenType::Whitespace | token::TokenType::EndOfLine => {
                 self.make_token_at_pos(token::TokenType::Whitespace)
             }
-            _ => self.make_token_at_pos(token::TokenType::Text)
+            _ => self.make_token_at_pos(token::TokenType::Text),
         }
     }
 
