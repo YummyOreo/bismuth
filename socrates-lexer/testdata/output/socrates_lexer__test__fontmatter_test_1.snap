@@ -2,11 +2,11 @@
 source: socrates-lexer/src/lib.rs
 expression: "snapshot(\"./testdata/tests/test_fontmatter_2.md\")"
 ---
----
-^^ Token(FontmatterStart, "---", 0 -> 2)
-font: "this is a --- font matter test"
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Token(FontmatterInside, "font: \"this is a --- font matter test\"\n", 4 -> 42)
----
+---↲
+^^^ Token(FontmatterStart, "---", 0 -> 2)
+font: "this is a --- font matter test"↲
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Token(FontmatterInside, "font: \"this is a --- font matter test\"\n", 4 -> 42)
+---↲
 ^^^ Token(FontmatterEnd, "---", 43 -> 45)
    ^ Token(EndOfLine, "\n", 46 -> 46)
 

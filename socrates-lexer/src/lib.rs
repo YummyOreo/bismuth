@@ -40,7 +40,7 @@ impl Lexer {
                 curr_line.push('\n');
                 lines.push((line_index, curr_line));
                 curr_line = String::new();
-                line_index += ptr-line_index + 1;
+                line_index += ptr - line_index + 1;
             } else {
                 curr_line.push(self.chars[ptr]);
             }
@@ -481,43 +481,39 @@ mod test {
 
         let mut output = String::new();
         let mut token_ptr = 0;
+
         for (index, line) in lexer.get_lines() {
+            let line = line.replace('\n', "↲\n");
             output += &line;
 
-            loop {
-                if token_ptr >= tokens.len() {
-                    break;
-                }
-                let curr_token = &tokens[token_ptr];
+            while token_ptr < tokens.len() {
+                let t = &tokens[token_ptr];
                 token_ptr += 1;
 
-                match curr_token.kind {
-                    token::TokenType::EndOfFile | token::TokenType::StartOfFile => {}
-                    token::TokenType::FontmatterInside | token::TokenType::FontmatterStart => {
-                        output += &"^".repeat(curr_token.end - curr_token.start);
-                        output += &format!(" {curr_token}");
-                        output += "\n";
+                if t.kind == token::TokenType::StartOfFile || t.kind == token::TokenType::EndOfFile
+                {
+                    continue;
+                }
+
+                output += &" ".repeat(t.start - index);
+
+                let mut repeat_num = t.end - t.start;
+                repeat_num += 1;
+                output += &"^".repeat(repeat_num);
+
+                output += &format!(" {t}");
+                output += "\n";
+                match t.kind {
+                    token::TokenType::EndOfLine
+                    | token::TokenType::FontmatterInside
+                    | token::TokenType::FontmatterStart => {
                         break;
                     }
-                    token::TokenType::EndOfLine => {
-                        output += &" ".repeat(curr_token.start - index);
-                        output += "^";
-                        output += &format!(" {curr_token}");
-                        output += "\n";
-                        break;
-                    }
-                    _ => {
-                        output += &" ".repeat(curr_token.start - index);
-                        output += &"^".repeat(curr_token.end - curr_token.start + 1);
-                        output += &format!(" {curr_token}");
-                        output += "\n";
-                    }
+                    _ => {}
                 }
             }
         }
-        // for token in lexer.tokens {
-        //     let text = token.text.iter().map(|c| c.to_owned()).collect::<String>();
-        // }
+
         output
     }
 
