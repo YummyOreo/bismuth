@@ -2,21 +2,12 @@
 source: socrates-md/src/load.rs
 expression: "snapshot(\"./testdata/tests/\")"
 ---
-[
-    MarkdownFile {
-        content: "# this is test 0\r\n",
-        path: "./test.markdown",
-    },
-    MarkdownFile {
-        content: "# this is test 1\r\n",
-        path: "./test1.markdown",
-    },
-    MarkdownFile {
-        content: "# this is test 2\r\n",
-        path: "./test2.md",
-    },
-    MarkdownFile {
-        content: "# This is test 3\r\n",
-        path: "./test3.md",
-    },
-]
+- content: "# this is test 0\r\n"
+  path: "./test.markdown"
+- content: "# this is test 1\r\n"
+  path: "./test1.markdown"
+- content: "# this is test 2\r\n"
+  path: "./test2.md"
+- content: "# This is test 3\r\n"
+  path: "./test3.md"
+

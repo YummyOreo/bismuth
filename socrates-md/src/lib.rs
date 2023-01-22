@@ -1,10 +1,11 @@
 #![allow(dead_code)]
 use std::fs;
 use std::path::{ PathBuf, Path };
+use serde::Serialize;
 
 pub mod load;
 
-#[derive(Debug)]
+#[derive(Debug, Serialize)]
 pub struct MarkdownFile {
     pub content: String,
     pub path: PathBuf,

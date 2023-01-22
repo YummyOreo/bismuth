@@ -33,20 +33,23 @@ pub fn load_from_dir(path: &PathBuf) -> Result<Vec<MarkdownFile>, MarkdownFileEr
 }
 
 // # Tests:
+//
+// TODO: Fix this, broken because:
+// Could load in any way order, should account for this
 
 #[cfg(test)]
 mod test {
     use super::*;
     use std::path::PathBuf;
 
-    fn snapshot(path: &str) -> String {
+    fn snapshot(path: &str) -> Vec<MarkdownFile> {
         let path = PathBuf::from(path).canonicalize().unwrap();
         let mut files = load_from_dir(&path).unwrap();
         for mut file in &mut files {
             let new_path = file.path.to_string_lossy().replace('\\', "/").to_lowercase();
             file.path = PathBuf::from(new_path);
         }
-        format!("{:#?}", files)
+        files
     }
 
     macro_rules! snapshot {
@@ -56,7 +59,7 @@ mod test {
                 let mut settings = insta::Settings::clone_current();
                 settings.set_snapshot_path("../testdata/output/");
                 settings.bind(|| {
-                    insta::assert_snapshot!(snapshot($path));
+                    insta::assert_yaml_snapshot!(snapshot($path));
                 });
             }
         };
