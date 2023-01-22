@@ -54,7 +54,7 @@ mod test {
     fn snapshot(path: &str) -> String {
         let path = PathBuf::from(path);
         let mut file = MarkdownFile::load_file(&path, &path).unwrap();
-        file.path = PathBuf::from(file.path.to_string_lossy().replace('\\', "/"));
+        file.path = PathBuf::from(file.path.to_string_lossy().replace('\\', "/").to_lowercase());
         format!("{:#?}", file)
     }
 

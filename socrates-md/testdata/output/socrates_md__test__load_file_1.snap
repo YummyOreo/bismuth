@@ -4,5 +4,5 @@ expression: "snapshot(\"./testdata/tests/test1.MARKDOWN\")"
 ---
 MarkdownFile {
     content: "# this is test 1\r\n",
-    path: "./testdata/tests/test1.MARKDOWN",
+    path: "./testdata/tests/test1.markdown",
 }

@@ -43,7 +43,7 @@ mod test {
         let path = PathBuf::from(path).canonicalize().unwrap();
         let mut files = load_from_dir(&path).unwrap();
         for mut file in &mut files {
-            let new_path = file.path.to_string_lossy().replace('\\', "/");
+            let new_path = file.path.to_string_lossy().replace('\\', "/").to_lowercase();
             file.path = PathBuf::from(new_path);
         }
         format!("{:#?}", files)
