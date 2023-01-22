@@ -509,6 +509,11 @@ mod test {
         lexer.run_lexer().unwrap();
 
         let tokens = lexer.tokens.clone();
+        if tokens[0].kind != token::TokenType::StartOfFile
+            || tokens[tokens.len() - 1].kind != token::TokenType::EndOfFile
+        {
+            panic!("There should be a StartOfFile and EndOfFile token at the start and end");
+        }
 
         let mut output = String::new();
         let mut token_ptr = 0;
