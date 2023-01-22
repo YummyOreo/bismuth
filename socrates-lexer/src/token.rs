@@ -51,6 +51,7 @@ pub enum TokenType {
 
     // more than one space is a whitespace
     // Whitespace,
+    Whitespace,
     Tab,
 
     Asterisk,
@@ -72,6 +73,8 @@ pub enum TokenType {
 
     CurlybraceLeft,
     CurlybraceRight,
+
+    Percent,
 
     FontmatterStart,
     FontmatterInside,

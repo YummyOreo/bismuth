@@ -109,7 +109,7 @@ impl Lexer {
 
         self.position
             ..=chars
-                .position(|c| c != self.peek_at(self.position).unwrap())
+                .position(|c| c != self.peek_at(self.position).expect("Should be at a char"))
                 .unwrap_or(len)
                 + self.position
                 - 1
@@ -303,29 +303,46 @@ impl Lexer {
         }
 
         let before_after = (self.peek_back(1)?, self.peek(1)?);
-        if let (&'\n', &'\n') = before_after {
-            let diff = *self.peek_till_diff().end();
-            if diff == self.position + 2 {
-                let t = token::Token {
-                    start: self.position,
-                    end: diff,
-                    kind: token::TokenType::Dash,
-                    text: vec!['-', '-', '-'],
-                };
-                self.move_to(self.position + 2)?;
-                return Ok(t);
+
+        match before_after {
+            (&'\n', &'\n') => {
+                let diff = *self.peek_till_diff().end();
+                if diff == self.position + 2 {
+                    let t = token::Token {
+                        start: self.position,
+                        end: diff,
+                        kind: token::TokenType::Dash,
+                        text: vec!['-', '-', '-'],
+                    };
+                    self.move_to(self.position + 2)?;
+                    return Ok(t);
+                }
             }
-        } else if let (&' ', &' ') = before_after {
-            return self.make_token_at_pos(token::TokenType::Dash);
+            (_, &' ') => {
+                return self.make_token_at_pos(token::TokenType::Dash);
+            }
+            _ => {}
         }
 
         self.make_token_at_pos(token::TokenType::Text)
+    }
+
+    fn handle_whitespace(&mut self) -> Result<token::Token, LexerError> {
+        match self.current_token.kind {
+            token::TokenType::Whitespace | token::TokenType::EndOfLine => {
+                self.make_token_at_pos(token::TokenType::Whitespace)
+            }
+            _ => self.make_token_at_pos(token::TokenType::Text)
+        }
     }
 
     fn match_char(&mut self) -> Result<token::Token, LexerError> {
         let c = self.current()?;
         match c {
             '\n' => self.make_token_at_pos(token::TokenType::EndOfLine),
+
+            // could be text or whitespace
+            ' ' => self.handle_whitespace(),
 
             '$' => self.make_token_at_pos(token::TokenType::DollarSign),
 
@@ -352,6 +369,8 @@ impl Lexer {
             '{' => self.make_token_at_pos(token::TokenType::CurlybraceLeft),
             '}' => self.make_token_at_pos(token::TokenType::CurlybraceRight),
 
+            '%' => self.make_token_at_pos(token::TokenType::Percent),
+
             _ => self.make_token_at_pos(token::TokenType::Text),
         }
     }
@@ -362,7 +381,11 @@ impl Lexer {
         // if the token type is the same as the current token type
         // append it the the current token
         let token = self.match_char()?;
-        if token.kind == self.current_token.kind {
+
+        // we don't want to combine EOL tokens
+        if token.kind == token::TokenType::EndOfLine {
+            self.new_token(token);
+        } else if token.kind == self.current_token.kind {
             self.current_token.append(token.text);
         } else {
             self.new_token(token);
@@ -535,6 +558,11 @@ mod test {
 
                 let mut repeat_num = t.end - t.start;
                 repeat_num += 1;
+
+                // cap at 100, because i don't want to use a lib just to get the terminal width
+                if repeat_num > 100 {
+                    repeat_num = 100;
+                }
                 output += &"^".repeat(repeat_num);
 
                 output += &format!(" {t}");
@@ -566,5 +594,6 @@ mod test {
 
     snapshot!(fontmatter_test, "./testdata/tests/test_fontmatter.md");
     snapshot!(test_load_file, "./testdata/tests/test1.md");
+    snapshot!(test_load_file_1, "./testdata/tests/test2.md");
     snapshot!(fontmatter_test_1, "./testdata/tests/test_fontmatter_2.md");
 }
