@@ -2,93 +2,15 @@
 source: socrates-lexer/src/lib.rs
 expression: "snapshot(\"./testdata/tests/test_fontmatter.md\")"
 ---
-[
-    Token {
-        start: 0,
-        end: 0,
-        kind: StartOfFile,
-        text: [],
-    },
-    Token {
-        start: 0,
-        end: 2,
-        kind: FontmatterStart,
-        text: [
-            '-',
-            '-',
-            '-',
-        ],
-    },
-    Token {
-        start: 3,
-        end: 23,
-        kind: FontmatterInside,
-        text: [
-            '\n',
-            't',
-            'h',
-            'i',
-            's',
-            ':',
-            ' ',
-            '"',
-            'f',
-            'o',
-            'n',
-            't',
-            ' ',
-            'm',
-            'a',
-            't',
-            't',
-            'e',
-            'r',
-            '"',
-            '\n',
-        ],
-    },
-    Token {
-        start: 24,
-        end: 26,
-        kind: FontmatterEnd,
-        text: [
-            '-',
-            '-',
-            '-',
-        ],
-    },
-    Token {
-        start: 28,
-        end: 28,
-        kind: Hash,
-        text: [
-            '#',
-        ],
-    },
-    Token {
-        start: 29,
-        end: 33,
-        kind: Text,
-        text: [
-            ' ',
-            'T',
-            'E',
-            'S',
-            'T',
-        ],
-    },
-    Token {
-        start: 34,
-        end: 34,
-        kind: EndOfLine,
-        text: [
-            '\n',
-        ],
-    },
-    Token {
-        start: 35,
-        end: 35,
-        kind: EndOfFile,
-        text: [],
-    },
-]
+---
+^^ Token(FontmatterStart, "---", 0 -> 2)
+this: "font matter"
+^^^^^^^^^^^^^^^^^^^ Token(FontmatterInside, "this: \"font matter\"\n", 4 -> 23)
+---
+^^^ Token(FontmatterEnd, "---", 24 -> 26)
+   ^ Token(EndOfLine, "\n", 27 -> 27)
+# TEST
+^ Token(Hash, "#", 28 -> 28)
+ ^^^^^ Token(Text, " TEST", 29 -> 33)
+      ^ Token(EndOfLine, "\n", 34 -> 34)
+

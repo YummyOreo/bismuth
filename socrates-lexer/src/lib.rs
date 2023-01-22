@@ -30,6 +30,25 @@ impl Lexer {
         }
     }
 
+    pub fn get_lines(&self) -> Vec<(usize, String)> {
+        let mut ptr = 0;
+        let mut curr_line = String::new();
+        let mut lines: Vec<(usize, String)> = Vec::new();
+        let mut line_index = 0;
+        while ptr < self.chars.len() {
+            if self.chars[ptr] == '\n' {
+                curr_line.push('\n');
+                lines.push((line_index, curr_line));
+                curr_line = String::new();
+                line_index += ptr-line_index + 1;
+            } else {
+                curr_line.push(self.chars[ptr]);
+            }
+            ptr += 1;
+        }
+        lines
+    }
+
     fn current(&self) -> Result<&char, LexerError> {
         self.chars
             .get(self.position)
@@ -211,7 +230,7 @@ impl Lexer {
         if fontmatter_end.start() == fontmatter_end.end() {
             None
         } else {
-            Some(fontmatter_end)
+            Some(*fontmatter_end.start()..=*fontmatter_end.end() - 1)
         }
     }
 
@@ -231,14 +250,16 @@ impl Lexer {
 
             let fontmatter_end = self.get_fm_end().ok_or(LexerError::FontmatterError)?;
 
-            self.append_fm_inside(diff_end+1..=*fontmatter_end.start() - 1)?;
+            self.append_fm_inside(diff_end + 2..=*fontmatter_end.start() - 1)?;
+
+            // appending fm_end
 
             // Moves to the end of the fontmatter
             self.move_to(*fontmatter_end.end())?;
 
             return Ok(token::Token {
                 start: *fontmatter_end.start(),
-                end: *fontmatter_end.end() - 1,
+                end: *fontmatter_end.end(),
                 kind: token::TokenType::FontmatterEnd,
                 text: vec!['-', '-', '-'],
             });
@@ -265,13 +286,7 @@ impl Lexer {
                 return Ok(t);
             }
         }
-        // self.make_token_at_postoken::TokenType::Text
-        // token::Token {
-        //     start: self.position,
-        //     end: self.position,
-        //     kind: token::TokenType::Text,
-        //     text: vec![*self.current().unwrap()],
-        // }
+
         self.make_token_at_pos(token::TokenType::Text)
     }
 
@@ -455,18 +470,55 @@ mod test {
     use std::path::PathBuf;
 
     fn snapshot(path: &str) -> String {
+        // TODO: rewrite this please
         let path = PathBuf::from(path);
         let file = MarkdownFile::load_file(&path, &path).unwrap();
 
         let mut lexer = Lexer::new(file);
         lexer.run_lexer().unwrap();
 
-        // let output = String::new();
+        let tokens = lexer.tokens.clone();
+
+        let mut output = String::new();
+        let mut token_ptr = 0;
+        for (index, line) in lexer.get_lines() {
+            output += &line;
+
+            loop {
+                if token_ptr >= tokens.len() {
+                    break;
+                }
+                let curr_token = &tokens[token_ptr];
+                token_ptr += 1;
+
+                match curr_token.kind {
+                    token::TokenType::EndOfFile | token::TokenType::StartOfFile => {}
+                    token::TokenType::FontmatterInside | token::TokenType::FontmatterStart => {
+                        output += &"^".repeat(curr_token.end - curr_token.start);
+                        output += &format!(" {curr_token}");
+                        output += "\n";
+                        break;
+                    }
+                    token::TokenType::EndOfLine => {
+                        output += &" ".repeat(curr_token.start - index);
+                        output += "^";
+                        output += &format!(" {curr_token}");
+                        output += "\n";
+                        break;
+                    }
+                    _ => {
+                        output += &" ".repeat(curr_token.start - index);
+                        output += &"^".repeat(curr_token.end - curr_token.start + 1);
+                        output += &format!(" {curr_token}");
+                        output += "\n";
+                    }
+                }
+            }
+        }
         // for token in lexer.tokens {
         //     let text = token.text.iter().map(|c| c.to_owned()).collect::<String>();
         // }
-        // output
-        format!("{:#?}", lexer.tokens)
+        output
     }
 
     macro_rules! snapshot {
@@ -482,7 +534,7 @@ mod test {
         };
     }
 
-    snapshot!(test_load_file, "./testdata/tests/test1.md");
     snapshot!(fontmatter_test, "./testdata/tests/test_fontmatter.md");
+    snapshot!(test_load_file, "./testdata/tests/test1.md");
     snapshot!(fontmatter_test_1, "./testdata/tests/test_fontmatter_2.md");
 }

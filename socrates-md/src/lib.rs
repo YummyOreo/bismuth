@@ -1,6 +1,6 @@
 #![allow(dead_code)]
 use std::fs;
-use std::path::PathBuf;
+use std::path::{ PathBuf, Path };
 
 pub mod load;
 
@@ -20,7 +20,7 @@ pub enum MarkdownFileError {
 }
 
 impl MarkdownFile {
-    pub fn load_file(path: &PathBuf, rel: &PathBuf) -> Result<Self, MarkdownFileError> {
+    pub fn load_file(path: &PathBuf, rel: &Path) -> Result<Self, MarkdownFileError> {
         if !path.is_file() {
             return Err(MarkdownFileError::IsFileError(
                 path.to_string_lossy().to_string(),
