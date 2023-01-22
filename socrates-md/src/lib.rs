@@ -53,7 +53,9 @@ mod test {
 
     fn snapshot(path: &str) -> String {
         let path = PathBuf::from(path);
-        format!("{:#?}", MarkdownFile::load_file(&path, &path).unwrap())
+        let mut file = MarkdownFile::load_file(&path, &path).unwrap();
+        file.path = PathBuf::from(file.path.to_string_lossy().replace('\\', "/"));
+        format!("{:#?}", file)
     }
 
     macro_rules! snapshot {

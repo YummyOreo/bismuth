@@ -41,8 +41,12 @@ mod test {
 
     fn snapshot(path: &str) -> String {
         let path = PathBuf::from(path).canonicalize().unwrap();
-        println!("{:?}", path);
-        format!("{:#?}", load_from_dir(&path).unwrap())
+        let mut files = load_from_dir(&path).unwrap();
+        for mut file in &mut files {
+            let new_path = file.path.to_string_lossy().replace('\\', "/");
+            file.path = PathBuf::from(new_path);
+        }
+        format!("{:#?}", files)
     }
 
     macro_rules! snapshot {
