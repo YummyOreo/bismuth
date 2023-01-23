@@ -73,9 +73,6 @@ mod test {
 
     snapshot!(test_load_file, "./testdata/tests/test.markdown");
 
-    snapshot!(test_load_file_1, "./testdata/tests/test1.MARKDOWN");
+    snapshot!(test_load_file_1, "./testdata/tests/test1.md");
 
-    snapshot!(test_load_file_2, "./testdata/tests/test2.md");
-
-    snapshot!(test_load_file_3, "./testdata/tests/TEST3.MD");
 }

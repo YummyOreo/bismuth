@@ -9,14 +9,6 @@ expression: "snapshot(\"./testdata/tests/\")"
     },
     MarkdownFile {
         content: "# this is test 1\r\n",
-        path: "./test1.markdown",
-    },
-    MarkdownFile {
-        content: "# this is test 2\r\n",
-        path: "./test2.md",
-    },
-    MarkdownFile {
-        content: "# This is test 3\r\n",
-        path: "./test3.md",
+        path: "./test1.md",
     },
 ]

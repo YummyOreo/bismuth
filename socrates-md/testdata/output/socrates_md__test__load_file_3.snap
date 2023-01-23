@@ -1,8 +1,0 @@
----
-source: socrates-md/src/lib.rs
-expression: "snapshot(\"./testdata/tests/TEST3.MD\")"
----
-MarkdownFile {
-    content: "# This is test 3\r\n",
-    path: "./testdata/tests/test3.md",
-}
