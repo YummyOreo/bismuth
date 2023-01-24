@@ -294,9 +294,9 @@ impl Lexer {
         let before_after = (self.peek_back(1)?, self.peek(1)?);
 
         match before_after {
-            (&'\n', &'\n') => {
+            (&'\n', &'-') => {
                 let diff = *self.peek_till_diff().end();
-                if diff == self.position + 2 {
+                if diff == self.position + 2 && self.peek_at(diff + 1)? == &'\n' {
                     let t = token::Token {
                         start: self.position,
                         end: diff,
@@ -329,13 +329,17 @@ impl Lexer {
         let arround = (self.peek_back(1)?, self.peek(1)?);
 
         match arround {
-            (&'\n', &'.') => {
+            (&'\n', _) => {
+                let till_dot =
+                    self.peek_regex(Regex::new(r"\d*\.").expect("Should be valid regex"));
+                let end = *till_dot.end();
+                let text = self.get_range(till_dot);
                 let t = token::Token {
                     start: self.position,
-                    end: self.position + 1,
+                    end,
                     kind: token::TokenType::ListNumber,
 
-                    text: vec![*self.current()?, '.'],
+                    text,
                 };
                 self.move_to(self.position + 1)?;
                 Ok(t)
@@ -603,8 +607,9 @@ mod test {
         };
     }
 
-    snapshot!(fontmatter_test, "./testdata/tests/test_fontmatter.md");
     snapshot!(test_load_file, "./testdata/tests/test1.md");
     snapshot!(test_load_file_1, "./testdata/tests/test2.md");
+    snapshot!(test_load_file_2, "./testdata/tests/test3.md");
+    snapshot!(fontmatter_test, "./testdata/tests/test_fontmatter.md");
     snapshot!(fontmatter_test_1, "./testdata/tests/test_fontmatter_2.md");
 }

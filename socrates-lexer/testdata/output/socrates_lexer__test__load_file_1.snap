@@ -41,7 +41,7 @@ expression: "snapshot(\"./testdata/tests/test2.md\")"
 ↲
 ^ Token(EndOfLine, "\n", 113 -> 113)
 ---↲
-^^^ Token(Text, "---", 114 -> 116)
+^^^ Token(Dash, "---", 114 -> 116)
    ^ Token(EndOfLine, "\n", 117 -> 117)
 # List↲
 ^ Token(Hash, "#", 118 -> 118)
