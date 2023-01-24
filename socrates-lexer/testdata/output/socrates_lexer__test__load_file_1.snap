@@ -23,7 +23,8 @@ expression: "snapshot(\"./testdata/tests/test2.md\")"
     ^^^^ Token(Text, "Tab?", 59 -> 62)
         ^ Token(EndOfLine, "\n", 63 -> 63)
 1. List item↲
-^^^^^^^^^^^^ Token(Text, "1. List item", 64 -> 75)
+^^ Token(ListNumber, "1.", 64 -> 65)
+  ^^^^^^^^^^ Token(Text, " List item", 66 -> 75)
             ^ Token(EndOfLine, "\n", 76 -> 76)
 ↲
 ^ Token(EndOfLine, "\n", 77 -> 77)

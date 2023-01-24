@@ -163,13 +163,13 @@ impl Lexer {
     }
 
     fn handle_greaterthan(&self) -> Result<token::Token, LexerError> {
-        let peeked = (self.peek(1).unwrap_or(&'a'), self.peek(2).unwrap_or(&'a'));
-
-        match peeked {
-            (_, ' ') => self.make_token_at_pos(token::TokenType::Text),
-            (' ', _) => self.make_token_at_pos(token::TokenType::GreaterThan),
-            (_, _) => self.make_token_at_pos(token::TokenType::Text),
+        if self.current_token.kind == token::TokenType::EndOfLine {
+            let peek = self.peek(1)?;
+            if peek == &' ' {
+                return self.make_token_at_pos(token::TokenType::GreaterThan);
+            }
         }
+        self.make_token_at_pos(token::TokenType::Exclamation)
     }
 
     // Fontmatter
@@ -325,8 +325,30 @@ impl Lexer {
         }
     }
 
+    fn handle_number(&mut self) -> Result<token::Token, LexerError> {
+        let arround = (self.peek_back(1)?, self.peek(1)?);
+
+        match arround {
+            (&'\n', &'.') => {
+                let t = token::Token {
+                    start: self.position,
+                    end: self.position + 1,
+                    kind: token::TokenType::ListNumber,
+
+                    text: vec![*self.current()?, '.'],
+                };
+                self.move_to(self.position + 1)?;
+                Ok(t)
+            }
+            (_, _) => self.make_token_at_pos(token::TokenType::Text),
+        }
+    }
+
     fn match_char(&mut self) -> Result<token::Token, LexerError> {
         let c = self.current()?;
+        if c.is_numeric() {
+            return self.handle_number();
+        }
         match c {
             '\n' => self.make_token_at_pos(token::TokenType::EndOfLine),
 

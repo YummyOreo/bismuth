@@ -18,13 +18,6 @@ impl Token {
         }
     }
 
-    // pub fn push(&mut self, c: &'a char) {
-    //     self.text.push(c);
-    // }
-    //
-    // pub fn append(&mut self, mut c: Vec<&'a char>) {
-    //     self.text.append(&mut c);
-    // }
     pub fn append(&mut self, mut c: Vec<char>) {
         self.text.append(&mut c);
         self.end += 1;
@@ -50,7 +43,6 @@ pub enum TokenType {
     DollarSign,
 
     // more than one space is a whitespace
-    // Whitespace,
     Whitespace,
     Tab,
 
@@ -68,6 +60,7 @@ pub enum TokenType {
     GreaterThan,
 
     Dash,
+    ListNumber,
 
     Backtick,
 
