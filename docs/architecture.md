@@ -13,4 +13,4 @@ This is the error handler for the program. It handles all errors that can be res
 # Socrates-MD:
 This is the Markdown file handling. This loads the markdown files from a dir, or a single file from a path. The paths are stored relative to the config dir.
 ## Socrates-Lexer:
-This is handling for the tokenizing a markdown file. Read more about this [here](socrates-lexer/readme.md)
+This is handling for the tokenizing a markdown file. Read more about this [here](../socrates-lexer/readme.md)
