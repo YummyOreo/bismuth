@@ -341,7 +341,7 @@ impl Lexer {
 
                     text,
                 };
-                self.move_to(self.position + 1)?;
+                self.move_to(end)?;
                 Ok(t)
             }
             (_, _) => self.make_token_at_pos(token::TokenType::Text),

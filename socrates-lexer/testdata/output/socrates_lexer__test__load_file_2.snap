@@ -189,7 +189,7 @@ Start numbering with offset:↲
 ^ Token(EndOfLine, "\n", 795 -> 795)
 57. foo↲
 ^^^ Token(ListNumber, "57.", 796 -> 798)
-  ^^^^^ Token(Text, ". foo", 798 -> 802)
+   ^^^^ Token(Text, " foo", 799 -> 802)
        ^ Token(EndOfLine, "\n", 803 -> 803)
 1. bar↲
 ^^ Token(ListNumber, "1.", 804 -> 805)
