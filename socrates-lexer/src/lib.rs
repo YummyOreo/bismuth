@@ -169,7 +169,7 @@ impl Lexer {
                 return self.make_token_at_pos(token::TokenType::GreaterThan);
             }
         }
-        self.make_token_at_pos(token::TokenType::Exclamation)
+        self.make_token_at_pos(token::TokenType::Text)
     }
 
     // Fontmatter
