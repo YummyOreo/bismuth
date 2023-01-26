@@ -8,3 +8,5 @@ edition = "2021"
 [dependencies]
 socrates-lexer = {version = "0.1.0", path = "../socrates-lexer"}
 socrates-md = {version = "0.1.0", path = "../socrates-md"}
+serde = {version = "1.0.152", features = ["derive"]}
+serde_yaml = "0.9"

@@ -1,16 +1,16 @@
 #![allow(dead_code)]
 use socrates_lexer::Lexer;
 
+mod fontmatter;
 mod item;
-use crate::item::{Item, ItemKind};
-
-#[derive(Default)]
-pub struct FontMatter {}
+use crate::{
+    fontmatter::FontMatter,
+    item::{Item, ItemKind},
+};
 
 pub struct Parser {
     pub lexer: Lexer,
 
-    // current_token: &'a Token,
     current_token_index: usize,
 
     current_item: Item,
@@ -22,6 +22,7 @@ pub struct Parser {
 
 impl Parser {
     pub fn new(lexer: Lexer) -> Self {
+        let fontmatter = FontMatter::new(&lexer.file.path, None);
         Parser {
             lexer,
 
@@ -32,7 +33,7 @@ impl Parser {
                 children: vec![],
             },
 
-            fontmatter: Default::default(),
+            fontmatter,
 
             ast: vec![],
         }

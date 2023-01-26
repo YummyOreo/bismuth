@@ -2,7 +2,7 @@ use std::path::PathBuf;
 
 pub struct Item {
     pub kind: ItemKind,
-    pub children: Vec<Box<Item>>
+    pub children: Vec<Item>
 }
 
 pub enum ItemKind {
@@ -20,6 +20,7 @@ pub enum ItemKind {
     CodeBlock(CodeBlockItem),
     Italic(TextItem),
     Bold(TextItem),
+    LineBreak,
 }
 
 pub struct TextItem {
