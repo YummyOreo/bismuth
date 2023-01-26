@@ -3,6 +3,7 @@ The main thing that this does is tokenize a markdown file.
 
 ## Tokens:
 A token can be more than one character. All tokens (with the exception of EOL tokens) are combined when needed.
+
 - `Text`: All characters that do not fall in the other tokens
 - `EndOfFile`: The end of the file
 - `EndOfLine`: The end of a line, this will never be combined with previous EOL tokens. Characters are always `\n`. *But in the snapshots/tests, these are replaced with '↲' because it is easyer to see. If yout just see a question mark in a box, then you should install a [nerdfont](https://www.nerdfonts.com/font-downloads)

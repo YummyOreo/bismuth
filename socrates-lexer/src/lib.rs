@@ -8,12 +8,12 @@ pub mod token;
 use crate::error::LexerError;
 
 pub struct Lexer {
-    file: MarkdownFile,
+    pub file: MarkdownFile,
     chars: Vec<char>,
     position: usize,
 
     current_token: token::Token,
-    tokens: Vec<token::Token>,
+    pub tokens: Vec<token::Token>,
 }
 
 impl Lexer {
