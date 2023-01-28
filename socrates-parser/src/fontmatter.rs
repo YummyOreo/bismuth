@@ -24,7 +24,14 @@ impl FontMatter {
         FontMatter {
             title: Some(title),
             path: Some(path.to_string_lossy().to_string()),
+            kind: Some(String::from("default")),
             ..Default::default()
+        }
+    }
+
+    fn fill_defaults(&mut self) {
+        if self.kind.is_none() {
+            self.kind = Some(String::from("default"));
         }
     }
 
@@ -32,25 +39,31 @@ impl FontMatter {
         let updated_fm: FontMatter = from_str(s)?;
 
         if let Some(p) = updated_fm.path {
-            if self.path.as_ref().unwrap_or(&"".to_string()) != &p {
-                self.path = Some(p)
+            let p = Some(p);
+            if self.path != p {
+                self.path = p
             }
         }
 
         if let Some(t) = updated_fm.title {
-            if self.title.as_ref().unwrap_or(&"".to_string()) != &t {
-                self.title = Some(t)
+            let t = Some(t);
+            if self.title != t {
+                self.title = t
             }
         }
 
-        let kind = updated_fm.kind.unwrap_or("default".to_string());
-        if &kind != self.kind.as_ref().unwrap_or(&"".to_string()) {
-            self.kind = Some(kind);
+        if let Some(k) = updated_fm.kind {
+            let k = Some(k);
+            if self.kind != k {
+                self.kind = k
+            }
         }
 
         if self.values != updated_fm.values {
             self.values = updated_fm.values;
         }
+
+        self.fill_defaults();
 
         Ok(())
     }
