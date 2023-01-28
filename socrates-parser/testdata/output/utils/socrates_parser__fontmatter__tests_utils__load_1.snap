@@ -1,0 +1,16 @@
+---
+source: socrates-parser/src/fontmatter.rs
+expression: "format!(\"{:#?}\", fm)"
+---
+FontMatter {
+    title: Some(
+        "this is a title",
+    ),
+    path: Some(
+        "/path/test",
+    ),
+    kind: Some(
+        "This is another test",
+    ),
+    values: None,
+}
