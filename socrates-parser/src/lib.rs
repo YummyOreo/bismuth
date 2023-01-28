@@ -1,5 +1,6 @@
 #![allow(dead_code)]
 use socrates_lexer::Lexer;
+use std::path::{Path, PathBuf};
 
 mod fontmatter;
 mod item;
@@ -8,6 +9,21 @@ use crate::{
     item::{Item, ItemKind},
 };
 
+#[derive(Default)]
+pub struct Metadata {
+    absolute_path: PathBuf,
+    fontmatter: FontMatter,
+}
+
+impl Metadata {
+    pub fn new(path: &Path) -> Self {
+        Metadata {
+            absolute_path: path.to_path_buf(),
+            fontmatter: FontMatter::new(path),
+        }
+    }
+}
+
 pub struct Parser {
     pub lexer: Lexer,
 
@@ -15,14 +31,14 @@ pub struct Parser {
 
     current_item: Item,
 
-    fontmatter: FontMatter,
+    metadata: Metadata,
 
     pub ast: Vec<Item>,
 }
 
 impl Parser {
     pub fn new(lexer: Lexer) -> Self {
-        let fontmatter = FontMatter::new(&lexer.file.path, None);
+        let metadata = Metadata::new(&lexer.file.path);
         Parser {
             lexer,
 
@@ -33,7 +49,7 @@ impl Parser {
                 children: vec![],
             },
 
-            fontmatter,
+            metadata,
 
             ast: vec![],
         }
