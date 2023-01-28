@@ -31,21 +31,20 @@ impl Lexer {
     }
 
     pub fn get_lines(&self) -> Vec<(usize, String)> {
-        let mut ptr = 0;
         let mut curr_line = String::new();
         let mut lines: Vec<(usize, String)> = Vec::new();
         let mut line_index = 0;
-        while ptr < self.chars.len() {
-            if self.chars[ptr] == '\n' {
+        for (i, c) in self.chars.iter().enumerate() {
+            if c == &'\n' {
                 curr_line.push('\n');
                 lines.push((line_index, curr_line));
                 curr_line = String::new();
-                line_index += ptr - line_index + 1;
+                line_index = i + 1;
             } else {
-                curr_line.push(self.chars[ptr]);
+                curr_line.push(*c);
             }
-            ptr += 1;
         }
+        println!("{lines:?}");
         lines
     }
 
