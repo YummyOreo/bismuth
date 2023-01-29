@@ -3,11 +3,8 @@ use socrates_lexer::Lexer;
 use std::path::{Path, PathBuf};
 
 mod fontmatter;
-mod item;
-use crate::{
-    fontmatter::FontMatter,
-    item::{Item, ItemKind},
-};
+mod tree;
+use crate::{fontmatter::FontMatter, tree::Ast};
 
 #[derive(Default)]
 pub struct Metadata {
@@ -29,11 +26,9 @@ pub struct Parser {
 
     current_token_index: usize,
 
-    current_item: Item,
-
     metadata: Metadata,
 
-    pub ast: Vec<Item>,
+    pub ast: Ast,
 }
 
 impl Parser {
@@ -44,14 +39,9 @@ impl Parser {
 
             current_token_index: 0,
 
-            current_item: Item {
-                kind: ItemKind::Root,
-                children: vec![],
-            },
-
             metadata,
 
-            ast: vec![],
+            ast: Default::default(),
         }
     }
 }

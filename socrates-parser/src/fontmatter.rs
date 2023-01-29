@@ -29,6 +29,26 @@ impl FontMatter {
         }
     }
 
+    pub fn get_value(&self, key: &str) -> Option<&String> {
+        self.values
+            .as_ref()?
+            .iter()
+            .find(|t| t.contains_key(key))?
+            .get(key)
+    }
+
+    pub fn get_kind(&self) -> Option<&String> {
+        self.kind.as_ref()
+    }
+
+    pub fn get_path(&self) -> Option<&String> {
+        self.path.as_ref()
+    }
+
+    pub fn get_title(&self) -> Option<&String> {
+        self.title.as_ref()
+    }
+
     fn fill_defaults(&mut self) {
         if self.kind.is_none() {
             self.kind = Some(String::from("default"));

@@ -21,6 +21,10 @@
 - [Jsfiddle](https://jsfiddle.net/)
 - [Codesandbox](https://codesandbox.io/)
 - [Replit](https://replit.com/)
+### Tests snippets in langs:
+- Allows you to define a code base (like the whole code) at multiple states
+- Then you can take snippets of those
+- It will test if it compiles
 ## Page types:
 - Blog
 - Main

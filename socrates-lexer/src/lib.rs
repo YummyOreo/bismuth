@@ -44,7 +44,6 @@ impl Lexer {
                 curr_line.push(*c);
             }
         }
-        println!("{lines:?}");
         lines
     }
 
