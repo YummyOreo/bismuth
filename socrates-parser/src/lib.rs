@@ -4,6 +4,7 @@ use std::path::{Path, PathBuf};
 
 mod fontmatter;
 mod tree;
+mod custom;
 use crate::{fontmatter::FontMatter, tree::Ast};
 
 #[derive(Default)]

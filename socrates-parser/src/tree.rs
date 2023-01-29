@@ -1,3 +1,5 @@
+use crate::custom;
+
 #[derive(Default)]
 pub struct Ast {
     elements: Vec<Node>,
@@ -24,7 +26,7 @@ pub enum Node {
     InlineLaTeX(Element),
     BlockLaTeX(Element),
 
-    CustomData(Element),
+    CustomElement(custom::CustomElm),
 
     Header(Element, i8),
 

@@ -5,6 +5,7 @@ type: "list"
 
 # Blog Posts:
 
-```list
-directory: "./posts/"
-```
+%{{
+    component: blog list
+    dir: /blogs/
+}}
