@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use crate::custom;
 
 #[derive(Default)]
@@ -18,7 +20,7 @@ pub enum Node {
     List(Element),
     ListElement(Element, i8),
 
-    OrderedListElement(Element, i8, i8),
+    OrderedListElement(Element, i8, u32),
 
     InlineCode(Element),
     BlockCode(Element),
@@ -39,5 +41,5 @@ pub enum Node {
 pub struct Element {
     elements: Vec<Node>,
     text: Option<String>,
-    attrs: Vec<(String, String)>,
+    attrs: HashMap<String, String>,
 }
