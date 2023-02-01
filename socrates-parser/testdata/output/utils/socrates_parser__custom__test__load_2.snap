@@ -1,0 +1,14 @@
+---
+source: socrates-parser/src/custom.rs
+expression: "snapshot(\"name: this is a test name with --- dashes\\nkey: value\\ntext: this is a test \\\\n\\n---\\n<p>this is the body text</p>\")"
+---
+CustomElm {
+    name: "this is a test name with --- dashes",
+    values: {
+        "key": "value",
+        "text": "this is a test \\n",
+    },
+    body: Some(
+        "<p>this is the body text</p>",
+    ),
+}

@@ -18,7 +18,7 @@ impl CustomElm {
     }
 
     pub fn from_string(s: &str) -> Option<Self> {
-        let sections = s.split("---\n").collect::<Vec<&str>>();
+        let sections = s.splitn(2, "---\n").collect::<Vec<&str>>();
         let yaml = sections.first()?;
         let body = sections.get(1).map(|p| p.to_string());
 
@@ -34,9 +34,41 @@ impl CustomElm {
 
         let mut values: HashMap<String, String> = HashMap::new();
         for (key, value) in parsed_yaml {
-            values.insert(key, value)?;
+            let _ = values.insert(key, value);
         }
 
         Some(CustomElm { name, values, body })
     }
+}
+
+#[cfg(test)]
+mod test {
+    use super::*;
+
+    fn snapshot(content: &str) -> String {
+        format!("{:#?}", CustomElm::from_string(content).unwrap())
+    }
+
+    macro_rules! snapshot_load {
+        ($name:tt, $content:tt) => {
+            #[test]
+            fn $name() {
+                let mut settings = insta::Settings::clone_current();
+                settings.set_snapshot_path("../testdata/output/utils");
+                settings.bind(|| {
+                    insta::assert_snapshot!(snapshot($content));
+                });
+            }
+        };
+    }
+
+    snapshot_load!(test_load, "name: me\nvalue: not a key");
+    snapshot_load!(
+        test_load_1,
+        "name: me\nvalue: not a key\n---\nthis is the body"
+    );
+    snapshot_load!(
+        test_load_2,
+        "name: this is a test name with --- dashes\nkey: value\ntext: this is a test \\n\n---\n<p>this is the body text</p>"
+    );
 }

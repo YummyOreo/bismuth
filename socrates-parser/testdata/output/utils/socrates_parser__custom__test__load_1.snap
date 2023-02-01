@@ -1,0 +1,13 @@
+---
+source: socrates-parser/src/custom.rs
+expression: "snapshot(\"name: me\\nvalue: not a key\\n---\\nthis is the body\")"
+---
+CustomElm {
+    name: "me",
+    values: {
+        "value": "not a key",
+    },
+    body: Some(
+        "this is the body",
+    ),
+}
