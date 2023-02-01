@@ -93,46 +93,76 @@ impl FontMatter {
 mod tests_utils {
     use super::*;
 
+    pub fn run_snapshot(mut fm: FontMatter, update: &str) -> String {
+        fm.update_from_str(update).unwrap();
+        if let Some(mut values) = fm.values.clone() {
+            values.sort();
+            fm.values = Some(values);
+        }
+        format!("{fm:#?}")
+    }
+
     macro_rules! snapshot {
-        ($string:tt) => {
-            let mut settings = insta::Settings::clone_current();
-            settings.set_snapshot_path("../testdata/output/utils/");
-            settings.bind(|| {
-                insta::assert_snapshot!(format!("{:#?}", $string));
-            });
+        ($name:tt, $update:tt) => {
+            #[test]
+            fn $name() {
+                let fm: FontMatter = Default::default();
+                let mut settings = insta::Settings::clone_current();
+                settings.set_snapshot_path("../testdata/output/utils/");
+                settings.bind(|| {
+                    insta::assert_snapshot!(run_snapshot(fm, $update));
+                });
+            }
+        };
+
+        ($name:tt, $update:tt, $($key:tt, $value:expr),*) => {
+            #[test]
+            fn $name() {
+                let fm = FontMatter {
+                    $(
+                        $key: Some($value),
+                    )*
+                        ..Default::default()
+                };
+                let mut settings = insta::Settings::clone_current();
+                settings.set_snapshot_path("../testdata/output/utils/");
+                settings.bind(|| {
+                    insta::assert_snapshot!(run_snapshot(fm, $update));
+                });
+            }
         };
     }
 
-    #[test]
-    fn test_load() {
-        let mut fm = FontMatter::default();
-        let s_fm = "title: Test\npath: /test\nkind: test\nvalues:\n    - test: te";
-        fm.update_from_str(s_fm).unwrap();
+    snapshot!(
+        test_load,
+        "
+        title: Test
+        path: /test
+        kind: test
+        values:
+            - test: te
+        "
+    );
 
-        snapshot!(fm);
-    }
+    snapshot!(
+        test_load_1,
+        "
+        title: this is a title
+        kind: This is another test
+        ",
+        path,
+        "/path/test".to_string()
+    );
 
-    #[test]
-    fn test_load_1() {
-        let mut fm = FontMatter {
-            path: Some("/path/test".to_string()),
-            ..Default::default()
-        };
-        let s_fm = "title: this is a title\nkind: This is another test";
-        fm.update_from_str(s_fm).unwrap();
-
-        snapshot!(fm);
-    }
-
-    #[test]
-    fn test_load_2() {
-        let mut fm = FontMatter {
-            path: Some("/path/test".to_string()),
-            ..Default::default()
-        };
-        let s_fm = "title: this is a title\nvalues:\n    - value-1: test\n    - value-2: test 2";
-        fm.update_from_str(s_fm).unwrap();
-
-        snapshot!(fm);
-    }
+    snapshot!(
+        test_load_2,
+        "
+        title: this is a title
+        values:
+            - value-1: test
+            - value-2: test 2
+        ",
+        path,
+        "/path/test".to_string()
+    );
 }
