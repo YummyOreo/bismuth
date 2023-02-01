@@ -22,7 +22,7 @@ fn main() {
             let _config = config::Config::new(&path);
             let md_files = get_files(&path);
 
-            println!("{:#?}", md_files);
+            println!("{md_files:#?}");
         }
     }
 }

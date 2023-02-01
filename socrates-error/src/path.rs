@@ -20,7 +20,7 @@ fn update_input(path: &mut String) -> Option<()> {
             }
             KeyCode::Backspace => {
                 path.pop();
-                let print_path = format!("Enter new path: {}", path);
+                let print_path = format!("Enter new path: {path}");
                 execute!(
                     stdout(),
                     terminal::Clear(terminal::ClearType::CurrentLine),

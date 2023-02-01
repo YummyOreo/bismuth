@@ -14,10 +14,8 @@ use crate::State;
 pub fn init_options(options: &[String], description: &str) -> Result<()> {
     // init cursor
     execute!(stdout(), cursor::Hide, cursor::SavePosition,)?;
-    let message = format!(
-        "There was a error! {} Here are some options that might fix this:\n",
-        description
-    );
+    let message =
+        format!("There was a error! {description} Here are some options that might fix this:\n",);
 
     execute!(
         stdout(),
@@ -33,7 +31,7 @@ pub fn init_options(options: &[String], description: &str) -> Result<()> {
         if i == 0 {
             continue;
         }
-        let formated_option = format!("{}\n", option);
+        let formated_option = format!("{option}\n");
         execute!(stdout(), Print(formated_option))?;
     }
     execute!(stdout(), cursor::RestorePosition)?;
