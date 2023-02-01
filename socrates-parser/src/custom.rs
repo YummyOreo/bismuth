@@ -60,7 +60,29 @@ mod test {
     use super::*;
 
     fn snapshot(content: &str) -> String {
-        format!("{:#?}", CustomElm::from_string(content).unwrap())
+        let elm = CustomElm::from_string(content).unwrap();
+        let mut values: Vec<_> = elm.values.iter().collect();
+        values.sort();
+        let values_str = {
+            let mut s = String::from("{\n");
+            for (key, value) in values {
+                s.push_str(&format!("\t\t{key}, {value}\n"));
+            }
+            s.push_str("\t},");
+            s
+        };
+        format!(
+            "{{\n\tname: {:#?}\n\tvalues: {values_str}\n\tbody: {}\n}}",
+            elm.name,
+            {
+                match elm.body {
+                    Some(body) => {
+                        format!("{body:#?}")
+                    }
+                    None => "None".to_string(),
+                }
+            }
+        )
     }
 
     macro_rules! snapshot_load {

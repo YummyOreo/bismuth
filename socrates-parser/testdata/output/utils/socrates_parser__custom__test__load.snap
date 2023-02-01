@@ -2,10 +2,10 @@
 source: socrates-parser/src/custom.rs
 expression: "snapshot(\"name: me\\nvalue: not a key\")"
 ---
-CustomElm {
-    name: "me",
-    values: {
-        "value": "not a key",
-    },
-    body: None,
+{
+	name: "me"
+	values: {
+		value, not a key
+	},
+	body: None
 }
