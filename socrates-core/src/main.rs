@@ -8,7 +8,7 @@ mod config;
 fn get_files(path: &Path) -> Vec<socrates_md::MarkdownFile> {
     match socrates_md::load::load_from_dir(&path.to_path_buf()) {
         Ok(files) => files,
-        Err(e) =>  panic!("{e:#?}"),
+        Err(e) => panic!("{e:#?}"),
     }
 }
 
@@ -21,8 +21,14 @@ fn main() {
 
             let _config = config::Config::new(&path);
             let md_files = get_files(&path);
+            let mut lexer_files: Vec<socrates_lexer::Lexer> = vec![];
+            for file in md_files {
+                let mut lexer = socrates_lexer::Lexer::new(file);
+                lexer.run_lexer().unwrap();
+                lexer_files.push(lexer);
+            }
 
-            println!("{md_files:#?}");
+            println!("{lexer_files:#?}");
         }
     }
 }

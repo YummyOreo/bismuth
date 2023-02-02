@@ -83,7 +83,7 @@ impl Parser {
     }
 
     pub fn parse(&mut self) {
-        while let Some(current_token) = self.advance_token() {}
+        while let Some(_current_token) = self.advance_token() {}
     }
 }
 

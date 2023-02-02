@@ -487,6 +487,7 @@ dependencies = [
  "clap",
  "insta",
  "socrates-error",
+ "socrates-lexer",
  "socrates-md",
 ]
 

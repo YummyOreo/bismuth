@@ -9,6 +9,7 @@ pub mod error;
 pub mod token;
 use crate::error::LexerError;
 
+#[derive(Debug)]
 pub struct Lexer {
     pub path: PathBuf,
     chars: Vec<char>,
