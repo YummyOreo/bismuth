@@ -31,8 +31,6 @@ pub struct Parser {
 
     current_token_index: usize,
 
-    current_token: Option<Token>,
-
     metadata: Metadata,
 
     pub ast: Ast,
@@ -41,12 +39,10 @@ pub struct Parser {
 impl Parser {
     pub fn new(lexer: Lexer) -> Self {
         let metadata = Metadata::new(&lexer.path);
-        let current_token = lexer.tokens.get(0).cloned();
         Parser {
             lexer,
 
             current_token_index: 0,
-            current_token,
 
             metadata,
 
@@ -54,36 +50,61 @@ impl Parser {
         }
     }
 
-    fn advance_token(&mut self) -> Option<&Token> {
+    fn current(&mut self) -> Result<&Token, error::ParseError> {
+        self.lexer
+            .tokens
+            .get(self.current_token_index)
+            .ok_or(error::ParseError::GetChar(self.current_token_index))
+    }
+
+    fn advance_token(&mut self) -> Result<&Token, error::ParseError> {
         self.advance_n_token(1)
     }
 
-    fn advance_n_token(&mut self, n: usize) -> Option<&Token> {
+    fn advance_n_token(&mut self, n: usize) -> Result<&Token, error::ParseError> {
+        if self.current_token_index + n >= self.lexer.tokens.len() {
+            return Err(error::ParseError::Move(self.current_token_index + n));
+        }
         self.current_token_index += n;
-        self.current_token = self.lexer.tokens.get(self.current_token_index).cloned();
-        self.current_token.as_ref()
+
+        self.current()
     }
 
-    fn peek(&self, n: usize) -> Option<&Token> {
-        self.lexer.tokens.get(n)
+    fn peek(&self, n: usize) -> Result<&Token, error::ParseError> {
+        self.lexer.tokens.get(n).ok_or(error::ParseError::Peek(n))
     }
 
-    fn peek_after(&self, n: usize) -> Option<&Token> {
+    fn peek_after(&self, n: usize) -> Result<&Token, error::ParseError> {
         self.peek(self.current_token_index + n)
     }
 
-    fn peek_before(&self, n: usize) -> Option<&Token> {
+    fn peek_before(&self, n: usize) -> Result<&Token, error::ParseError> {
         self.peek(self.current_token_index - n)
     }
 
-    fn peek_till_kind(&mut self, kind: TokenType) -> Option<Vec<Token>> {
+    fn peek_till_kind(&mut self, kind: TokenType) -> Result<Vec<Token>, error::ParseError> {
         let tokens_after = self.lexer.tokens.split_at(self.current_token_index).1;
-        let end = tokens_after.iter().position(|t| t.kind == kind)?;
-        Some(tokens_after.split_at(end).0.to_vec())
+        let end = tokens_after
+            .iter()
+            .position(|t| t.kind == kind)
+            .ok_or(error::ParseError::Peek(0))?;
+
+        Ok(tokens_after.split_at(end).0.to_vec())
     }
 
-    pub fn parse(&mut self) {
-        while let Some(_current_token) = self.advance_token() {}
+    pub fn parse_current(&mut self) {
+        todo!()
+    }
+
+    pub fn parse(&mut self) -> Result<(), error::ParseError> {
+        while let Ok(token) = self.advance_token() {
+            if token.kind == TokenType::EndOfFile {
+                break;
+            }
+
+            self.parse_current();
+        }
+        Ok(())
     }
 }
 
@@ -121,7 +142,7 @@ mod test_utils {
             &Token::new(TokenType::EndOfFile, Vec::new(), 17, 17),
             parser.advance_token().unwrap()
         );
-        assert_eq!(None, parser.advance_token());
+        assert_eq!(Err(error::ParseError::Move(5)), parser.advance_token());
     }
 
     #[test]
@@ -129,7 +150,7 @@ mod test_utils {
         let lexer = init_lexer("this is a test []");
         let mut parser = Parser::new(lexer);
         // skip start of file
-        parser.advance_token();
+        parser.advance_token().unwrap();
 
         let r = parser.peek_till_kind(TokenType::BracketRight).unwrap();
         let l = vec![
