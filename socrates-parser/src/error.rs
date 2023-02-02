@@ -1,8 +1,9 @@
 #[derive(Debug, PartialEq)]
 pub enum ParseError {
-    GetChar(usize),
+    GetToken(usize),
     Move(usize),
     Peek(usize),
+    WhitespaceError,
 }
 
 #[derive(Debug, PartialEq)]

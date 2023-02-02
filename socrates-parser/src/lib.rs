@@ -34,6 +34,8 @@ struct State {
     pub new_line: bool,
 }
 
+type ParseReturn = Result<(), error::ParseError>;
+
 pub struct Parser {
     pub lexer: Lexer,
 
@@ -61,23 +63,27 @@ impl Parser {
             current_element: None,
 
             ast: Default::default(),
-            state: Default::default()
+            state: Default::default(),
         }
     }
 
-    fn current(&self) -> Result<&Token, error::ParseError> {
+    fn current_token(&self) -> Result<&Token, error::ParseError> {
         self.lexer
             .tokens
             .get(self.current_token_index)
-            .ok_or(error::ParseError::GetChar(self.current_token_index))
+            .ok_or(error::ParseError::GetToken(self.current_token_index))
     }
 
-    fn current_chars(&self) -> Result<&Vec<char>, error::ParseError> {
-        Ok(&self.current()?.text)
+    fn current_token_chars(&self) -> Result<&Vec<char>, error::ParseError> {
+        Ok(&self.current_token()?.text)
     }
 
-    fn current_type(&self) -> Result<&TokenType, error::ParseError> {
-        Ok(&self.current()?.kind)
+    fn current_token_type(&self) -> Result<&TokenType, error::ParseError> {
+        Ok(&self.current_token()?.kind)
+    }
+
+    fn current_token_diff(&self) -> Result<usize, error::ParseError> {
+        Ok((self.current_token()?.end - self.current_token()?.start) + 1)
     }
 
     fn current_element(&self) -> Option<&Element> {
@@ -104,7 +110,8 @@ impl Parser {
     /// [
     /// text,
     /// bold,
-    /// text
+    /// text,
+    /// link
     /// ]
     /// )
     /// thsetheoasutnhaoe *test* snteahuasenthu
@@ -129,7 +136,7 @@ impl Parser {
         }
         self.current_token_index += n;
 
-        self.current()
+        self.current_token()
     }
 
     fn peek(&self, n: usize) -> Result<&Token, error::ParseError> {
@@ -154,16 +161,107 @@ impl Parser {
         Ok(tokens_after.split_at(end).0.to_vec())
     }
 
-    pub fn parse_current(&mut self) -> Result<(), error::ParseError> {
-        match self.current_type()? {
-            TokenType::Text => {
-                let mut txt_elm = Element::new(Kind::Text);
-                txt_elm.text = Some(self.current_chars()?.iter().collect::<String>());
-                self.append_element(txt_elm)
-            }
-            _ => {}
+    fn handle_tab_whitespace(&mut self, num: usize) -> ParseReturn {
+        todo!()
+    }
+    fn handle_tab(&mut self) -> ParseReturn {
+        let tabs = self.current_token_diff()?;
+        self.handle_tab_whitespace(tabs)
+    }
+
+    fn handle_whitespace(&mut self) -> ParseReturn {
+        let diff = self.current_token_diff()?;
+        if diff % 4 != 0 {
+            let mut elm = Element::new(Kind::Text);
+            elm.text = Some(self.current_token_chars()?.iter().collect::<String>());
+            return Ok(());
         }
-        Ok(())
+        let tabs = diff / 4;
+        self.handle_tab_whitespace(tabs)
+    }
+
+    fn handle_hash(&mut self) -> ParseReturn {
+        todo!()
+    }
+
+    fn handle_dash(&mut self) -> ParseReturn {
+        todo!()
+    }
+
+    fn handle_precent(&mut self) -> ParseReturn {
+        todo!()
+    }
+
+    fn handle_asterisk(&mut self) -> ParseReturn {
+        todo!()
+    }
+
+    fn handle_backtick(&mut self) -> ParseReturn {
+        todo!()
+    }
+
+    fn handle_dollarsign(&mut self) -> ParseReturn {
+        todo!()
+    }
+
+    fn handle_underscore(&mut self) -> ParseReturn {
+        todo!()
+    }
+
+    fn handle_num(&mut self) -> ParseReturn {
+        todo!()
+    }
+
+    fn handle_bracket(&mut self) -> ParseReturn {
+        todo!()
+    }
+
+    fn handle_exclamation(&mut self) -> ParseReturn {
+        todo!()
+    }
+
+    fn handle_fontmatter(&mut self) -> ParseReturn {
+        todo!()
+    }
+
+    fn parse_newline(&mut self) -> ParseReturn {
+        todo!()
+    }
+
+    fn parse_current(&mut self) -> ParseReturn {
+        if self.state.new_line {
+            return self.parse_newline();
+        }
+
+        match self.current_token_type()? {
+            // greaterthan becasue that relise on tabs.
+            TokenType::Text | TokenType::GreaterThan => {
+                let mut elm = Element::new(Kind::Text);
+                elm.text = Some(self.current_token_chars()?.iter().collect::<String>());
+                self.append_element(elm);
+                Ok(())
+            }
+            TokenType::EndOfLine => {
+                let elm = Element::new(Kind::EndOfLine);
+                self.append_element(elm);
+                Ok(())
+            }
+            TokenType::Tab => self.handle_tab(),
+            TokenType::Whitespace => self.handle_whitespace(),
+
+            TokenType::Hash => self.handle_hash(),
+            TokenType::Dash => self.handle_dash(),
+            TokenType::Percent => self.handle_precent(),
+            TokenType::Asterisk => self.handle_asterisk(),
+            TokenType::Backtick => self.handle_backtick(),
+            TokenType::DollarSign => self.handle_dollarsign(),
+            TokenType::Underscore => self.handle_underscore(),
+            TokenType::ListNumber => self.handle_num(),
+            TokenType::BracketLeft => self.handle_bracket(),
+            TokenType::Exclamation => self.handle_exclamation(),
+            TokenType::FontmatterStart => self.handle_fontmatter(),
+            _ => Ok(()),
+        }
     }
 
     pub fn parse(&mut self) -> Result<(), error::ParseError> {
