@@ -161,9 +161,6 @@ impl Parser {
         Ok(tokens_after.split_at(end).0.to_vec())
     }
 
-    fn handle_tab_whitespace(&mut self, num: usize) -> ParseReturn {
-        todo!()
-    }
     fn handle_tab(&mut self) -> ParseReturn {
         let tabs = self.current_token_diff()?;
         self.handle_tab_whitespace(tabs)
@@ -180,6 +177,11 @@ impl Parser {
         self.handle_tab_whitespace(tabs)
     }
 
+    fn handle_tab_whitespace(&mut self, num: usize) -> ParseReturn {
+        todo!()
+    }
+
+    // should only appear at start of line, so should be handled after eol
     fn handle_hash(&mut self) -> ParseReturn {
         todo!()
     }
@@ -188,10 +190,12 @@ impl Parser {
         todo!()
     }
 
+    // should only appear at start of line, so should be handled after eol
     fn handle_precent(&mut self) -> ParseReturn {
         todo!()
     }
 
+    // these are just the same, just different types:
     fn handle_asterisk(&mut self) -> ParseReturn {
         todo!()
     }
@@ -207,15 +211,19 @@ impl Parser {
     fn handle_underscore(&mut self) -> ParseReturn {
         todo!()
     }
+    //
 
+    // should only appear at start of line, so should be handled after eol
     fn handle_num(&mut self) -> ParseReturn {
         todo!()
     }
 
+    // Somewhat same as *
     fn handle_bracket(&mut self) -> ParseReturn {
         todo!()
     }
 
+    // just bracket with diff type and checks
     fn handle_exclamation(&mut self) -> ParseReturn {
         todo!()
     }
@@ -234,8 +242,12 @@ impl Parser {
         }
 
         match self.current_token_type()? {
-            // greaterthan becasue that relise on tabs.
-            TokenType::Text | TokenType::GreaterThan => {
+            // greaterthan becasue that relise on tabs. Hash... only at sol
+            TokenType::Text
+            | TokenType::GreaterThan
+            | TokenType::Hash
+            | TokenType::ListNumber
+            | TokenType::Percent => {
                 let mut elm = Element::new(Kind::Text);
                 elm.text = Some(self.current_token_chars()?.iter().collect::<String>());
                 self.append_element(elm);
@@ -249,14 +261,14 @@ impl Parser {
             TokenType::Tab => self.handle_tab(),
             TokenType::Whitespace => self.handle_whitespace(),
 
-            TokenType::Hash => self.handle_hash(),
+            // TokenType::Hash => self.handle_hash(),
             TokenType::Dash => self.handle_dash(),
-            TokenType::Percent => self.handle_precent(),
+            // TokenType::Percent => self.handle_precent(),
             TokenType::Asterisk => self.handle_asterisk(),
             TokenType::Backtick => self.handle_backtick(),
             TokenType::DollarSign => self.handle_dollarsign(),
             TokenType::Underscore => self.handle_underscore(),
-            TokenType::ListNumber => self.handle_num(),
+            // TokenType::ListNumber => self.handle_num(),
             TokenType::BracketLeft => self.handle_bracket(),
             TokenType::Exclamation => self.handle_exclamation(),
             TokenType::FontmatterStart => self.handle_fontmatter(),
