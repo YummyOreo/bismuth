@@ -61,8 +61,9 @@ mod test {
 
     fn snapshot(content: &str) -> String {
         let elm = CustomElm::from_string(content).unwrap();
-        let mut values: Vec<_> = elm.values.iter().collect();
+        let mut values: Vec<(&String, &String)> = elm.values.iter().collect();
         values.sort();
+
         let values_str = {
             let mut s = String::from("{\n");
             for (key, value) in values {
@@ -71,6 +72,7 @@ mod test {
             s.push_str("\t},");
             s
         };
+
         format!(
             "{{\n\tname: {:#?}\n\tvalues: {values_str}\n\tbody: {}\n}}",
             elm.name,

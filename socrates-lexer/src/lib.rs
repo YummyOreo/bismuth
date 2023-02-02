@@ -1,14 +1,16 @@
 #![allow(unused_doc_comments, dead_code)]
 use regex::Regex;
+
 use socrates_md::MarkdownFile;
 use std::ops::RangeInclusive;
+use std::path::PathBuf;
 
 pub mod error;
 pub mod token;
 use crate::error::LexerError;
 
 pub struct Lexer {
-    pub file: MarkdownFile,
+    pub path: PathBuf,
     chars: Vec<char>,
     position: usize,
 
@@ -21,7 +23,20 @@ impl Lexer {
         let mut content = file.content.chars().collect::<Vec<char>>();
         content.retain(|c| c != &'\r');
         Lexer {
-            file,
+            path: file.path,
+            chars: content,
+            position: 0,
+
+            current_token: token::Token::new(token::TokenType::StartOfFile, vec![], 0, 0),
+            tokens: vec![],
+        }
+    }
+
+    pub fn new_test(path: PathBuf, content: String) -> Self {
+        let mut content = content.chars().collect::<Vec<char>>();
+        content.retain(|c| c != &'\r');
+        Lexer {
+            path,
             chars: content,
             position: 0,
 
