@@ -4,3 +4,9 @@ pub enum ParseError {
     Move(usize),
     Peek(usize),
 }
+
+#[derive(Debug, PartialEq)]
+pub enum ElementError {
+    GetAttrError(String),
+    GetTextError,
+}

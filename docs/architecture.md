@@ -4,6 +4,7 @@
 | socrates-error | Error handling |
 | socrates-md | The main interface for markdown files |
 | socrates-lexer | Tokenizing markdown files |
+| socrates-parser | Parses tokenized files |
 
 # Socrates-Core:
 The main entry point for the app. This handles cli argument and configuration details.
@@ -14,3 +15,5 @@ This is the error handler for the program. It handles all errors that can be res
 This is the Markdown file handling. This loads the markdown files from a dir, or a single file from a path. The paths are stored relative to the config dir.
 ## Socrates-Lexer:
 This is handling for the tokenizing a markdown file. Read more about this [here](../socrates-lexer/readme.md)
+## Socrates-Parser:
+This is for parsing a tokenized file into a AST
