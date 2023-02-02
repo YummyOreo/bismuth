@@ -8,7 +8,7 @@ pub enum CustomElmError {
     NoName,
 }
 
-#[derive(Default, Debug)]
+#[derive(Default, Debug, Clone, PartialEq)]
 pub struct CustomElm {
     name: String,
     values: HashMap<String, String>,

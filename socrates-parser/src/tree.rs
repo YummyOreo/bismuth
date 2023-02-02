@@ -4,33 +4,34 @@ use crate::{custom, error::ElementError};
 
 #[derive(Default)]
 pub struct Ast {
-    elements: Vec<Node>,
+    pub elements: Vec<Option<Element>>,
 }
 
-pub enum Node {
-    Text(Element),
-    Link(Element),
-    FilePrev(Element),
+#[derive(Clone, PartialEq)]
+pub enum Kind {
+    Text,
+    Link,
+    FilePrev,
 
-    Italic(Element),
-    Bold(Element),
+    Italic,
+    Bold,
 
-    Blockquote(Element),
+    Blockquote,
 
-    List(Element),
-    ListElement(Element, i8),
+    List,
+    ListElement,
 
-    OrderedListElement(Element, i8, u32),
+    OrderedListElement,
 
-    InlineCode(Element),
-    BlockCode(Element),
+    InlineCode,
+    BlockCode,
 
-    InlineLaTeX(Element),
-    BlockLaTeX(Element),
+    InlineLaTeX,
+    BlockLaTeX,
 
     CustomElement(custom::CustomElm),
 
-    Header(Element, i8),
+    Header,
 
     HorizontalRule,
 
@@ -38,23 +39,31 @@ pub enum Node {
     LineBreak,
 }
 
-#[derive(Default)]
+#[derive(Clone)]
 pub struct Element {
-    elements: Vec<Node>,
-    text: Option<String>,
-    attrs: HashMap<String, String>,
+    pub kind: Kind,
+    pub elements: Vec<Option<Element>>,
+    pub text: Option<String>,
+    pub attrs: HashMap<String, String>,
 }
 
 impl Element {
-    pub fn new() -> Self {
+    pub fn new(kind: Kind) -> Self {
         Element {
-            ..Default::default()
+            kind,
+            elements: vec![],
+            text: Default::default(),
+            attrs: Default::default(),
         }
     }
 
-    pub fn append_node(&mut self, node: Node) -> &Node {
-        self.elements.push(node);
-        self.elements.last().expect("Should be there")
+    pub fn append_node(&mut self, elm: Element) -> Option<&Element> {
+        self.elements.push(Some(elm));
+        self.elements.last().expect("Should be there").as_ref()
+    }
+
+    pub fn add_attr(&mut self, key: &str, value: &str) {
+        self.attrs.insert(key.to_string(), value.to_string());
     }
 
     pub fn get_attr(&self, attr: &str) -> Result<&String, ElementError> {
@@ -63,11 +72,17 @@ impl Element {
             .ok_or(ElementError::GetAttrError(attr.to_string()))
     }
 
+    pub fn get_attr_mut(&mut self, attr: &str) -> Result<&mut String, ElementError> {
+        self.attrs
+            .get_mut(attr)
+            .ok_or(ElementError::GetAttrError(attr.to_string()))
+    }
+
     pub fn get_text(&self) -> Result<&String, ElementError> {
         self.text.as_ref().ok_or(ElementError::GetTextError)
     }
 
-    pub fn get_elements(&self) -> &Vec<Node> {
+    pub fn get_elements(&self) -> &Vec<Option<Element>> {
         &self.elements
     }
 }
