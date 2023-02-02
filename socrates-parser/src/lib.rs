@@ -92,12 +92,20 @@ impl Parser {
         Ok(tokens_after.split_at(end).0.to_vec())
     }
 
-    pub fn parse_current(&mut self) {
-        todo!()
-    }
+    pub fn parse_current(&mut self) {}
 
     pub fn parse(&mut self) -> Result<(), error::ParseError> {
-        while let Ok(token) = self.advance_token() {
+        while let Ok(token) = {
+            match self.advance_token() {
+                Ok(t) => Ok(t),
+                Err(e) => match e {
+                    error::ParseError::Move(_) => Err(e),
+                    _ => {
+                        panic!("{e:#?}");
+                    }
+                },
+            }
+        } {
             if token.kind == TokenType::EndOfFile {
                 break;
             }
