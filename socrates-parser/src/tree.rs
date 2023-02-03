@@ -9,6 +9,8 @@ pub struct Ast {
 
 #[derive(Clone, PartialEq)]
 pub enum Kind {
+    Paragraph,
+
     Text,
     Link,
     FilePrev,

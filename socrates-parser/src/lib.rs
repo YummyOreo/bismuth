@@ -50,6 +50,8 @@ pub struct Parser {
     pub ast: Ast,
 }
 
+// Utils
+
 impl Parser {
     pub fn new(lexer: Lexer) -> Self {
         let metadata = Metadata::new(&lexer.path);
@@ -160,7 +162,11 @@ impl Parser {
 
         Ok(tokens_after.split_at(end).0.to_vec())
     }
+}
 
+// Parsing
+
+impl Parser {
     fn handle_tab(&mut self) -> ParseReturn {
         let tabs = self.current_token_diff()?;
         self.handle_tab_whitespace(tabs)
@@ -195,23 +201,9 @@ impl Parser {
         todo!()
     }
 
-    // these are just the same, just different types:
-    fn handle_asterisk(&mut self) -> ParseReturn {
+    fn handle_container(&mut self, kind: TokenType) -> ParseReturn {
         todo!()
     }
-
-    fn handle_backtick(&mut self) -> ParseReturn {
-        todo!()
-    }
-
-    fn handle_dollarsign(&mut self) -> ParseReturn {
-        todo!()
-    }
-
-    fn handle_underscore(&mut self) -> ParseReturn {
-        todo!()
-    }
-    //
 
     // should only appear at start of line, so should be handled after eol
     fn handle_num(&mut self) -> ParseReturn {
@@ -237,6 +229,10 @@ impl Parser {
     }
 
     fn parse_current(&mut self) -> ParseReturn {
+        // TODO: Refactor this so there are 2 diff paths: SOL Or in line. in line could be called
+        // by start of line if needed (ie. if it sees a *, then it would be Paragraph + italic)
+
+        // parse is different if it is at the start of the line
         if self.state.new_line {
             return self.parse_newline();
         }
@@ -263,14 +259,15 @@ impl Parser {
 
             // TokenType::Hash => self.handle_hash(),
             TokenType::Dash => self.handle_dash(),
-            // TokenType::Percent => self.handle_precent(),
-            TokenType::Asterisk => self.handle_asterisk(),
-            TokenType::Backtick => self.handle_backtick(),
-            TokenType::DollarSign => self.handle_dollarsign(),
-            TokenType::Underscore => self.handle_underscore(),
-            // TokenType::ListNumber => self.handle_num(),
+
+            TokenType::Asterisk => self.handle_container(TokenType::Asterisk),
+            TokenType::Backtick => self.handle_container(TokenType::Backtick),
+            TokenType::DollarSign => self.handle_container(TokenType::DollarSign),
+            TokenType::Underscore => self.handle_container(TokenType::Underscore),
+
             TokenType::BracketLeft => self.handle_bracket(),
             TokenType::Exclamation => self.handle_exclamation(),
+
             TokenType::FontmatterStart => self.handle_fontmatter(),
             _ => Ok(()),
         }
