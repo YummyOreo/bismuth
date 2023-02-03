@@ -252,9 +252,7 @@ impl Parser {
 
         match self.current_token_type()? {
             // Hash... only at sol
-            TokenType::Text
-            | TokenType::Hash
-            | TokenType::Percent => {
+            TokenType::Text | TokenType::Hash | TokenType::Percent => {
                 self.append_element(self.make_text_at_token()?);
                 Ok(())
             }
