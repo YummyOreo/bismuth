@@ -20,8 +20,7 @@ pub enum Kind {
 
     Blockquote,
 
-    List,
-    ListElement,
+    ListItem,
 
     OrderedListElement,
 

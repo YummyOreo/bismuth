@@ -32,6 +32,7 @@ impl Metadata {
 #[derive(Default)]
 struct State {
     pub new_line: bool,
+    pub indent_level: i32,
 }
 
 type ParseReturn = Result<(), error::ParseError>;
@@ -162,6 +163,12 @@ impl Parser {
 
         Ok(tokens_after.split_at(end).0.to_vec())
     }
+
+    fn make_text_at_token(&self) -> Result<Element, error::ParseError> {
+        let mut elm = Element::new(Kind::Text);
+        elm.text = Some(self.current_token_chars()?.iter().collect::<String>());
+        Ok(elm)
+    }
 }
 
 // Parsing
@@ -184,11 +191,16 @@ impl Parser {
     }
 
     fn handle_tab_whitespace(&mut self, num: usize) -> ParseReturn {
-        todo!()
+        self.state.indent_level = num as i32;
+        Ok(())
     }
 
     // should only appear at start of line, so should be handled after eol
     fn handle_hash(&mut self) -> ParseReturn {
+        todo!()
+    }
+
+    fn handle_greaterthan(&mut self) -> ParseReturn {
         todo!()
     }
 
@@ -225,6 +237,7 @@ impl Parser {
     }
 
     fn parse_newline(&mut self) -> ParseReturn {
+        // handle hash, listnum and precent here
         todo!()
     }
 
@@ -238,15 +251,11 @@ impl Parser {
         }
 
         match self.current_token_type()? {
-            // greaterthan becasue that relise on tabs. Hash... only at sol
+            // Hash... only at sol
             TokenType::Text
-            | TokenType::GreaterThan
             | TokenType::Hash
-            | TokenType::ListNumber
             | TokenType::Percent => {
-                let mut elm = Element::new(Kind::Text);
-                elm.text = Some(self.current_token_chars()?.iter().collect::<String>());
-                self.append_element(elm);
+                self.append_element(self.make_text_at_token()?);
                 Ok(())
             }
             TokenType::EndOfLine => {
@@ -259,6 +268,9 @@ impl Parser {
 
             // TokenType::Hash => self.handle_hash(),
             TokenType::Dash => self.handle_dash(),
+            TokenType::ListNumber => self.handle_num(),
+
+            TokenType::GreaterThan => self.handle_greaterthan(),
 
             TokenType::Asterisk => self.handle_container(TokenType::Asterisk),
             TokenType::Backtick => self.handle_container(TokenType::Backtick),
