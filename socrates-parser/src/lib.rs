@@ -229,15 +229,23 @@ impl Parser {
     }
 
     fn handle_dash(&mut self) -> ParseReturn {
-        if self.state.indent_level > 0 {
-            // is a list item
-            todo!()
-        } else if self.state.new_line {
-            // may be list or ---
-            todo!()
-        } else {
-            self.append_element(self.make_text_at_token()?);
+        let diff = self.current_token_diff()?;
+        if self.state.new_line {
+            if self.state.indent_level > 0 && diff == 1 {
+                let mut elm = Element::new(Kind::ListItem);
+                elm.add_attr("level", &diff.to_string());
+                self.append_element(elm);
+
+                return Ok(());
+            } else if diff == 3 && self.peek_after(1)?.kind == TokenType::EndOfLine {
+                let elm = Element::new(Kind::HorizontalRule);
+                self.append_element(elm);
+
+                return Ok(());
+            }
         }
+
+        self.append_element(self.make_text_at_token()?);
         Ok(())
     }
 
