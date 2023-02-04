@@ -102,6 +102,7 @@ impl Parser {
                 curr_elm.append_node(elm);
                 return;
             } else {
+                self.reset_state();
                 self.state.new_line = true;
             }
         }
@@ -165,9 +166,22 @@ impl Parser {
     }
 
     fn make_text_at_token(&self) -> Result<Element, error::ParseError> {
-        let mut elm = Element::new(Kind::Text);
-        elm.text = Some(self.current_token_chars()?.iter().collect::<String>());
-        Ok(elm)
+        if self.state.new_line {
+            let mut elm = Element::new(Kind::Paragraph);
+            let mut elm_txt = Element::new(Kind::Text);
+            elm_txt.text = Some(self.current_token_chars()?.iter().collect::<String>());
+            elm.append_node(elm_txt);
+            Ok(elm)
+        } else {
+            let mut elm = Element::new(Kind::Text);
+            elm.text = Some(self.current_token_chars()?.iter().collect::<String>());
+            Ok(elm)
+        }
+    }
+
+    fn reset_state(&mut self) {
+        self.state.indent_level = 0;
+        self.state.new_line = false;
     }
 }
 
@@ -197,18 +211,36 @@ impl Parser {
 
     // should only appear at start of line, so should be handled after eol
     fn handle_hash(&mut self) -> ParseReturn {
-        todo!()
+        let num = self.current_token_diff()?;
+        let mut elm = Element::new(Kind::Header);
+        elm.add_attr("level", &num.to_string());
+        self.append_element(elm);
+        Ok(())
     }
 
     fn handle_greaterthan(&mut self) -> ParseReturn {
-        todo!()
+        if self.state.indent_level == 1 {
+            let elm = Element::new(Kind::Blockquote);
+            self.append_element(elm);
+        } else {
+            self.append_element(self.make_text_at_token()?);
+        }
+        Ok(())
     }
 
     fn handle_dash(&mut self) -> ParseReturn {
-        todo!()
+        if self.state.indent_level > 0 {
+            // is a list item
+            todo!()
+        } else if self.state.new_line {
+            // may be list or ---
+            todo!()
+        } else {
+            self.append_element(self.make_text_at_token()?);
+        }
+        Ok(())
     }
 
-    // should only appear at start of line, so should be handled after eol
     fn handle_precent(&mut self) -> ParseReturn {
         todo!()
     }
@@ -236,23 +268,9 @@ impl Parser {
         todo!()
     }
 
-    fn parse_newline(&mut self) -> ParseReturn {
-        // handle hash, listnum and precent here
-        todo!()
-    }
-
     fn parse_current(&mut self) -> ParseReturn {
-        // TODO: Refactor this so there are 2 diff paths: SOL Or in line. in line could be called
-        // by start of line if needed (ie. if it sees a *, then it would be Paragraph + italic)
-
-        // parse is different if it is at the start of the line
-        if self.state.new_line {
-            return self.parse_newline();
-        }
-
         match self.current_token_type()? {
-            // Hash... only at sol
-            TokenType::Text | TokenType::Hash | TokenType::Percent => {
+            TokenType::Text => {
                 self.append_element(self.make_text_at_token()?);
                 Ok(())
             }
@@ -264,7 +282,8 @@ impl Parser {
             TokenType::Tab => self.handle_tab(),
             TokenType::Whitespace => self.handle_whitespace(),
 
-            // TokenType::Hash => self.handle_hash(),
+            TokenType::Hash => self.handle_hash(),
+            TokenType::Percent => self.handle_precent(),
             TokenType::Dash => self.handle_dash(),
             TokenType::ListNumber => self.handle_num(),
 
