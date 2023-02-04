@@ -4,6 +4,7 @@ pub enum ParseError {
     Move(usize),
     Peek(usize),
     WhitespaceError,
+    CouldNotFindPattern,
 }
 
 #[derive(Debug, PartialEq)]

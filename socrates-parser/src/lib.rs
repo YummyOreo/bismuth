@@ -33,6 +33,7 @@ impl Metadata {
 struct State {
     pub new_line: bool,
     pub indent_level: i32,
+    pub inside_custom: bool,
 }
 
 type ParseReturn = Result<(), error::ParseError>;
@@ -85,8 +86,12 @@ impl Parser {
         Ok(&self.current_token()?.kind)
     }
 
-    fn current_token_diff(&self) -> Result<usize, error::ParseError> {
-        Ok((self.current_token()?.end - self.current_token()?.start) + 1)
+    fn token_len(&self, token: &Token) -> usize {
+        (token.end - token.start) + 1
+    }
+
+    fn current_token_len(&self) -> Result<usize, error::ParseError> {
+        Ok(self.token_len(self.current_token()?))
     }
 
     fn current_element(&self) -> Option<&Element> {
@@ -155,7 +160,16 @@ impl Parser {
         self.peek(self.current_token_index - n)
     }
 
-    fn peek_till_kind(&mut self, kind: TokenType) -> Result<Vec<Token>, error::ParseError> {
+    fn peek_till(&self, n: usize) -> Result<Vec<Token>, error::ParseError> {
+        if n >= self.lexer.tokens.len() || n < self.current_token_index {
+            return Err(error::ParseError::Peek(n));
+        }
+
+        let tokens_after = self.lexer.tokens.split_at(self.current_token_index).1;
+        Ok(tokens_after.split_at(n).0.to_vec())
+    }
+
+    fn peek_till_kind(&self, kind: TokenType) -> Result<Vec<Token>, error::ParseError> {
         let tokens_after = self.lexer.tokens.split_at(self.current_token_index).1;
         let end = tokens_after
             .iter()
@@ -163,6 +177,22 @@ impl Parser {
             .ok_or(error::ParseError::Peek(0))?;
 
         Ok(tokens_after.split_at(end).0.to_vec())
+    }
+
+    fn till_pattern(&self, kinds: Vec<TokenType>) -> Result<usize, error::ParseError> {
+        let tokens_after = self.lexer.tokens.split_at(self.current_token_index).1;
+        let mut pat_index = 0;
+        for (index, token) in tokens_after.iter().enumerate() {
+            if pat_index >= kinds.len() - 1 {
+                return Ok((index - pat_index) + self.current_token_index);
+            }
+            if kinds[pat_index] == token.kind {
+                pat_index += 1;
+            } else {
+                pat_index = 0;
+            }
+        }
+        Err(error::ParseError::CouldNotFindPattern)
     }
 
     fn make_text_at_token(&self) -> Result<Element, error::ParseError> {
@@ -189,12 +219,12 @@ impl Parser {
 
 impl Parser {
     fn handle_tab(&mut self) -> ParseReturn {
-        let tabs = self.current_token_diff()?;
+        let tabs = self.current_token_len()?;
         self.handle_tab_whitespace(tabs)
     }
 
     fn handle_whitespace(&mut self) -> ParseReturn {
-        let diff = self.current_token_diff()?;
+        let diff = self.current_token_len()?;
         if diff % 4 != 0 {
             let mut elm = Element::new(Kind::Text);
             elm.text = Some(self.current_token_chars()?.iter().collect::<String>());
@@ -211,7 +241,7 @@ impl Parser {
 
     // should only appear at start of line, so should be handled after eol
     fn handle_hash(&mut self) -> ParseReturn {
-        let num = self.current_token_diff()?;
+        let num = self.current_token_len()?;
         let mut elm = Element::new(Kind::Header);
         elm.add_attr("level", &num.to_string());
         self.append_element(elm);
@@ -229,7 +259,7 @@ impl Parser {
     }
 
     fn handle_dash(&mut self) -> ParseReturn {
-        let diff = self.current_token_diff()?;
+        let diff = self.current_token_len()?;
         if self.state.new_line {
             if self.state.indent_level > 0 && diff == 1 {
                 let mut elm = Element::new(Kind::ListItem);
@@ -244,12 +274,20 @@ impl Parser {
                 return Ok(());
             }
         }
-
         self.append_element(self.make_text_at_token()?);
         Ok(())
     }
 
     fn handle_precent(&mut self) -> ParseReturn {
+        // check if it is a custom elm
+        // set inside to true
+        // loop till you get to [Newline, curlybrace*2, NewLine]
+        // append everything to a string
+        // make the element
+        let peek = self.peek_after(1)?;
+        if peek.kind == TokenType::CurlybraceLeft && self.token_len(peek) == 2 {
+            self.state.inside_custom = true;
+        }
         todo!()
     }
 
@@ -388,5 +426,9 @@ mod test_utils {
         ];
 
         assert_eq!(l, r);
+    }
+
+    #[test]
+    fn peek_pattern_test() {
     }
 }
