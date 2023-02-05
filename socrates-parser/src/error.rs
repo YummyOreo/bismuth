@@ -1,3 +1,5 @@
+use std::error::Error;
+
 #[derive(Debug, PartialEq)]
 pub enum ParseError {
     GetToken(usize),

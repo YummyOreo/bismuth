@@ -11,6 +11,12 @@
     - The html file template is basted no the File struct `type` field (or in Metadat)
 - Make Rss based on the markdown files
 
+## implementation details:
+For internal/default templates, use:
+`include_str!`
+
+Lazyload all images
+
 # Support:
 ## Langs:
 - Wasm

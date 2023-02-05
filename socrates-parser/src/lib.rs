@@ -292,8 +292,31 @@ impl Parser {
 
         if is_newline && is_curlybrace && is_2_len {
             self.state.inside_custom = true;
+            self.advance_n_token(2)?;
+
+            let pattern = vec![
+                TokenType::EndOfLine,
+                TokenType::CurlybraceRight,
+                TokenType::CurlybraceRight,
+                TokenType::EndOfLine,
+            ];
+
+            let end = self.till_pattern(&pattern)?;
+            let inside_tokens = self.peek_till(end)?;
+
+            let mut inside_str = String::new();
+            for token in &inside_tokens {
+                inside_str.push_str(&token.text.iter().collect::<String>())
+            }
+            self.advance_n_token(inside_tokens.len() + 3)?;
+            if let Ok(c) = custom::CustomElm::from_string(&inside_str) {
+                let elm = Element::new(Kind::CustomElement(c));
+                self.append_element(elm);
+                return Ok(());
+            }
         }
-        todo!()
+        self.append_element(self.make_text_at_token()?);
+        Ok(())
     }
 
     fn handle_container(&mut self, kind: TokenType) -> ParseReturn {
@@ -453,11 +476,11 @@ mod test_utils {
         let r = parser.till_pattern(&pattern).unwrap();
         assert_eq!(l, r);
 
-
         let lexer = init_lexer("this is a test \n[]\n another line \n[]\n");
         let mut parser = Parser::new(lexer);
-        // skip start of file
+
         parser.advance_n_token(4).unwrap();
+
         let l = 8;
         let r = parser.till_pattern(&pattern).unwrap();
         assert_eq!(l, r);
