@@ -168,11 +168,11 @@ impl Parser {
         Ok(tokens_after.split_at(n).0.to_vec())
     }
 
-    fn peek_till_kind(&self, kind: TokenType) -> Result<Vec<Token>, error::ParseError> {
+    fn peek_till_kind(&self, kind: &TokenType) -> Result<Vec<Token>, error::ParseError> {
         let tokens_after = self.lexer.tokens.split_at(self.current_token_index).1;
         let end = tokens_after
             .iter()
-            .position(|t| t.kind == kind)
+            .position(|t| &t.kind == kind)
             .ok_or(error::ParseError::Peek(0))?;
 
         Ok(tokens_after.split_at(end).0.to_vec())
@@ -330,11 +330,35 @@ impl Parser {
     }
 
     fn handle_container(&mut self, kind: TokenType) -> ParseReturn {
-        // check till token for the type, Ie [ => ]
+        // check till token for the type, Ie [ => ] [t*t]
         // Then get the inside
-        // Parse the inside
+        // Parse the inside (we do this because: __*text*__ would be bold(italic(text)))
         // set that as the text for the container
-        todo!()
+        let inside = self.peek_till_kind(&kind)?;
+
+        let elm_kind = match (kind, self.token_len(self.current_token()?)) {
+            (TokenType::Asterisk, 1) | (TokenType::Underscore, 1) => Kind::Italic,
+            (TokenType::Asterisk, 2) | (TokenType::Underscore, 2) => Kind::Bold,
+            (TokenType::DollarSign, 1) => Kind::InlineLaTeX,
+            (TokenType::DollarSign, 3) => Kind::BlockLaTeX,
+            (TokenType::Backtick, 1) => Kind::InlineCode,
+            (TokenType::Backtick, 3) => Kind::BlockCode,
+            _ => Kind::Text,
+        };
+
+        if elm_kind == Kind::Text {
+            self.append_element(self.make_text_at_token()?);
+            return Ok(());
+        } else {
+            let elm = Element::new(elm_kind);
+            self.append_element(elm);
+        }
+
+        for token in &inside {
+            self.parse_token(token)?;
+        }
+        self.advance_n_token(inside.len() + 1)?;
+        Ok(())
     }
 
     // should only appear at start of line, so should be handled after eol
@@ -391,7 +415,7 @@ impl Parser {
     }
 
     pub fn parse(&mut self) -> Result<(), error::ParseError> {
-        while let Ok(token) = {
+        while {
             match self.advance_token() {
                 Ok(t) => Ok(t),
                 Err(e) => match e {
@@ -401,12 +425,14 @@ impl Parser {
                     }
                 },
             }
+            .is_ok()
         } {
+            let token = self.current_token()?.clone();
             if token.kind == TokenType::EndOfFile {
                 break;
             }
 
-            self.parse_token(self.current_token()?)?;
+            self.parse_token(&token)?;
         }
         Ok(())
     }
@@ -463,7 +489,7 @@ mod test_utils {
         // skip start of file
         parser.advance_token().unwrap();
 
-        let r = parser.peek_till_kind(TokenType::BracketRight).unwrap();
+        let r = parser.peek_till_kind(&TokenType::BracketRight).unwrap();
         let l = vec![
             Token::new(
                 TokenType::Text,
