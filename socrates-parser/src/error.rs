@@ -1,6 +1,6 @@
 use crate::custom::CustomElmError;
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug)]
 pub enum ParseError {
     GetToken(usize),
     Move(usize),

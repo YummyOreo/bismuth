@@ -318,7 +318,7 @@ impl Parser {
 
             // makes the custom element
             let c = custom::CustomElm::from_string(&inside_str)
-                .map_err(|e| error::ParseError::CustomElementError(e))?;
+                .map_err(error::ParseError::CustomElementError)?;
 
             let elm = Element::new(Kind::CustomElement(c));
             self.append_element(elm);
@@ -421,6 +421,9 @@ mod test_utils {
         l
     }
 
+    #[derive(Debug, PartialEq)]
+    struct TestError {}
+
     #[test]
     fn advance_token_test() {
         let lexer = init_lexer("this is a test []");
@@ -442,7 +445,11 @@ mod test_utils {
             &Token::new(TokenType::EndOfFile, Vec::new(), 17, 17),
             parser.advance_token().unwrap()
         );
-        assert_eq!(Err(error::ParseError::Move(5)), parser.advance_token());
+
+        assert_eq!(
+            Err(TestError {}),
+            parser.advance_token().map_err(|_| TestError {})
+        );
     }
 
     #[test]

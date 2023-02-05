@@ -1,7 +1,7 @@
 use serde_yaml::{from_str, Error};
 use std::collections::{BTreeMap, HashMap};
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug)]
 pub enum CustomElmError {
     YamlParse(Error),
     NoKeys,
