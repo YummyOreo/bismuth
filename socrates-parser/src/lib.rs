@@ -260,9 +260,9 @@ impl Parser {
     fn handle_dash(&mut self) -> ParseReturn {
         let diff = self.current_token_len()?;
         if self.state.new_line {
-            if self.state.indent_level > 0 && diff == 1 {
+            if diff == 1 {
                 let mut elm = Element::new(Kind::ListItem);
-                elm.add_attr("level", &diff.to_string());
+                elm.add_attr("level", &self.state.indent_level.to_string());
                 self.append_element(elm);
 
                 return Ok(());
@@ -363,7 +363,17 @@ impl Parser {
 
     // should only appear at start of line, so should be handled after eol
     fn handle_num(&mut self) -> ParseReturn {
-        todo!()
+        let mut elm = Element::new(Kind::OrderedListElement);
+        let num = self
+            .current_token_chars()?
+            .iter()
+            .filter(|c| c.is_numeric())
+            .collect::<String>();
+        elm.add_attr("num", &num);
+        elm.add_attr("level", &self.state.indent_level.to_string());
+
+        self.append_element(elm);
+        Ok(())
     }
 
     // Somewhat same as *
