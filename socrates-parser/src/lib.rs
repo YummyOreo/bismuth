@@ -179,7 +179,7 @@ impl Parser {
         Ok(tokens_after.split_at(end).0.to_vec())
     }
 
-    fn till_pattern(&self, kinds: Vec<TokenType>) -> Result<usize, error::ParseError> {
+    fn till_pattern(&self, kinds: &[TokenType]) -> Result<usize, error::ParseError> {
         let tokens_after = self.lexer.tokens.split_at(self.current_token_index).1;
         let mut pat_index = 0;
         for (index, token) in tokens_after.iter().enumerate() {
@@ -281,11 +281,16 @@ impl Parser {
     fn handle_precent(&mut self) -> ParseReturn {
         // check if it is a custom elm
         // set inside to true
-        // loop till you get to [Newline, curlybrace*2, NewLine]
+        // loop till you get to [Newline, CurlybraceRight*2, NewLine]
         // append everything to a string
         // make the element
         let peek = self.peek_after(1)?;
-        if peek.kind == TokenType::CurlybraceLeft && self.token_len(peek) == 2 {
+
+        let is_newline = self.state.new_line;
+        let is_curlybrace = peek.kind == TokenType::CurlybraceLeft;
+        let is_2_len = self.token_len(peek) == 2;
+
+        if is_newline && is_curlybrace && is_2_len {
             self.state.inside_custom = true;
         }
         todo!()
@@ -316,7 +321,7 @@ impl Parser {
 
     fn parse_current(&mut self) -> ParseReturn {
         match self.current_token_type()? {
-            TokenType::Text => {
+            TokenType::Text | TokenType::CurlybraceLeft | TokenType::CurlybraceRight => {
                 self.append_element(self.make_text_at_token()?);
                 Ok(())
             }
@@ -426,9 +431,35 @@ mod test_utils {
         ];
 
         assert_eq!(l, r);
+        let r = parser.peek_till(2).unwrap();
+
+        assert_eq!(l, r);
     }
 
     #[test]
     fn peek_pattern_test() {
+        let lexer = init_lexer("this is a test \n[]\n");
+        let mut parser = Parser::new(lexer);
+        // skip start of file
+        parser.advance_token().unwrap();
+        let pattern: Vec<TokenType> = vec![
+            TokenType::EndOfLine,    // \n
+            TokenType::BracketLeft,  // [
+            TokenType::BracketRight, // ]
+            TokenType::EndOfLine,    // \n
+        ];
+
+        let l = 2;
+        let r = parser.till_pattern(&pattern).unwrap();
+        assert_eq!(l, r);
+
+
+        let lexer = init_lexer("this is a test \n[]\n another line \n[]\n");
+        let mut parser = Parser::new(lexer);
+        // skip start of file
+        parser.advance_n_token(4).unwrap();
+        let l = 8;
+        let r = parser.till_pattern(&pattern).unwrap();
+        assert_eq!(l, r);
     }
 }
