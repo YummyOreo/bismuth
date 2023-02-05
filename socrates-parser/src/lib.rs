@@ -330,6 +330,10 @@ impl Parser {
     }
 
     fn handle_container(&mut self, kind: TokenType) -> ParseReturn {
+        // check till token for the type, Ie [ => ]
+        // Then get the inside
+        // Parse the inside
+        // set that as the text for the container
         todo!()
     }
 
@@ -352,8 +356,8 @@ impl Parser {
         todo!()
     }
 
-    fn parse_current(&mut self) -> ParseReturn {
-        match self.current_token_type()? {
+    fn parse_token(&mut self, token: &Token) -> ParseReturn {
+        match token.kind {
             TokenType::Text | TokenType::CurlybraceLeft | TokenType::CurlybraceRight => {
                 self.append_element(self.make_text_at_token()?);
                 Ok(())
@@ -402,7 +406,7 @@ impl Parser {
                 break;
             }
 
-            self.parse_current()?;
+            self.parse_token(self.current_token()?)?;
         }
         Ok(())
     }
