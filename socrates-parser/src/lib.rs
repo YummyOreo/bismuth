@@ -33,7 +33,6 @@ impl Metadata {
 struct State {
     pub new_line: bool,
     pub indent_level: i32,
-    pub inside_custom: bool,
 }
 
 type ParseReturn = Result<(), error::ParseError>;
@@ -291,9 +290,10 @@ impl Parser {
         let is_2_len = self.token_len(peek) == 2;
 
         if is_newline && is_curlybrace && is_2_len {
-            self.state.inside_custom = true;
+            // advance past %{{
             self.advance_n_token(2)?;
 
+            // get where the \n}}\n is indicating the end
             let pattern = vec![
                 TokenType::EndOfLine,
                 TokenType::CurlybraceRight,
@@ -302,18 +302,28 @@ impl Parser {
             ];
 
             let end = self.till_pattern(&pattern)?;
+
+            // gets the tokens that are inside of the custom element
             let inside_tokens = self.peek_till(end)?;
 
-            let mut inside_str = String::new();
-            for token in &inside_tokens {
-                inside_str.push_str(&token.text.iter().collect::<String>())
-            }
-            self.advance_n_token(inside_tokens.len() + 3)?;
-            if let Ok(c) = custom::CustomElm::from_string(&inside_str) {
-                let elm = Element::new(Kind::CustomElement(c));
-                self.append_element(elm);
-                return Ok(());
-            }
+            // appends the text of those tokens to a string
+            let inside_str = inside_tokens
+                .iter()
+                .map(|t| t.text.iter().collect::<String>())
+                .collect::<String>();
+
+            // advances past the inside... \n}}\n (we don't need to advance pas the last \n because
+            // it will auto do that for us)
+            self.advance_n_token(inside_tokens.len() + 2)?;
+
+            // makes the custom element
+            let c = custom::CustomElm::from_string(&inside_str)
+                .map_err(|e| error::ParseError::CustomElementError(e))?;
+
+            let elm = Element::new(Kind::CustomElement(c));
+            self.append_element(elm);
+
+            return Ok(());
         }
         self.append_element(self.make_text_at_token()?);
         Ok(())

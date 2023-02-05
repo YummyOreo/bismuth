@@ -1,4 +1,4 @@
-use std::error::Error;
+use crate::custom::CustomElmError;
 
 #[derive(Debug, PartialEq)]
 pub enum ParseError {
@@ -7,6 +7,8 @@ pub enum ParseError {
     Peek(usize),
     WhitespaceError,
     CouldNotFindPattern,
+
+    CustomElementError(CustomElmError),
 }
 
 #[derive(Debug, PartialEq)]
