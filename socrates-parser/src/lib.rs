@@ -14,7 +14,7 @@ use crate::{
     tree::{Ast, Element, Kind},
 };
 
-#[derive(Default)]
+#[derive(Default, Debug)]
 pub struct Metadata {
     absolute_path: PathBuf,
     fontmatter: FontMatter,
@@ -29,14 +29,16 @@ impl Metadata {
     }
 }
 
-#[derive(Default)]
+#[derive(Default, Debug)]
 struct State {
     pub new_line: bool,
+    pub inside: Vec<u32>,
     pub indent_level: i32,
 }
 
 type ParseReturn = Result<(), error::ParseError>;
 
+#[derive(Debug)]
 pub struct Parser {
     pub lexer: Lexer,
 
@@ -99,17 +101,35 @@ impl Parser {
 
     fn append_element(&mut self, elm: Element) {
         if self.current_element().is_some() {
-            let curr_elm = self.current_element.as_mut().expect("Should be there");
+            let curr_elm = {
+                let mut elm = self.current_element.as_mut().expect("Should be there");
+                println!("inside {:#?}", self.state.inside);
+                println!("elms {:#?}", elm.elements);
 
-            if curr_elm.kind != Kind::EndOfLine {
+                for compair_id in &self.state.inside {
+                    if let Some(p) = elm.elements.iter().position(|e| e.get_id() == *compair_id) {
+                        elm = elm.elements.get_mut(p).expect("should be there");
+                    }
+                }
+                elm
+            };
+
+            println!("{elm:?} | {curr_elm:?}");
+            if elm.kind != Kind::EndOfLine {
                 self.state.new_line = false;
                 curr_elm.append_node(elm);
                 return;
             } else {
+                self.ast.elements.push(self.current_element.clone());
+                self.ast.elements.push(Some(elm));
+                self.current_element = None;
+
                 self.reset_state();
                 self.state.new_line = true;
+                return;
             }
         }
+        self.state.new_line = false;
         self.set_current_elm(elm);
     }
 
@@ -169,7 +189,12 @@ impl Parser {
     }
 
     fn peek_till_kind(&self, kind: &TokenType) -> Result<Vec<Token>, error::ParseError> {
+        // println!("tokens ptk {:#?}", self.lexer.tokens);
+        // println!("curr_index ptk {}", self.current_token_index);
         let tokens_after = self.lexer.tokens.split_at(self.current_token_index).1;
+        println!("{tokens_after:?}");
+        // println!("{tokens_after:#?}");
+        // println!("{kind:#?}");
         let end = tokens_after
             .iter()
             .position(|t| &t.kind == kind)
@@ -211,6 +236,7 @@ impl Parser {
     fn reset_state(&mut self) {
         self.state.indent_level = 0;
         self.state.new_line = false;
+        self.state.inside = vec![];
     }
 }
 
@@ -334,9 +360,7 @@ impl Parser {
         // Then get the inside
         // Parse the inside (we do this because: __*text*__ would be bold(italic(text)))
         // set that as the text for the container
-        let inside = self.peek_till_kind(&kind)?;
-
-        let elm_kind = match (kind, self.token_len(self.current_token()?)) {
+        let elm_kind = match (kind.clone(), self.token_len(self.current_token()?)) {
             (TokenType::Asterisk, 1) | (TokenType::Underscore, 1) => Kind::Italic,
             (TokenType::Asterisk, 2) | (TokenType::Underscore, 2) => Kind::Bold,
             (TokenType::DollarSign, 1) => Kind::InlineLaTeX,
@@ -347,17 +371,37 @@ impl Parser {
         };
 
         if elm_kind == Kind::Text {
-            self.append_element(self.make_text_at_token()?);
+            self.append_element(self.make_text_at_token().unwrap());
             return Ok(());
         } else {
             let elm = Element::new(elm_kind);
+            let elm_id = elm.get_id();
             self.append_element(elm);
+            self.state.inside.push(elm_id);
         }
+        self.advance_n_token(1)?;
+        let inside = self.peek_till_kind(&kind).unwrap();
+        println!("{inside:#?}");
 
+        let mut last_index = self.current_token_index;
+        let mut last_diff = 0;
         for token in &inside {
-            self.parse_token(token)?;
+            if last_diff > 0 {
+                last_diff -= 1;
+                continue;
+            }
+            println!("tk hc {:?}", token.kind);
+            self.parse_token(token).unwrap();
+            let advance_diff = self.current_token_index - last_index;
+            last_diff = advance_diff + 1;
+            println!("diff hc {advance_diff}");
+
+            self.advance_n_token(1).unwrap();
+
+            last_index = self.current_token_index;
         }
-        self.advance_n_token(inside.len() + 1)?;
+        self.state.inside.pop();
+        self.advance_n_token(1)?;
         Ok(())
     }
 
@@ -438,12 +482,19 @@ impl Parser {
             .is_ok()
         } {
             let token = self.current_token()?.clone();
+            // println!("{token:#?}");
             if token.kind == TokenType::EndOfFile {
                 break;
             }
 
             self.parse_token(&token)?;
+            // println!("{self:#?}");
+            // println!();
+            // println!("---");
+            // println!();
         }
+        println!("{self:#?}");
+        panic!();
         Ok(())
     }
 }
@@ -541,5 +592,41 @@ mod test_utils {
         let l = 8;
         let r = parser.till_pattern(&pattern).unwrap();
         assert_eq!(l, r);
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use super::*;
+    use std::path::PathBuf;
+
+    fn init_lexer(content: &str) -> Lexer {
+        let content = content.to_string();
+        let path = PathBuf::from("/test/");
+        let mut l = Lexer::new_test(path, content);
+        l.run_lexer().unwrap();
+        l
+    }
+
+    macro_rules! snapshot {
+        ($content:tt) => {
+            // #[test]
+            // fn $name() {
+            let mut settings = insta::Settings::clone_current();
+            settings.set_snapshot_path("../testdata/output/");
+            settings.bind(|| {
+                insta::assert_snapshot!(format!("{:#?}", $content));
+            });
+            // }
+        };
+    }
+
+    #[test]
+    fn name() {
+        let lexer = init_lexer("test \n test *__test__* none");
+        let mut parser = Parser::new(lexer);
+        parser.parse().unwrap();
+
+        snapshot!(parser);
     }
 }

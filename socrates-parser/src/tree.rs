@@ -1,13 +1,14 @@
+use rand::Rng;
 use std::collections::HashMap;
 
 use crate::{custom, error::ElementError};
 
-#[derive(Default)]
+#[derive(Default, Debug)]
 pub struct Ast {
     pub elements: Vec<Option<Element>>,
 }
 
-#[derive(Clone, PartialEq)]
+#[derive(Clone, PartialEq, Debug)]
 pub enum Kind {
     Paragraph,
 
@@ -40,27 +41,33 @@ pub enum Kind {
     LineBreak,
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug, PartialEq)]
 pub struct Element {
     pub kind: Kind,
-    pub elements: Vec<Option<Element>>,
+    pub elements: Vec<Element>,
     pub text: Option<String>,
     pub attrs: HashMap<String, String>,
+
+    id: u32,
 }
 
 impl Element {
     pub fn new(kind: Kind) -> Self {
+        let mut rng = rand::thread_rng();
+
         Element {
             kind,
             elements: vec![],
             text: Default::default(),
             attrs: Default::default(),
+
+            id: rng.gen::<u32>(),
         }
     }
 
-    pub fn append_node(&mut self, elm: Element) -> Option<&Element> {
-        self.elements.push(Some(elm));
-        self.elements.last().expect("Should be there").as_ref()
+    pub fn append_node(&mut self, elm: Element) -> &Element {
+        self.elements.push(elm);
+        self.elements.last().expect("Should be there")
     }
 
     pub fn add_attr(&mut self, key: &str, value: &str) {
@@ -83,7 +90,11 @@ impl Element {
         self.text.as_ref().ok_or(ElementError::GetTextError)
     }
 
-    pub fn get_elements(&self) -> &Vec<Option<Element>> {
+    pub fn get_elements(&self) -> &Vec<Element> {
         &self.elements
+    }
+
+    pub fn get_id(&self) -> u32 {
+        self.id
     }
 }
