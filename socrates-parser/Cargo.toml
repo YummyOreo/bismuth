@@ -11,6 +11,7 @@ socrates-md = {version = "0.1.0", path = "../socrates-md"}
 serde = {version = "1.0.152", features = ["derive"]}
 serde_yaml = "0.9"
 rand = "0.8.5"
+regex = "1"
 
 [dev-dependencies]
 insta = "1.26.0"

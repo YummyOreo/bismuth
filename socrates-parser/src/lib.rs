@@ -599,6 +599,7 @@ mod test_utils {
 mod test {
     use super::*;
     use std::path::PathBuf;
+    use regex::Regex;
 
     fn init_lexer(content: &str) -> Lexer {
         let content = content.to_string();
@@ -608,6 +609,12 @@ mod test {
         l
     }
 
+    fn snapshot(parser: Parser) -> String {
+        let s = format!("{parser:#?}");
+        let re = Regex::new(r"id: \d+").expect("Should be valid regex");
+        re.replace_all(&s, "id: [Random]").to_string()
+    }
+
     macro_rules! snapshot {
         ($content:tt) => {
             // #[test]
@@ -615,7 +622,7 @@ mod test {
             let mut settings = insta::Settings::clone_current();
             settings.set_snapshot_path("../testdata/output/");
             settings.bind(|| {
-                insta::assert_snapshot!(format!("{:#?}", $content));
+                insta::assert_snapshot!(snapshot($content));
             });
             // }
         };
@@ -626,6 +633,7 @@ mod test {
         let lexer = init_lexer("test \n test *__test__* none");
         let mut parser = Parser::new(lexer);
         parser.parse().unwrap();
+
 
         snapshot!(parser);
     }

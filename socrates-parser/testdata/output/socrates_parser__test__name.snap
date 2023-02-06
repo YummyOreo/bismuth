@@ -1,6 +1,6 @@
 ---
 source: socrates-parser/src/lib.rs
-expression: "format!(\"{:#?}\", parser)"
+expression: snapshot(parser)
 ---
 Parser {
     lexer: Lexer {
@@ -185,7 +185,7 @@ Parser {
                         "test ",
                     ),
                     attrs: {},
-                    id: 3985697409,
+                    id: [Random],
                 },
             ),
             Some(
@@ -194,7 +194,7 @@ Parser {
                     elements: [],
                     text: None,
                     attrs: {},
-                    id: 3577726924,
+                    id: [Random],
                 },
             ),
             Some(
@@ -208,7 +208,7 @@ Parser {
                                 "test ",
                             ),
                             attrs: {},
-                            id: 2087026888,
+                            id: [Random],
                         },
                         Element {
                             kind: Italic,
@@ -223,17 +223,17 @@ Parser {
                                                 "test",
                                             ),
                                             attrs: {},
-                                            id: 730191286,
+                                            id: [Random],
                                         },
                                     ],
                                     text: None,
                                     attrs: {},
-                                    id: 1802072213,
+                                    id: [Random],
                                 },
                             ],
                             text: None,
                             attrs: {},
-                            id: 2902379160,
+                            id: [Random],
                         },
                         Element {
                             kind: Text,
@@ -242,12 +242,12 @@ Parser {
                                 " none",
                             ),
                             attrs: {},
-                            id: 4152267815,
+                            id: [Random],
                         },
                     ],
                     text: None,
                     attrs: {},
-                    id: 1947778615,
+                    id: [Random],
                 },
             ),
         ],
