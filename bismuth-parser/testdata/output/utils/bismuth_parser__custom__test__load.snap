@@ -1,0 +1,11 @@
+---
+source: bismuth-parser/src/custom.rs
+expression: "snapshot(\"name: me\\nvalue: not a key\")"
+---
+{
+	name: "me"
+	values: {
+		value, not a key
+	},
+	body: None
+}

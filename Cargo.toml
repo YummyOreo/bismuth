@@ -1,4 +1,4 @@
 [workspace]
 
-members = ["socrates-core", "socrates-md", "socrates-error", "socrates-lexer", "socrates-parser"]
+members = ["bismuth-core", "bismuth-md", "bismuth-error", "bismuth-lexer", "bismuth-parser"]
 

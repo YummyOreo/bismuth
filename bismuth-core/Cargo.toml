@@ -1,0 +1,15 @@
+[package]
+name = "bismuth-core"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+bismuth-md = {version = "0.1.0", path = "../bismuth-md"}
+bismuth-error = {version = "0.1.0", path = "../bismuth-error"}
+bismuth-lexer = {version = "0.1.0", path = "../bismuth-lexer"}
+clap = { version="4.1.1", features = ["derive", "cargo"] }
+
+[dev-dependencies]
+insta = "1.26.0"

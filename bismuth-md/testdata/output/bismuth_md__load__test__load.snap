@@ -1,0 +1,14 @@
+---
+source: bismuth-md/src/load.rs
+expression: "snapshot(\"./testdata/tests/\")"
+---
+[
+    MarkdownFile {
+        content: "# this is test 0\r\n",
+        path: "./test.markdown",
+    },
+    MarkdownFile {
+        content: "# this is test 1\r\n",
+        path: "./test1.md",
+    },
+]

@@ -1,0 +1,99 @@
+---
+source: bismuth-lexer/src/lib.rs
+expression: "snapshot(\"./testdata/tests/test2.md\")"
+---
+# This is a test↲
+^ Token(Hash, "#", 0 -> 0)
+ ^^^^^^^^^^^^^^^ Token(Text, " This is a test", 1 -> 15)
+                ^ Token(EndOfLine, "\n", 16 -> 16)
+> Block quote↲
+^ Token(GreaterThan, ">", 17 -> 17)
+ ^^^^^^^^^^^^ Token(Text, " Block quote", 18 -> 29)
+             ^ Token(EndOfLine, "\n", 30 -> 30)
+## Will it work:↲
+^^ Token(Hash, "##", 31 -> 32)
+  ^^^^^^^^^^^^^^ Token(Text, " Will it work:", 33 -> 46)
+                ^ Token(EndOfLine, "\n", 47 -> 47)
+- List↲
+^ Token(Dash, "-", 48 -> 48)
+ ^^^^^ Token(Text, " List", 49 -> 53)
+      ^ Token(EndOfLine, "\n", 54 -> 54)
+    Tab?↲
+^^^^ Token(Whitespace, "    ", 55 -> 58)
+    ^^^^ Token(Text, "Tab?", 59 -> 62)
+        ^ Token(EndOfLine, "\n", 63 -> 63)
+1. List item↲
+^^ Token(ListNumber, "1.", 64 -> 65)
+  ^^^^^^^^^^ Token(Text, " List item", 66 -> 75)
+            ^ Token(EndOfLine, "\n", 76 -> 76)
+↲
+^ Token(EndOfLine, "\n", 77 -> 77)
+**Lorem** __ipsum__ dolor sit amet↲
+^^ Token(Asterisk, "**", 78 -> 79)
+  ^^^^^ Token(Text, "Lorem", 80 -> 84)
+       ^^ Token(Asterisk, "**", 85 -> 86)
+         ^ Token(Text, " ", 87 -> 87)
+          ^^ Token(Underscore, "__", 88 -> 89)
+            ^^^^^ Token(Text, "ipsum", 90 -> 94)
+                 ^^ Token(Underscore, "__", 95 -> 96)
+                   ^^^^^^^^^^^^^^^ Token(Text, " dolor sit amet", 97 -> 111)
+                                  ^ Token(EndOfLine, "\n", 112 -> 112)
+↲
+^ Token(EndOfLine, "\n", 113 -> 113)
+---↲
+^^^ Token(Dash, "---", 114 -> 116)
+   ^ Token(EndOfLine, "\n", 117 -> 117)
+# List↲
+^ Token(Hash, "#", 118 -> 118)
+ ^^^^^ Token(Text, " List", 119 -> 123)
+      ^ Token(EndOfLine, "\n", 124 -> 124)
+↲
+^ Token(EndOfLine, "\n", 125 -> 125)
+%{{↲
+^ Token(Percent, "%", 126 -> 126)
+ ^^ Token(CurlybraceLeft, "{{", 127 -> 128)
+   ^ Token(EndOfLine, "\n", 129 -> 129)
+↲
+^ Token(EndOfLine, "\n", 130 -> 130)
+}}↲
+^^ Token(CurlybraceRight, "}}", 131 -> 132)
+  ^ Token(EndOfLine, "\n", 133 -> 133)
+[link]()↲
+^ Token(BracketLeft, "[", 134 -> 134)
+ ^^^^ Token(Text, "link", 135 -> 138)
+     ^ Token(BracketRight, "]", 139 -> 139)
+      ^ Token(ParenthesisLeft, "(", 140 -> 140)
+       ^ Token(ParenthesisRight, ")", 141 -> 141)
+        ^ Token(EndOfLine, "\n", 142 -> 142)
+![file]()↲
+^ Token(Exclamation, "!", 143 -> 143)
+ ^ Token(BracketLeft, "[", 144 -> 144)
+  ^^^^ Token(Text, "file", 145 -> 148)
+      ^ Token(BracketRight, "]", 149 -> 149)
+       ^ Token(ParenthesisLeft, "(", 150 -> 150)
+        ^ Token(ParenthesisRight, ")", 151 -> 151)
+         ^ Token(EndOfLine, "\n", 152 -> 152)
+↲
+^ Token(EndOfLine, "\n", 153 -> 153)
+`inilen`↲
+^ Token(Backtick, "`", 154 -> 154)
+ ^^^^^^ Token(Text, "inilen", 155 -> 160)
+       ^ Token(Backtick, "`", 161 -> 161)
+        ^ Token(EndOfLine, "\n", 162 -> 162)
+```↲
+^^^ Token(Backtick, "```", 163 -> 165)
+   ^ Token(EndOfLine, "\n", 166 -> 166)
+non inline↲
+^^^^^^^^^^ Token(Text, "non inline", 167 -> 176)
+          ^ Token(EndOfLine, "\n", 177 -> 177)
+```↲
+^^^ Token(Backtick, "```", 178 -> 180)
+   ^ Token(EndOfLine, "\n", 181 -> 181)
+↲
+^ Token(EndOfLine, "\n", 182 -> 182)
+$Math?$↲
+^ Token(DollarSign, "$", 183 -> 183)
+ ^^^^^ Token(Text, "Math?", 184 -> 188)
+      ^ Token(DollarSign, "$", 189 -> 189)
+       ^ Token(EndOfLine, "\n", 190 -> 190)
+

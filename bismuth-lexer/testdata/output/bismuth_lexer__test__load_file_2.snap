@@ -1,0 +1,374 @@
+---
+source: bismuth-lexer/src/lib.rs
+expression: "snapshot(\"./testdata/tests/test3.md\")"
+---
+# h1 Heading 8-)↲
+^ Token(Hash, "#", 0 -> 0)
+ ^^^^^^^^^^^^^^ Token(Text, " h1 Heading 8-", 1 -> 14)
+               ^ Token(ParenthesisRight, ")", 15 -> 15)
+                ^ Token(EndOfLine, "\n", 16 -> 16)
+## h2 Heading↲
+^^ Token(Hash, "##", 17 -> 18)
+  ^^^^^^^^^^^ Token(Text, " h2 Heading", 19 -> 29)
+             ^ Token(EndOfLine, "\n", 30 -> 30)
+### h3 Heading↲
+^^^ Token(Hash, "###", 31 -> 33)
+   ^^^^^^^^^^^ Token(Text, " h3 Heading", 34 -> 44)
+              ^ Token(EndOfLine, "\n", 45 -> 45)
+#### h4 Heading↲
+^^^^ Token(Hash, "####", 46 -> 49)
+    ^^^^^^^^^^^ Token(Text, " h4 Heading", 50 -> 60)
+               ^ Token(EndOfLine, "\n", 61 -> 61)
+##### h5 Heading↲
+^^^^^ Token(Hash, "#####", 62 -> 66)
+     ^^^^^^^^^^^ Token(Text, " h5 Heading", 67 -> 77)
+                ^ Token(EndOfLine, "\n", 78 -> 78)
+###### h6 Heading↲
+^^^^^^ Token(Hash, "######", 79 -> 84)
+      ^^^^^^^^^^^ Token(Text, " h6 Heading", 85 -> 95)
+                 ^ Token(EndOfLine, "\n", 96 -> 96)
+↲
+^ Token(EndOfLine, "\n", 97 -> 97)
+↲
+^ Token(EndOfLine, "\n", 98 -> 98)
+## Horizontal Rules↲
+^^ Token(Hash, "##", 99 -> 100)
+  ^^^^^^^^^^^^^^^^^ Token(Text, " Horizontal Rules", 101 -> 117)
+                   ^ Token(EndOfLine, "\n", 118 -> 118)
+↲
+^ Token(EndOfLine, "\n", 119 -> 119)
+---↲
+^^^ Token(Dash, "---", 120 -> 122)
+   ^ Token(EndOfLine, "\n", 123 -> 123)
+↲
+^ Token(EndOfLine, "\n", 124 -> 124)
+!!!!!! ???? ,,  -- ---↲
+^^^^^^^^^^^^^^^^^ Token(Text, "!!!!!! ???? ,,  -", 125 -> 141)
+                 ^ Token(Dash, "-", 142 -> 142)
+                  ^^^^ Token(Text, " ---", 143 -> 146)
+                      ^ Token(EndOfLine, "\n", 147 -> 147)
+↲
+^ Token(EndOfLine, "\n", 148 -> 148)
+"Smartypants, double quotes" and 'single quotes'↲
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Token(Text, "\"Smartypants, double quotes\" and 'single quotes'", 149 -> 196)
+                                                ^ Token(EndOfLine, "\n", 197 -> 197)
+↲
+^ Token(EndOfLine, "\n", 198 -> 198)
+↲
+^ Token(EndOfLine, "\n", 199 -> 199)
+## Emphasis↲
+^^ Token(Hash, "##", 200 -> 201)
+  ^^^^^^^^^ Token(Text, " Emphasis", 202 -> 210)
+           ^ Token(EndOfLine, "\n", 211 -> 211)
+↲
+^ Token(EndOfLine, "\n", 212 -> 212)
+**This is bold text**↲
+^^ Token(Asterisk, "**", 213 -> 214)
+  ^^^^^^^^^^^^^^^^^ Token(Text, "This is bold text", 215 -> 231)
+                   ^^ Token(Asterisk, "**", 232 -> 233)
+                     ^ Token(EndOfLine, "\n", 234 -> 234)
+↲
+^ Token(EndOfLine, "\n", 235 -> 235)
+__This is bold text__↲
+^^ Token(Underscore, "__", 236 -> 237)
+  ^^^^^^^^^^^^^^^^^ Token(Text, "This is bold text", 238 -> 254)
+                   ^^ Token(Underscore, "__", 255 -> 256)
+                     ^ Token(EndOfLine, "\n", 257 -> 257)
+↲
+^ Token(EndOfLine, "\n", 258 -> 258)
+*This is italic text*↲
+^ Token(Asterisk, "*", 259 -> 259)
+ ^^^^^^^^^^^^^^^^^^^ Token(Text, "This is italic text", 260 -> 278)
+                    ^ Token(Asterisk, "*", 279 -> 279)
+                     ^ Token(EndOfLine, "\n", 280 -> 280)
+↲
+^ Token(EndOfLine, "\n", 281 -> 281)
+_This is italic text_↲
+^ Token(Underscore, "_", 282 -> 282)
+ ^^^^^^^^^^^^^^^^^^^ Token(Text, "This is italic text", 283 -> 301)
+                    ^ Token(Underscore, "_", 302 -> 302)
+                     ^ Token(EndOfLine, "\n", 303 -> 303)
+↲
+^ Token(EndOfLine, "\n", 304 -> 304)
+## Blockquotes↲
+^^ Token(Hash, "##", 305 -> 306)
+  ^^^^^^^^^^^^ Token(Text, " Blockquotes", 307 -> 318)
+              ^ Token(EndOfLine, "\n", 319 -> 319)
+↲
+^ Token(EndOfLine, "\n", 320 -> 320)
+↲
+^ Token(EndOfLine, "\n", 321 -> 321)
+> Blockquote...↲
+^ Token(GreaterThan, ">", 322 -> 322)
+ ^^^^^^^^^^^^^^ Token(Text, " Blockquote...", 323 -> 336)
+               ^ Token(EndOfLine, "\n", 337 -> 337)
+↲
+^ Token(EndOfLine, "\n", 338 -> 338)
+↲
+^ Token(EndOfLine, "\n", 339 -> 339)
+## Lists↲
+^^ Token(Hash, "##", 340 -> 341)
+  ^^^^^^ Token(Text, " Lists", 342 -> 347)
+        ^ Token(EndOfLine, "\n", 348 -> 348)
+↲
+^ Token(EndOfLine, "\n", 349 -> 349)
+Unordered↲
+^^^^^^^^^ Token(Text, "Unordered", 350 -> 358)
+         ^ Token(EndOfLine, "\n", 359 -> 359)
+↲
+^ Token(EndOfLine, "\n", 360 -> 360)
+- Sub-lists are made by indenting 2 spaces:↲
+^ Token(Dash, "-", 361 -> 361)
+ ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Token(Text, " Sub-lists are made by indenting 2 spaces:", 362 -> 403)
+                                           ^ Token(EndOfLine, "\n", 404 -> 404)
+  - Marker character change forces new list start:↲
+^^ Token(Whitespace, "  ", 405 -> 406)
+  ^ Token(Dash, "-", 407 -> 407)
+   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Token(Text, " Marker character change forces new list start:", 408 -> 454)
+                                                  ^ Token(EndOfLine, "\n", 455 -> 455)
+    * Ac tristique libero volutpat at↲
+^^^^ Token(Whitespace, "    ", 456 -> 459)
+    ^ Token(Asterisk, "*", 460 -> 460)
+     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Token(Text, " Ac tristique libero volutpat at", 461 -> 492)
+                                     ^ Token(EndOfLine, "\n", 493 -> 493)
+    - Facilisis in pretium nisl aliquet↲
+^^^^ Token(Whitespace, "    ", 494 -> 497)
+    ^ Token(Dash, "-", 498 -> 498)
+     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Token(Text, " Facilisis in pretium nisl aliquet", 499 -> 532)
+                                       ^ Token(EndOfLine, "\n", 533 -> 533)
+    - Nulla volutpat aliquam velit↲
+^^^^ Token(Whitespace, "    ", 534 -> 537)
+    ^ Token(Dash, "-", 538 -> 538)
+     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Token(Text, " Nulla volutpat aliquam velit", 539 -> 567)
+                                  ^ Token(EndOfLine, "\n", 568 -> 568)
+- Very easy!↲
+^ Token(Dash, "-", 569 -> 569)
+ ^^^^^^^^^^ Token(Text, " Very easy", 570 -> 579)
+           ^ Token(Exclamation, "!", 580 -> 580)
+            ^ Token(EndOfLine, "\n", 581 -> 581)
+↲
+^ Token(EndOfLine, "\n", 582 -> 582)
+Ordered↲
+^^^^^^^ Token(Text, "Ordered", 583 -> 589)
+       ^ Token(EndOfLine, "\n", 590 -> 590)
+↲
+^ Token(EndOfLine, "\n", 591 -> 591)
+1. Lorem ipsum dolor sit amet↲
+^^ Token(ListNumber, "1.", 592 -> 593)
+  ^^^^^^^^^^^^^^^^^^^^^^^^^^^ Token(Text, " Lorem ipsum dolor sit amet", 594 -> 620)
+                             ^ Token(EndOfLine, "\n", 621 -> 621)
+2. Consectetur adipiscing elit↲
+^^ Token(ListNumber, "2.", 622 -> 623)
+  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Token(Text, " Consectetur adipiscing elit", 624 -> 651)
+                              ^ Token(EndOfLine, "\n", 652 -> 652)
+3. Integer molestie lorem at massa↲
+^^ Token(ListNumber, "3.", 653 -> 654)
+  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Token(Text, " Integer molestie lorem at massa", 655 -> 686)
+                                  ^ Token(EndOfLine, "\n", 687 -> 687)
+↲
+^ Token(EndOfLine, "\n", 688 -> 688)
+↲
+^ Token(EndOfLine, "\n", 689 -> 689)
+1. You can use sequential numbers...↲
+^^ Token(ListNumber, "1.", 690 -> 691)
+  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Token(Text, " You can use sequential numbers...", 692 -> 725)
+                                    ^ Token(EndOfLine, "\n", 726 -> 726)
+1. ...or keep all the numbers as `1.`↲
+^^ Token(ListNumber, "1.", 727 -> 728)
+  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Token(Text, " ...or keep all the numbers as ", 729 -> 759)
+                                 ^ Token(Backtick, "`", 760 -> 760)
+                                  ^^ Token(Text, "1.", 761 -> 762)
+                                    ^ Token(Backtick, "`", 763 -> 763)
+                                     ^ Token(EndOfLine, "\n", 764 -> 764)
+↲
+^ Token(EndOfLine, "\n", 765 -> 765)
+Start numbering with offset:↲
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Token(Text, "Start numbering with offset:", 766 -> 793)
+                            ^ Token(EndOfLine, "\n", 794 -> 794)
+↲
+^ Token(EndOfLine, "\n", 795 -> 795)
+57. foo↲
+^^^ Token(ListNumber, "57.", 796 -> 798)
+   ^^^^ Token(Text, " foo", 799 -> 802)
+       ^ Token(EndOfLine, "\n", 803 -> 803)
+1. bar↲
+^^ Token(ListNumber, "1.", 804 -> 805)
+  ^^^^ Token(Text, " bar", 806 -> 809)
+      ^ Token(EndOfLine, "\n", 810 -> 810)
+↲
+^ Token(EndOfLine, "\n", 811 -> 811)
+↲
+^ Token(EndOfLine, "\n", 812 -> 812)
+## Code↲
+^^ Token(Hash, "##", 813 -> 814)
+  ^^^^^ Token(Text, " Code", 815 -> 819)
+       ^ Token(EndOfLine, "\n", 820 -> 820)
+↲
+^ Token(EndOfLine, "\n", 821 -> 821)
+Inline `code`↲
+^^^^^^^ Token(Text, "Inline ", 822 -> 828)
+       ^ Token(Backtick, "`", 829 -> 829)
+        ^^^^ Token(Text, "code", 830 -> 833)
+            ^ Token(Backtick, "`", 834 -> 834)
+             ^ Token(EndOfLine, "\n", 835 -> 835)
+↲
+^ Token(EndOfLine, "\n", 836 -> 836)
+Block code "fences"↲
+^^^^^^^^^^^^^^^^^^^ Token(Text, "Block code \"fences\"", 837 -> 855)
+                   ^ Token(EndOfLine, "\n", 856 -> 856)
+↲
+^ Token(EndOfLine, "\n", 857 -> 857)
+```↲
+^^^ Token(Backtick, "```", 858 -> 860)
+   ^ Token(EndOfLine, "\n", 861 -> 861)
+Sample text here...↲
+^^^^^^^^^^^^^^^^^^^ Token(Text, "Sample text here...", 862 -> 880)
+                   ^ Token(EndOfLine, "\n", 881 -> 881)
+```↲
+^^^ Token(Backtick, "```", 882 -> 884)
+   ^ Token(EndOfLine, "\n", 885 -> 885)
+↲
+^ Token(EndOfLine, "\n", 886 -> 886)
+Syntax highlighting↲
+^^^^^^^^^^^^^^^^^^^ Token(Text, "Syntax highlighting", 887 -> 905)
+                   ^ Token(EndOfLine, "\n", 906 -> 906)
+↲
+^ Token(EndOfLine, "\n", 907 -> 907)
+``` js↲
+^^^ Token(Backtick, "```", 908 -> 910)
+   ^^^ Token(Text, " js", 911 -> 913)
+      ^ Token(EndOfLine, "\n", 914 -> 914)
+var foo = function (bar) {↲
+^^^^^^^^^^^^^^^^^^^ Token(Text, "var foo = function ", 915 -> 933)
+                   ^ Token(ParenthesisLeft, "(", 934 -> 934)
+                    ^^^ Token(Text, "bar", 935 -> 937)
+                       ^ Token(ParenthesisRight, ")", 938 -> 938)
+                        ^ Token(Text, " ", 939 -> 939)
+                         ^ Token(CurlybraceLeft, "{", 940 -> 940)
+                          ^ Token(EndOfLine, "\n", 941 -> 941)
+  return bar++;↲
+^^ Token(Whitespace, "  ", 942 -> 943)
+  ^^^^^^^^^^^^^ Token(Text, "return bar++;", 944 -> 956)
+               ^ Token(EndOfLine, "\n", 957 -> 957)
+};↲
+^ Token(CurlybraceRight, "}", 958 -> 958)
+ ^ Token(Text, ";", 959 -> 959)
+  ^ Token(EndOfLine, "\n", 960 -> 960)
+↲
+^ Token(EndOfLine, "\n", 961 -> 961)
+console.log(foo(5));↲
+^^^^^^^^^^^ Token(Text, "console.log", 962 -> 972)
+           ^ Token(ParenthesisLeft, "(", 973 -> 973)
+            ^^^ Token(Text, "foo", 974 -> 976)
+               ^ Token(ParenthesisLeft, "(", 977 -> 977)
+                ^ Token(Text, "5", 978 -> 978)
+                 ^^ Token(ParenthesisRight, "))", 979 -> 980)
+                   ^ Token(Text, ";", 981 -> 981)
+                    ^ Token(EndOfLine, "\n", 982 -> 982)
+```↲
+^^^ Token(Backtick, "```", 983 -> 985)
+   ^ Token(EndOfLine, "\n", 986 -> 986)
+↲
+^ Token(EndOfLine, "\n", 987 -> 987)
+## Links↲
+^^ Token(Hash, "##", 988 -> 989)
+  ^^^^^^ Token(Text, " Links", 990 -> 995)
+        ^ Token(EndOfLine, "\n", 996 -> 996)
+↲
+^ Token(EndOfLine, "\n", 997 -> 997)
+[link text](example.com)↲
+^ Token(BracketLeft, "[", 998 -> 998)
+ ^^^^^^^^^ Token(Text, "link text", 999 -> 1007)
+          ^ Token(BracketRight, "]", 1008 -> 1008)
+           ^ Token(ParenthesisLeft, "(", 1009 -> 1009)
+            ^^^^^^^^^^^ Token(Text, "example.com", 1010 -> 1020)
+                       ^ Token(ParenthesisRight, ")", 1021 -> 1021)
+                        ^ Token(EndOfLine, "\n", 1022 -> 1022)
+↲
+^ Token(EndOfLine, "\n", 1023 -> 1023)
+[link with title](example.com)↲
+^ Token(BracketLeft, "[", 1024 -> 1024)
+ ^^^^^^^^^^^^^^^ Token(Text, "link with title", 1025 -> 1039)
+                ^ Token(BracketRight, "]", 1040 -> 1040)
+                 ^ Token(ParenthesisLeft, "(", 1041 -> 1041)
+                  ^^^^^^^^^^^ Token(Text, "example.com", 1042 -> 1052)
+                             ^ Token(ParenthesisRight, ")", 1053 -> 1053)
+                              ^ Token(EndOfLine, "\n", 1054 -> 1054)
+↲
+^ Token(EndOfLine, "\n", 1055 -> 1055)
+## Images↲
+^^ Token(Hash, "##", 1056 -> 1057)
+  ^^^^^^^ Token(Text, " Images", 1058 -> 1064)
+         ^ Token(EndOfLine, "\n", 1065 -> 1065)
+↲
+^ Token(EndOfLine, "\n", 1066 -> 1066)
+![Minion](example.com)↲
+^ Token(Exclamation, "!", 1067 -> 1067)
+ ^ Token(BracketLeft, "[", 1068 -> 1068)
+  ^^^^^^ Token(Text, "Minion", 1069 -> 1074)
+        ^ Token(BracketRight, "]", 1075 -> 1075)
+         ^ Token(ParenthesisLeft, "(", 1076 -> 1076)
+          ^^^^^^^^^^^ Token(Text, "example.com", 1077 -> 1087)
+                     ^ Token(ParenthesisRight, ")", 1088 -> 1088)
+                      ^ Token(EndOfLine, "\n", 1089 -> 1089)
+![Stormtroopocat](example.com)↲
+^ Token(Exclamation, "!", 1090 -> 1090)
+ ^ Token(BracketLeft, "[", 1091 -> 1091)
+  ^^^^^^^^^^^^^^ Token(Text, "Stormtroopocat", 1092 -> 1105)
+                ^ Token(BracketRight, "]", 1106 -> 1106)
+                 ^ Token(ParenthesisLeft, "(", 1107 -> 1107)
+                  ^^^^^^^^^^^ Token(Text, "example.com", 1108 -> 1118)
+                             ^ Token(ParenthesisRight, ")", 1119 -> 1119)
+                              ^ Token(EndOfLine, "\n", 1120 -> 1120)
+↲
+^ Token(EndOfLine, "\n", 1121 -> 1121)
+Like links, Images also have a footnote style syntax↲
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Token(Text, "Like links, Images also have a footnote style syntax", 1122 -> 1173)
+                                                    ^ Token(EndOfLine, "\n", 1174 -> 1174)
+↲
+^ Token(EndOfLine, "\n", 1175 -> 1175)
+## Custom stuff:↲
+^^ Token(Hash, "##", 1176 -> 1177)
+  ^^^^^^^^^^^^^^ Token(Text, " Custom stuff:", 1178 -> 1191)
+                ^ Token(EndOfLine, "\n", 1192 -> 1192)
+%{{↲
+^ Token(Percent, "%", 1193 -> 1193)
+ ^^ Token(CurlybraceLeft, "{{", 1194 -> 1195)
+   ^ Token(EndOfLine, "\n", 1196 -> 1196)
+    templates here↲
+^^^^ Token(Whitespace, "    ", 1197 -> 1200)
+    ^^^^^^^^^^^^^^ Token(Text, "templates here", 1201 -> 1214)
+                  ^ Token(EndOfLine, "\n", 1215 -> 1215)
+    or lists↲
+^^^^ Token(Whitespace, "    ", 1216 -> 1219)
+    ^^^^^^^^ Token(Text, "or lists", 1220 -> 1227)
+            ^ Token(EndOfLine, "\n", 1228 -> 1228)
+}}↲
+^^ Token(CurlybraceRight, "}}", 1229 -> 1230)
+  ^ Token(EndOfLine, "\n", 1231 -> 1231)
+↲
+^ Token(EndOfLine, "\n", 1232 -> 1232)
+### Tex:↲
+^^^ Token(Hash, "###", 1233 -> 1235)
+   ^^^^^ Token(Text, " Tex:", 1236 -> 1240)
+        ^ Token(EndOfLine, "\n", 1241 -> 1241)
+↲
+^ Token(EndOfLine, "\n", 1242 -> 1242)
+inline $Tex$↲
+^^^^^^^ Token(Text, "inline ", 1243 -> 1249)
+       ^ Token(DollarSign, "$", 1250 -> 1250)
+        ^^^ Token(Text, "Tex", 1251 -> 1253)
+           ^ Token(DollarSign, "$", 1254 -> 1254)
+            ^ Token(EndOfLine, "\n", 1255 -> 1255)
+↲
+^ Token(EndOfLine, "\n", 1256 -> 1256)
+$$↲
+^^ Token(DollarSign, "$$", 1257 -> 1258)
+  ^ Token(EndOfLine, "\n", 1259 -> 1259)
+None inline↲
+^^^^^^^^^^^ Token(Text, "None inline", 1260 -> 1270)
+           ^ Token(EndOfLine, "\n", 1271 -> 1271)
+$$↲
+^^ Token(DollarSign, "$$", 1272 -> 1273)
+  ^ Token(EndOfLine, "\n", 1274 -> 1274)
+

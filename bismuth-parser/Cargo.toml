@@ -1,0 +1,17 @@
+[package]
+name = "bismuth-parser"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+bismuth-lexer = {version = "0.1.0", path = "../bismuth-lexer"}
+bismuth-md = {version = "0.1.0", path = "../bismuth-md"}
+serde = {version = "1.0.152", features = ["derive"]}
+serde_yaml = "0.9"
+rand = "0.8.5"
+regex = "1"
+
+[dev-dependencies]
+insta = "1.26.0"
