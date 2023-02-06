@@ -103,8 +103,6 @@ impl Parser {
         if self.current_element().is_some() {
             let curr_elm = {
                 let mut elm = self.current_element.as_mut().expect("Should be there");
-                println!("inside {:#?}", self.state.inside);
-                println!("elms {:#?}", elm.elements);
 
                 for compair_id in &self.state.inside {
                     if let Some(p) = elm.elements.iter().position(|e| e.get_id() == *compair_id) {
@@ -114,7 +112,6 @@ impl Parser {
                 elm
             };
 
-            println!("{elm:?} | {curr_elm:?}");
             if elm.kind != Kind::EndOfLine {
                 self.state.new_line = false;
                 curr_elm.append_node(elm);
@@ -189,12 +186,7 @@ impl Parser {
     }
 
     fn peek_till_kind(&self, kind: &TokenType) -> Result<Vec<Token>, error::ParseError> {
-        // println!("tokens ptk {:#?}", self.lexer.tokens);
-        // println!("curr_index ptk {}", self.current_token_index);
         let tokens_after = self.lexer.tokens.split_at(self.current_token_index).1;
-        println!("{tokens_after:?}");
-        // println!("{tokens_after:#?}");
-        // println!("{kind:#?}");
         let end = tokens_after
             .iter()
             .position(|t| &t.kind == kind)
@@ -270,16 +262,6 @@ impl Parser {
         let mut elm = Element::new(Kind::Header);
         elm.add_attr("level", &num.to_string());
         self.append_element(elm);
-        Ok(())
-    }
-
-    fn handle_greaterthan(&mut self) -> ParseReturn {
-        if self.state.indent_level == 1 {
-            let elm = Element::new(Kind::Blockquote);
-            self.append_element(elm);
-        } else {
-            self.append_element(self.make_text_at_token()?);
-        }
         Ok(())
     }
 
@@ -381,7 +363,6 @@ impl Parser {
         }
         self.advance_n_token(1)?;
         let inside = self.peek_till_kind(&kind).unwrap();
-        println!("{inside:#?}");
 
         let mut last_index = self.current_token_index;
         let mut last_diff = 0;
@@ -390,11 +371,9 @@ impl Parser {
                 last_diff -= 1;
                 continue;
             }
-            println!("tk hc {:?}", token.kind);
             self.parse_token(token).unwrap();
             let advance_diff = self.current_token_index - last_index;
             last_diff = advance_diff + 1;
-            println!("diff hc {advance_diff}");
 
             self.advance_n_token(1).unwrap();
 
@@ -452,7 +431,11 @@ impl Parser {
             TokenType::Dash => self.handle_dash(),
             TokenType::ListNumber => self.handle_num(),
 
-            TokenType::GreaterThan => self.handle_greaterthan(),
+            TokenType::GreaterThan => {
+                let elm = Element::new(Kind::Blockquote);
+                self.append_element(elm);
+                Ok(())
+            }
 
             TokenType::Asterisk => self.handle_container(TokenType::Asterisk),
             TokenType::Backtick => self.handle_container(TokenType::Backtick),
@@ -481,16 +464,11 @@ impl Parser {
             .is_ok()
         } {
             let token = self.current_token()?.clone();
-            // println!("{token:#?}");
             if token.kind == TokenType::EndOfFile {
                 break;
             }
 
             self.parse_token(&token)?;
-            // println!("{self:#?}");
-            // println!();
-            // println!("---");
-            // println!();
         }
         // append the last element
         self.ast.elements.push(self.current_element.clone());
@@ -598,8 +576,8 @@ mod test_utils {
 #[cfg(test)]
 mod test {
     use super::*;
-    use std::path::PathBuf;
     use regex::Regex;
+    use std::path::PathBuf;
 
     fn init_lexer(content: &str) -> Lexer {
         let content = content.to_string();
@@ -629,11 +607,19 @@ mod test {
     }
 
     #[test]
-    fn name() {
+    fn test() {
         let lexer = init_lexer("test \n test *__test__* none");
         let mut parser = Parser::new(lexer);
         parser.parse().unwrap();
 
+        snapshot!(parser);
+    }
+
+    #[test]
+    fn test_1() {
+        let lexer = init_lexer("## header\n> blockquote\n- list\n\t- item");
+        let mut parser = Parser::new(lexer);
+        parser.parse().unwrap();
 
         snapshot!(parser);
     }
