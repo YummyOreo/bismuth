@@ -401,7 +401,6 @@ impl Parser {
             last_index = self.current_token_index;
         }
         self.state.inside.pop();
-        self.advance_n_token(1)?;
         Ok(())
     }
 
@@ -493,8 +492,9 @@ impl Parser {
             // println!("---");
             // println!();
         }
-        println!("{self:#?}");
-        panic!();
+        // append the last element
+        self.ast.elements.push(self.current_element.clone());
+        self.current_element = None;
         Ok(())
     }
 }
