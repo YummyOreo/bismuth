@@ -29,11 +29,21 @@ impl Metadata {
     }
 }
 
-#[derive(Default, Debug)]
+#[derive(Debug)]
 struct State {
     pub new_line: bool,
     pub inside: Vec<u32>,
     pub indent_level: i32,
+}
+
+impl Default for State {
+    fn default() -> Self {
+        Self {
+            new_line: true,
+            inside: vec![],
+            indent_level: 0,
+        }
+    }
 }
 
 type ParseReturn = Result<(), error::ParseError>;
@@ -296,6 +306,7 @@ impl Parser {
         let is_newline = self.state.new_line;
         let is_curlybrace = peek.kind == TokenType::CurlybraceLeft;
         let is_2_len = self.token_len(peek) == 2;
+        println!("{is_newline}, {is_curlybrace}, {is_2_len}");
 
         if is_newline && is_curlybrace && is_2_len {
             // advance past %{{
@@ -305,24 +316,30 @@ impl Parser {
             let pattern = vec![
                 TokenType::EndOfLine,
                 TokenType::CurlybraceRight,
-                TokenType::CurlybraceRight,
                 TokenType::EndOfLine,
             ];
+            let pattern_or = vec![
+                TokenType::EndOfLine,
+                TokenType::CurlybraceRight,
+                TokenType::EndOfFile,
+            ];
 
-            let end = self.till_pattern(&pattern)?;
+            let end = self
+                .till_pattern(&pattern)
+                .unwrap_or(self.till_pattern(&pattern_or)?);
 
             // gets the tokens that are inside of the custom element
             let inside_tokens = self.peek_till(end)?;
 
             // appends the text of those tokens to a string
-            let inside_str = inside_tokens
+            // need to -3 because it includes \n}}\n
+            let inside_str = inside_tokens[0..inside_tokens.len() - 3]
                 .iter()
                 .map(|t| t.text.iter().collect::<String>())
                 .collect::<String>();
 
-            // advances past the inside... \n}}\n (we don't need to advance pas the last \n because
-            // it will auto do that for us)
-            self.advance_n_token(inside_tokens.len() + 2)?;
+            // advance past inside till last \n
+            self.advance_n_token(inside_tokens.len() - 2)?;
 
             // makes the custom element
             let c = custom::CustomElm::from_string(&inside_str)
@@ -464,6 +481,7 @@ impl Parser {
             .is_ok()
         } {
             let token = self.current_token()?.clone();
+            println!("{token:?}");
             if token.kind == TokenType::EndOfFile {
                 break;
             }
@@ -617,7 +635,26 @@ mod test {
 
     #[test]
     fn test_1() {
-        let lexer = init_lexer("## header\n> blockquote\n- list\n\t- item\n        - level _**two??**_");
+        let lexer =
+            init_lexer("## header\n> blockquote\n- list\n\t- item\n        - level _**two??**_");
+        let mut parser = Parser::new(lexer);
+        parser.parse().unwrap();
+
+        snapshot!(parser);
+    }
+
+    #[test]
+    fn test_custom() {
+        let lexer = init_lexer("%{{\nname: test\nother: key\n---\nbody\ntest\n}}\n---\ntest");
+        let mut parser = Parser::new(lexer);
+        parser.parse().unwrap();
+
+        snapshot!(parser);
+    }
+
+    #[test]
+    fn test_custom_1() {
+        let lexer = init_lexer("%{{\nname: test\nother: key\n---\nbody\ntest\n}}");
         let mut parser = Parser::new(lexer);
         parser.parse().unwrap();
 

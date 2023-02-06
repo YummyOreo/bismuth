@@ -179,11 +179,19 @@ Parser {
         elements: [
             Some(
                 Element {
-                    kind: Text,
-                    elements: [],
-                    text: Some(
-                        "test ",
-                    ),
+                    kind: Paragraph,
+                    elements: [
+                        Element {
+                            kind: Text,
+                            elements: [],
+                            text: Some(
+                                "test ",
+                            ),
+                            attrs: {},
+                            id: [Random],
+                        },
+                    ],
+                    text: None,
                     attrs: {},
                     id: [Random],
                 },
