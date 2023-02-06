@@ -617,7 +617,7 @@ mod test {
 
     #[test]
     fn test_1() {
-        let lexer = init_lexer("## header\n> blockquote\n- list\n\t- item");
+        let lexer = init_lexer("## header\n> blockquote\n- list\n\t- item\n        - level _**two??**_");
         let mut parser = Parser::new(lexer);
         parser.parse().unwrap();
 

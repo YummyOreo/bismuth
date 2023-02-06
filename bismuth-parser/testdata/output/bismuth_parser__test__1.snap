@@ -43,11 +43,39 @@ Parser {
             't',
             'e',
             'm',
+            '\n',
+            ' ',
+            ' ',
+            ' ',
+            ' ',
+            ' ',
+            ' ',
+            ' ',
+            ' ',
+            '-',
+            ' ',
+            'l',
+            'e',
+            'v',
+            'e',
+            'l',
+            ' ',
+            '_',
+            '*',
+            '*',
+            't',
+            'w',
+            'o',
+            '?',
+            '?',
+            '*',
+            '*',
+            '_',
         ],
-        position: 37,
+        position: 65,
         current_token: Token {
-            start: 37,
-            end: 37,
+            start: 65,
+            end: 65,
             kind: EndOfFile,
             text: [],
         },
@@ -182,12 +210,103 @@ Parser {
             Token {
                 start: 37,
                 end: 37,
+                kind: EndOfLine,
+                text: [
+                    '\n',
+                ],
+            },
+            Token {
+                start: 38,
+                end: 45,
+                kind: Whitespace,
+                text: [
+                    ' ',
+                    ' ',
+                    ' ',
+                    ' ',
+                    ' ',
+                    ' ',
+                    ' ',
+                    ' ',
+                ],
+            },
+            Token {
+                start: 46,
+                end: 46,
+                kind: Dash,
+                text: [
+                    '-',
+                ],
+            },
+            Token {
+                start: 47,
+                end: 53,
+                kind: Text,
+                text: [
+                    ' ',
+                    'l',
+                    'e',
+                    'v',
+                    'e',
+                    'l',
+                    ' ',
+                ],
+            },
+            Token {
+                start: 54,
+                end: 54,
+                kind: Underscore,
+                text: [
+                    '_',
+                ],
+            },
+            Token {
+                start: 55,
+                end: 56,
+                kind: Asterisk,
+                text: [
+                    '*',
+                    '*',
+                ],
+            },
+            Token {
+                start: 57,
+                end: 61,
+                kind: Text,
+                text: [
+                    't',
+                    'w',
+                    'o',
+                    '?',
+                    '?',
+                ],
+            },
+            Token {
+                start: 62,
+                end: 63,
+                kind: Asterisk,
+                text: [
+                    '*',
+                    '*',
+                ],
+            },
+            Token {
+                start: 64,
+                end: 64,
+                kind: Underscore,
+                text: [
+                    '_',
+                ],
+            },
+            Token {
+                start: 65,
+                end: 65,
                 kind: EndOfFile,
                 text: [],
             },
         ],
     },
-    current_token_index: 13,
+    current_token_index: 22,
     metadata: Metadata {
         absolute_path: "/test/",
         fontmatter: FontMatter {
@@ -207,7 +326,7 @@ Parser {
     state: State {
         new_line: false,
         inside: [],
-        indent_level: 1,
+        indent_level: 2,
     },
     ast: Ast {
         elements: [
@@ -316,6 +435,61 @@ Parser {
                     text: None,
                     attrs: {
                         "level": "1",
+                    },
+                    id: [Random],
+                },
+            ),
+            Some(
+                Element {
+                    kind: EndOfLine,
+                    elements: [],
+                    text: None,
+                    attrs: {},
+                    id: [Random],
+                },
+            ),
+            Some(
+                Element {
+                    kind: ListItem,
+                    elements: [
+                        Element {
+                            kind: Text,
+                            elements: [],
+                            text: Some(
+                                " level ",
+                            ),
+                            attrs: {},
+                            id: [Random],
+                        },
+                        Element {
+                            kind: Italic,
+                            elements: [
+                                Element {
+                                    kind: Bold,
+                                    elements: [
+                                        Element {
+                                            kind: Text,
+                                            elements: [],
+                                            text: Some(
+                                                "two??",
+                                            ),
+                                            attrs: {},
+                                            id: [Random],
+                                        },
+                                    ],
+                                    text: None,
+                                    attrs: {},
+                                    id: [Random],
+                                },
+                            ],
+                            text: None,
+                            attrs: {},
+                            id: [Random],
+                        },
+                    ],
+                    text: None,
+                    attrs: {
+                        "level": "2",
                     },
                     id: [Random],
                 },
