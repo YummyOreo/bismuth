@@ -1,4 +1,4 @@
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq, Default)]
 pub struct Token {
     pub start: usize,
     pub end: usize,
@@ -72,4 +72,10 @@ pub enum TokenType {
     FontmatterStart,
     FontmatterInside,
     FontmatterEnd,
+}
+
+impl Default for TokenType {
+    fn default() -> Self {
+        TokenType::Text
+    }
 }

@@ -594,7 +594,6 @@ mod test_utils {
 #[cfg(test)]
 mod test {
     use super::*;
-    use regex::Regex;
     use std::collections::HashMap;
     use std::path::PathBuf;
 
@@ -652,7 +651,6 @@ mod test {
         }
         s
     }
-
 
     macro_rules! snapshot {
         ($content:tt) => {

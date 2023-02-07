@@ -340,64 +340,30 @@ impl Lexer {
     }
 
     fn handle_number(&mut self) -> Result<token::Token, LexerError> {
-        if let Some(t) = {
-            if self.tokens.is_empty() {
-                Some(token::Token::new(
-                    token::TokenType::EndOfLine,
-                    Default::default(),
-                    Default::default(),
-                    Default::default(),
-                ))
-            } else {
-                Some(self.current_token.clone())
-            }
-        } {
-            println!("{t:#?}");
-            println!("{:#?}", self.current());
-            match t.kind {
-                token::TokenType::Whitespace
-                | token::TokenType::Tab
-                | token::TokenType::EndOfLine => {
-                    println!("num");
-                    let till_dot =
-                        self.peek_regex(Regex::new(r"\d*\.").expect("Should be valid regex"));
-                    let end = *till_dot.end();
-                    let text = self.get_range(till_dot);
-                    let t = token::Token {
-                        start: self.position,
-                        end,
-                        kind: token::TokenType::ListNumber,
+        let t = self.current_token.clone();
+        match t.kind {
+            token::TokenType::Whitespace
+            | token::TokenType::Tab
+            | token::TokenType::EndOfLine
+            | token::TokenType::StartOfFile => {
+                println!("num");
+                let till_dot =
+                    self.peek_regex(Regex::new(r"\d*\.").expect("Should be valid regex"));
+                let end = *till_dot.end();
+                let text = self.get_range(till_dot);
+                let t = token::Token {
+                    start: self.position,
+                    end,
+                    kind: token::TokenType::ListNumber,
 
-                        text,
-                    };
-                    self.move_to(end)?;
-                    println!("num");
-                    return Ok(t);
-                }
-                _ => {}
+                    text,
+                };
+                self.move_to(end)?;
+                println!("num");
+                Ok(t)
             }
+            _ => self.make_token_at_pos(token::TokenType::Text),
         }
-
-        self.make_token_at_pos(token::TokenType::Text)
-        //
-        // match back {
-        //     &'\n' | &'\t' => {
-        //         let till_dot =
-        //             self.peek_regex(Regex::new(r"\d*\.").expect("Should be valid regex"));
-        //         let end = *till_dot.end();
-        //         let text = self.get_range(till_dot);
-        //         let t = token::Token {
-        //             start: self.position,
-        //             end,
-        //             kind: token::TokenType::ListNumber,
-        //
-        //             text,
-        //         };
-        //         self.move_to(end)?;
-        //         Ok(t)
-        //     }
-        //     _ => self.make_token_at_pos(token::TokenType::Text),
-        // }
     }
 
     fn match_char(&mut self) -> Result<token::Token, LexerError> {
