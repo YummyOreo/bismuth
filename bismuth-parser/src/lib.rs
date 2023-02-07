@@ -595,6 +595,7 @@ mod test_utils {
 mod test {
     use super::*;
     use regex::Regex;
+    use std::collections::HashMap;
     use std::path::PathBuf;
 
     fn init_lexer(content: &str) -> Lexer {
@@ -605,11 +606,53 @@ mod test {
         l
     }
 
-    fn snapshot(parser: Parser) -> String {
-        let s = format!("{parser:#?}");
-        let re = Regex::new(r"id: \d+").expect("Should be valid regex");
-        re.replace_all(&s, "id: [Random]").to_string()
+    fn sort_hm(map: &HashMap<String, String>) -> String {
+        let mut keys_values = map.iter().collect::<Vec<(&String, &String)>>();
+        keys_values.sort();
+        format!("{keys_values:?}")
     }
+
+    fn format_kind(kind: &Kind) -> String {
+        match kind {
+            Kind::CustomElement(c) => {
+                format!(
+                    "Custom{{Name: {}, Body: {:?}, Values: {}}}",
+                    c.name,
+                    c.body,
+                    sort_hm(&c.values)
+                )
+            }
+            _ => format!("{kind:?}"),
+        }
+    }
+
+    fn render_element(element: &Element, level: usize) -> String {
+        let t = "    ";
+        let ts = t.repeat(level);
+        let mut s = format!(
+            "Element{{\n{ts}{t}Kind: {:#?},\n{ts}{t}Text: {:?},\n{ts}{t}Attrs: {},\n{ts}{t}Elements: [\n",
+            format_kind(&element.kind),
+            element.text,
+            sort_hm(&element.attrs)
+        );
+        for elm in &element.elements {
+            let inside_s = format!("{ts}{ts}{t}{}", render_element(elm, level + 1));
+            s.push_str(&inside_s);
+        }
+        s.push_str(&format!("\n{ts}{t}])\n{ts}}}"));
+        s
+    }
+
+    fn format_parser(parser: Parser) -> String {
+        let ast = &parser.ast;
+        let mut s = String::new();
+        for element in &ast.elements {
+            s.push_str(&render_element(&element.clone().unwrap(), 0));
+            s.push('\n');
+        }
+        s
+    }
+
 
     macro_rules! snapshot {
         ($content:tt) => {
@@ -618,7 +661,7 @@ mod test {
             let mut settings = insta::Settings::clone_current();
             settings.set_snapshot_path("../testdata/output/");
             settings.bind(|| {
-                insta::assert_snapshot!(snapshot($content));
+                insta::assert_snapshot!(format_parser($content));
             });
             // }
         };
@@ -637,6 +680,15 @@ mod test {
     fn test_1() {
         let lexer =
             init_lexer("## header\n> blockquote\n- list\n\t- item\n        - level _**two??**_");
+        let mut parser = Parser::new(lexer);
+        parser.parse().unwrap();
+
+        snapshot!(parser);
+    }
+
+    #[test]
+    fn test_2() {
+        let lexer = init_lexer("1. list item\n\t2. hmm");
         let mut parser = Parser::new(lexer);
         parser.parse().unwrap();
 

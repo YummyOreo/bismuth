@@ -10,9 +10,9 @@ pub enum CustomElmError {
 
 #[derive(Default, Debug, Clone, PartialEq)]
 pub struct CustomElm {
-    name: String,
-    values: HashMap<String, String>,
-    body: Option<String>,
+    pub name: String,
+    pub values: HashMap<String, String>,
+    pub body: Option<String>,
 }
 
 impl CustomElm {

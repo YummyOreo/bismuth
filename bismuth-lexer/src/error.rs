@@ -4,4 +4,5 @@ pub enum LexerError {
     MoveError(usize),
     PeekError(usize),
     FontmatterError,
+    MathError,
 }
