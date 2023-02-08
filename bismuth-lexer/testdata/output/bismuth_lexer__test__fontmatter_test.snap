@@ -14,4 +14,6 @@ this: "font matter"↲
 ^ Token(Hash, "#", 28 -> 28)
  ^^^^^ Token(Text, " TEST", 29 -> 33)
       ^ Token(EndOfLine, "\n", 34 -> 34)
+↲
+^ Token(EndOfLine, "\n", 35 -> 35)
 

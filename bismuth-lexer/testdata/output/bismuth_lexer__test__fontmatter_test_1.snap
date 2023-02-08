@@ -13,4 +13,6 @@ this: "is a test of muli line support?"↲
 ---↲
 ^^^ Token(FontmatterEnd, "---", 83 -> 85)
    ^ Token(EndOfLine, "\n", 86 -> 86)
+↲
+^ Token(EndOfLine, "\n", 87 -> 87)
 

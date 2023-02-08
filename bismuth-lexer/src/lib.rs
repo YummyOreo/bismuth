@@ -23,6 +23,7 @@ impl Lexer {
     pub fn new(file: MarkdownFile) -> Self {
         let mut content = file.content.chars().collect::<Vec<char>>();
         content.retain(|c| c != &'\r');
+        content.push('\n');
         Lexer {
             path: file.path,
             chars: content,
@@ -36,6 +37,7 @@ impl Lexer {
     pub fn new_test(path: PathBuf, content: String) -> Self {
         let mut content = content.chars().collect::<Vec<char>>();
         content.retain(|c| c != &'\r');
+        content.push('\n');
         Lexer {
             path,
             chars: content,
@@ -476,13 +478,13 @@ mod test_utils {
         let mut lexer = Lexer::new(file);
         lexer.move_to(15).unwrap();
 
-        assert_eq!(lexer.peek_till(&'c'), 15..=lexer.chars.len() - 2);
+        assert_eq!(lexer.peek_till(&'c'), 15..=lexer.chars.len() - 3);
 
         let file = setup("this is a test aaaaaab");
         let mut lexer = Lexer::new(file);
         lexer.move_to(15).unwrap();
 
-        assert_eq!(lexer.peek_till(&'b'), 15..=lexer.chars.len() - 2);
+        assert_eq!(lexer.peek_till(&'b'), 15..=lexer.chars.len() - 3);
     }
 
     #[test]
@@ -491,13 +493,13 @@ mod test_utils {
         let mut lexer = Lexer::new(file);
         lexer.move_to(15).unwrap();
 
-        assert_eq!(lexer.peek_till_diff(), 15..=lexer.chars.len() - 2);
+        assert_eq!(lexer.peek_till_diff(), 15..=lexer.chars.len() - 3);
 
         let file = setup("this is a test aaaaaa");
         let mut lexer = Lexer::new(file);
         lexer.move_to(15).unwrap();
 
-        assert_eq!(lexer.peek_till_diff(), 15..=lexer.chars.len() - 1);
+        assert_eq!(lexer.peek_till_diff(), 15..=lexer.chars.len() - 2);
     }
 
     #[test]
@@ -544,7 +546,7 @@ mod test_utils {
         let mut lexer = Lexer::new(file);
         lexer.move_to(21).unwrap();
 
-        let re = Regex::new(r"(est,\s$)").unwrap();
+        let re = Regex::new(r"(est,\s)").unwrap();
         assert_eq!(lexer.peek_regex(re), 25..=29);
     }
 }

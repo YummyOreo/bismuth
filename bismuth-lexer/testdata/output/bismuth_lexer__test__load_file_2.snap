@@ -371,4 +371,6 @@ None inline↲
 $$↲
 ^^ Token(DollarSign, "$$", 1272 -> 1273)
   ^ Token(EndOfLine, "\n", 1274 -> 1274)
+↲
+^ Token(EndOfLine, "\n", 1275 -> 1275)
 

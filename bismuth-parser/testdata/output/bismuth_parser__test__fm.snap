@@ -7,19 +7,18 @@ FontMatter {
         "test",
     ),
     path: Some(
-        "/test/",
+        "/test/path/",
     ),
     kind: Some(
         "default",
     ),
-    values: None,
-}
-Element{
-    Kind: "Custom{Name: test, Body: Some(\"body\\ntest\"), Values: [(\"other\", \"key\")]}",
-    Text: None,
-    Attrs: [],
-    Elements: [
-    ])
+    values: Some(
+        [
+            {
+                "key": "value",
+            },
+        ],
+    ),
 }
 Element{
     Kind: "EndOfLine",
@@ -28,5 +27,4 @@ Element{
     Elements: [
     ])
 }
-
 

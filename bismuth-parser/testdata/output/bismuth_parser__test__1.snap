@@ -2,6 +2,18 @@
 source: bismuth-parser/src/lib.rs
 expression: format_parser(parser)
 ---
+FontMatter {
+    title: Some(
+        "test",
+    ),
+    path: Some(
+        "/test/",
+    ),
+    kind: Some(
+        "default",
+    ),
+    values: None,
+}
 Element{
     Kind: "Header",
     Text: None,
@@ -121,4 +133,12 @@ Element{
     },
     ])
 }
+Element{
+    Kind: "EndOfLine",
+    Text: None,
+    Attrs: [],
+    Elements: [
+    ])
+}
+
 

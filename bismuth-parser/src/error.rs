@@ -1,3 +1,4 @@
+use serde_yaml::Error;
 use crate::custom::CustomElmError;
 
 #[derive(Debug)]
@@ -9,6 +10,7 @@ pub enum ParseError {
     CouldNotFindPattern,
 
     CustomElementError(CustomElmError),
+    FontMatterError(Error),
 }
 
 #[derive(Debug, PartialEq)]

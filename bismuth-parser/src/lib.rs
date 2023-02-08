@@ -458,7 +458,15 @@ impl Parser {
     }
 
     fn handle_fontmatter(&mut self) -> ParseReturn {
-        todo!()
+        let mut inside = self.peek_till_kind(&TokenType::FontmatterEnd)?;
+        inside.pop();
+        let mut s = String::new();
+        for token in &inside {
+            s.push_str(&token.text.iter().collect::<String>());
+        }
+        self.advance_n_token(inside.len())?;
+        self.metadata.fontmatter.update_from_str(&s).map_err(error::ParseError::FontMatterError)?;
+        Ok(())
     }
 
     fn parse_token(&mut self, token: &Token) -> ParseReturn {
@@ -559,7 +567,11 @@ mod test_utils {
             parser.advance_n_token(2).unwrap()
         );
         assert_eq!(
-            &Token::new(TokenType::EndOfFile, Vec::new(), 17, 17),
+            &Token::new(TokenType::EndOfLine, vec!['\n'], 17, 17),
+            parser.advance_token().unwrap()
+        );
+        assert_eq!(
+            &Token::new(TokenType::EndOfFile, Vec::new(), 18, 18),
             parser.advance_token().unwrap()
         );
 
@@ -675,8 +687,11 @@ mod test {
     fn format_parser(parser: Parser) -> String {
         let ast = &parser.ast;
         let mut s = String::new();
+        s.push_str(&format!("{:#?}\n", parser.metadata.fontmatter));
         for element in &ast.elements {
-            s.push_str(&render_element(&element.clone().unwrap(), 0));
+            if element.is_some() {
+                s.push_str(&render_element(&element.clone().unwrap(), 0));
+            }
             s.push('\n');
         }
         s
@@ -744,6 +759,16 @@ mod test {
     #[test]
     fn test_custom_1() {
         let lexer = init_lexer("%{{\nname: test\nother: key\n---\nbody\ntest\n}}");
+        let mut parser = Parser::new(lexer);
+        parser.parse().unwrap();
+
+        snapshot!(parser);
+    }
+
+    #[test]
+    fn test_fm() {
+        let lexer =
+            init_lexer("---\ntitle: test title\npath: /test/path/\nvalues:\n    - key: value\n---");
         let mut parser = Parser::new(lexer);
         parser.parse().unwrap();
 

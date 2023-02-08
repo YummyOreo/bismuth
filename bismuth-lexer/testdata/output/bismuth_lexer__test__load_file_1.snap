@@ -96,4 +96,6 @@ $Math?$↲
  ^^^^^ Token(Text, "Math?", 184 -> 188)
       ^ Token(DollarSign, "$", 189 -> 189)
        ^ Token(EndOfLine, "\n", 190 -> 190)
+↲
+^ Token(EndOfLine, "\n", 191 -> 191)
 

@@ -17,4 +17,6 @@ Text↲
 #This is not a header↲
 ^^^^^^^^^^^^^^^^^^^^^ Token(Text, "#This is not a header", 38 -> 58)
                      ^ Token(EndOfLine, "\n", 59 -> 59)
+↲
+^ Token(EndOfLine, "\n", 60 -> 60)
 
