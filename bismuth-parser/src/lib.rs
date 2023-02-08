@@ -522,7 +522,6 @@ impl Parser {
             .is_ok()
         } {
             let token = self.current_token()?.clone();
-            println!("{token:?}");
             if token.kind == TokenType::EndOfFile {
                 break;
             }
