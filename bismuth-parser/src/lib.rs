@@ -465,7 +465,10 @@ impl Parser {
             s.push_str(&token.text.iter().collect::<String>());
         }
         self.advance_n_token(inside.len())?;
-        self.metadata.fontmatter.update_from_str(&s).map_err(error::ParseError::FontMatterError)?;
+        self.metadata
+            .fontmatter
+            .update_from_str(&s)
+            .map_err(error::ParseError::FontMatterError)?;
         Ok(())
     }
 
@@ -635,6 +638,10 @@ mod test_utils {
 
 #[cfg(test)]
 mod test {
+    // TODO: improve how this is handled, make it so you do not have to always init a test
+    // function, also make 2 types of tests: from string | from file. Denote this in the name by
+    // adding it to the start of the name along with test
+    // (ie test_str_$name or test_file_$name)
     use super::*;
     use std::collections::HashMap;
     use std::path::PathBuf;
