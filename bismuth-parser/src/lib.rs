@@ -140,23 +140,6 @@ impl Parser {
         self.set_current_elm(elm);
     }
 
-    /// ## Tthsethe *bold* tsthsthsnth [th]()
-    /// Header(
-    /// [
-    /// text,
-    /// bold,
-    /// text,
-    /// link
-    /// ]
-    /// )
-    /// thsetheoasutnhaoe *test* snteahuasenthu
-    /// Paragraph(
-    /// text,
-    /// bold,
-    /// text
-    /// )
-    ///
-
     fn set_current_elm(&mut self, elm: Element) {
         self.current_element = Some(elm);
     }
@@ -225,7 +208,9 @@ impl Parser {
         if self.state.new_line {
             let mut elm = Element::new(Kind::Paragraph);
             let mut elm_txt = Element::new(Kind::Text);
+
             elm_txt.text = Some(self.current_token_chars()?.iter().collect::<String>());
+
             elm.append_node(elm_txt);
             Ok(elm)
         } else {
@@ -257,6 +242,7 @@ impl Parser {
             elm.text = Some(self.current_token_chars()?.iter().collect::<String>());
             return Ok(());
         }
+
         let tabs = diff / 4;
         self.handle_tab_whitespace(tabs)
     }
@@ -268,86 +254,81 @@ impl Parser {
 
     // should only appear at start of line, so should be handled after eol
     fn handle_hash(&mut self) -> ParseReturn {
-        let num = self.current_token_len()?;
         let mut elm = Element::new(Kind::Header);
-        elm.add_attr("level", &num.to_string());
+
+        let num = self.current_token_len()?;
+        elm.add_attr("level", &num);
+
         self.append_element(elm);
         Ok(())
     }
 
     fn handle_dash(&mut self) -> ParseReturn {
         let diff = self.current_token_len()?;
+
         if self.state.new_line {
             if diff == 1 {
                 let mut elm = Element::new(Kind::ListItem);
-                elm.add_attr("level", &self.state.indent_level.to_string());
+                elm.add_attr("level", &self.state.indent_level);
                 self.append_element(elm);
 
                 return Ok(());
             } else if diff == 3 && self.peek_after(1)?.kind == TokenType::EndOfLine {
-                let elm = Element::new(Kind::HorizontalRule);
-                self.append_element(elm);
-
+                self.append_element(Element::new(Kind::HorizontalRule));
                 return Ok(());
             }
         }
+
         self.append_element(self.make_text_at_token()?);
         Ok(())
     }
 
+    fn make_custom(&mut self) -> Result<Element, error::ParseError> {
+        // advance past %{{
+        self.advance_n_token(2)?;
+
+        // get where the \n}}\n is indicating the end
+        let pattern = vec![
+            TokenType::EndOfLine,
+            TokenType::CurlybraceRight,
+            TokenType::EndOfLine,
+        ];
+        let pattern_or = vec![
+            TokenType::EndOfLine,
+            TokenType::CurlybraceRight,
+            TokenType::EndOfFile,
+        ];
+
+        let end = self
+            .till_pattern(&pattern)
+            .unwrap_or(self.till_pattern(&pattern_or)?);
+
+        let inside_tokens = self.peek_till(end)?;
+        // need to -3 because it includes \n}}\n
+        let inside_str = inside_tokens[0..inside_tokens.len() - 3]
+            .iter()
+            .map(|t| t.text.iter().collect::<String>())
+            .collect::<String>();
+
+        // advance past inside till last \n
+        self.advance_n_token(inside_tokens.len() - 2)?;
+
+        // makes the custom element
+        let c = custom::CustomElm::from_string(&inside_str)
+            .map_err(error::ParseError::CustomElementError)?;
+        Ok(Element::new(Kind::CustomElement(c)))
+    }
+
     fn handle_precent(&mut self) -> ParseReturn {
-        // check if it is a custom elm
-        // set inside to true
-        // loop till you get to [Newline, CurlybraceRight*2, NewLine]
-        // append everything to a string
-        // make the element
         let peek = self.peek_after(1)?;
 
         let is_newline = self.state.new_line;
         let is_curlybrace = peek.kind == TokenType::CurlybraceLeft;
         let is_2_len = self.token_len(peek) == 2;
-        println!("{is_newline}, {is_curlybrace}, {is_2_len}");
 
         if is_newline && is_curlybrace && is_2_len {
-            // advance past %{{
-            self.advance_n_token(2)?;
-
-            // get where the \n}}\n is indicating the end
-            let pattern = vec![
-                TokenType::EndOfLine,
-                TokenType::CurlybraceRight,
-                TokenType::EndOfLine,
-            ];
-            let pattern_or = vec![
-                TokenType::EndOfLine,
-                TokenType::CurlybraceRight,
-                TokenType::EndOfFile,
-            ];
-
-            let end = self
-                .till_pattern(&pattern)
-                .unwrap_or(self.till_pattern(&pattern_or)?);
-
-            // gets the tokens that are inside of the custom element
-            let inside_tokens = self.peek_till(end)?;
-
-            // appends the text of those tokens to a string
-            // need to -3 because it includes \n}}\n
-            let inside_str = inside_tokens[0..inside_tokens.len() - 3]
-                .iter()
-                .map(|t| t.text.iter().collect::<String>())
-                .collect::<String>();
-
-            // advance past inside till last \n
-            self.advance_n_token(inside_tokens.len() - 2)?;
-
-            // makes the custom element
-            let c = custom::CustomElm::from_string(&inside_str)
-                .map_err(error::ParseError::CustomElementError)?;
-
-            let elm = Element::new(Kind::CustomElement(c));
+            let elm = self.make_custom()?;
             self.append_element(elm);
-
             return Ok(());
         }
         self.append_element(self.make_text_at_token()?);
@@ -355,10 +336,6 @@ impl Parser {
     }
 
     fn handle_container(&mut self, kind: TokenType) -> ParseReturn {
-        // check till token for the type, Ie [ => ] [t*t]
-        // Then get the inside
-        // Parse the inside (we do this because: __*text*__ would be bold(italic(text)))
-        // set that as the text for the container
         let elm_kind = match (kind.clone(), self.token_len(self.current_token()?)) {
             (TokenType::Asterisk, 1) | (TokenType::Underscore, 1) => Kind::Italic,
             (TokenType::Asterisk, 2) | (TokenType::Underscore, 2) => Kind::Bold,
@@ -370,16 +347,17 @@ impl Parser {
         };
 
         if elm_kind == Kind::Text {
-            self.append_element(self.make_text_at_token().unwrap());
+            self.append_element(self.make_text_at_token()?);
             return Ok(());
-        } else {
-            let elm = Element::new(elm_kind);
-            let elm_id = elm.get_id();
-            self.append_element(elm);
-            self.state.inside.push(elm_id);
         }
+
+        let elm = Element::new(elm_kind);
+        let elm_id = elm.get_id();
+        self.append_element(elm);
+        self.state.inside.push(elm_id);
+
         self.advance_n_token(1)?;
-        let inside = self.peek_till_kind(&kind).unwrap();
+        let inside = self.peek_till_kind(&kind)?;
 
         let mut last_index = self.current_token_index;
         let mut last_diff = 0;
@@ -388,13 +366,13 @@ impl Parser {
                 last_diff -= 1;
                 continue;
             }
-            self.parse_token(token).unwrap();
-            let advance_diff = self.current_token_index - last_index;
-            last_diff = advance_diff + 1;
 
-            self.advance_n_token(1).unwrap();
+            self.parse_token(token)?;
 
+            last_diff = (self.current_token_index - last_index) + 1;
             last_index = self.current_token_index;
+
+            self.advance_n_token(1)?;
         }
         self.state.inside.pop();
         Ok(())
@@ -408,8 +386,9 @@ impl Parser {
             .iter()
             .filter(|c| c.is_numeric())
             .collect::<String>();
+
         elm.add_attr("num", &num);
-        elm.add_attr("level", &self.state.indent_level.to_string());
+        elm.add_attr("level", &self.state.indent_level);
 
         self.append_element(elm);
         Ok(())
@@ -417,12 +396,65 @@ impl Parser {
 
     // Somewhat same as *
     fn handle_bracket(&mut self) -> ParseReturn {
-        todo!()
+        match self.get_url() {
+            Ok((text, url)) => {
+                let mut elm = Element::new(Kind::Link);
+                elm.text = Some(text);
+                elm.add_attr("link", &url);
+                self.append_element(elm);
+            }
+            Err(error::ParseError::Peek(_)) => {
+                self.append_element(self.make_text_at_token()?);
+            }
+            Err(e) => {
+                return Err(e);
+            }
+        }
+        Ok(())
     }
 
     // just bracket with diff type and checks
     fn handle_exclamation(&mut self) -> ParseReturn {
-        todo!()
+        self.advance_token()?;
+        match self.get_url() {
+            Ok((text, url)) => {
+                let mut elm = Element::new(Kind::FilePrev);
+                elm.text = Some(text);
+                elm.add_attr("link", &url);
+                self.append_element(elm);
+            }
+            Err(error::ParseError::Peek(_)) => {
+                self.append_element(self.make_text_at_token()?);
+            }
+            Err(e) => {
+                return Err(e);
+            }
+        }
+        Ok(())
+    }
+
+    fn get_url(&mut self) -> Result<(String, String), error::ParseError> {
+        self.advance_token()?;
+        // this assumes that you are on [
+        let text = self.peek_till_kind(&TokenType::BracketRight)?;
+        let mut text_s = String::new();
+
+        for token in &text {
+            text_s.push_str(&token.text.iter().collect::<String>());
+        }
+
+        self.advance_n_token(text.len() + 2)?;
+
+        let url = self.peek_till_kind(&TokenType::ParenthesisRight)?;
+        let mut url_s = String::new();
+
+        for token in &url {
+            url_s.push_str(&token.text.iter().collect::<String>());
+        }
+
+        self.advance_n_token(url.len())?;
+
+        Ok((text_s, url_s))
     }
 
     fn handle_fontmatter(&mut self) -> ParseReturn {
@@ -436,8 +468,7 @@ impl Parser {
                 Ok(())
             }
             TokenType::EndOfLine => {
-                let elm = Element::new(Kind::EndOfLine);
-                self.append_element(elm);
+                self.append_element(Element::new(Kind::EndOfLine));
                 Ok(())
             }
             TokenType::Tab => self.handle_tab(),
@@ -449,8 +480,7 @@ impl Parser {
             TokenType::ListNumber => self.handle_num(),
 
             TokenType::GreaterThan => {
-                let elm = Element::new(Kind::Blockquote);
-                self.append_element(elm);
+                self.append_element(Element::new(Kind::Blockquote));
                 Ok(())
             }
 
@@ -629,13 +659,13 @@ mod test {
         let t = "    ";
         let ts = t.repeat(level);
         let mut s = format!(
-            "Element{{\n{ts}{t}Kind: {:#?},\n{ts}{t}Text: {:?},\n{ts}{t}Attrs: {},\n{ts}{t}Elements: [\n",
+            "Element{{\n{ts}{t}Kind: {:#?},\n{ts}{t}Text: {:?},\n{ts}{t}Attrs: {},\n{ts}{t}Elements: [",
             format_kind(&element.kind),
             element.text,
             sort_hm(&element.attrs)
         );
         for elm in &element.elements {
-            let inside_s = format!("{ts}{ts}{t}{}", render_element(elm, level + 1));
+            let inside_s = format!("\n{ts}{ts}{t}{},", render_element(elm, level + 1));
             s.push_str(&inside_s);
         }
         s.push_str(&format!("\n{ts}{t}])\n{ts}}}"));
@@ -687,6 +717,15 @@ mod test {
     #[test]
     fn test_2() {
         let lexer = init_lexer("1. list item\n\t2. hmm");
+        let mut parser = Parser::new(lexer);
+        parser.parse().unwrap();
+
+        snapshot!(parser);
+    }
+
+    #[test]
+    fn test_3() {
+        let lexer = init_lexer("[test](link)\n![prev](of a file)\ntest ![other txt](./*test*)");
         let mut parser = Parser::new(lexer);
         parser.parse().unwrap();
 

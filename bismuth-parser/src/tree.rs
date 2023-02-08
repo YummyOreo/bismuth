@@ -70,7 +70,7 @@ impl Element {
         self.elements.last().expect("Should be there")
     }
 
-    pub fn add_attr(&mut self, key: &str, value: &str) {
+    pub fn add_attr<T: ToString>(&mut self, key: &str, value: &T) {
         self.attrs.insert(key.to_string(), value.to_string());
     }
 

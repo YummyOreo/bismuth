@@ -12,9 +12,8 @@ Element{
         Text: Some(" list item"),
         Attrs: [],
         Elements: [
-
         ])
-    }
+    },
     ])
 }
 Element{
@@ -22,7 +21,6 @@ Element{
     Text: None,
     Attrs: [],
     Elements: [
-
     ])
 }
 Element{
@@ -35,9 +33,8 @@ Element{
         Text: Some(" hmm"),
         Attrs: [],
         Elements: [
-
         ])
-    }
+    },
     ])
 }
 

@@ -103,7 +103,7 @@ impl Lexer {
     }
 
     fn peek_back(&self, next: usize) -> Result<&char, LexerError> {
-        self.peek_at(self.position.checked_sub(1).ok_or(LexerError::MathError)?)
+        self.peek_at(self.position.checked_sub(next).ok_or(LexerError::MathError)?)
     }
 
     fn peek_at(&self, index: usize) -> Result<&char, LexerError> {

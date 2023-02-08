@@ -12,9 +12,8 @@ Element{
         Text: Some("test "),
         Attrs: [],
         Elements: [
-
         ])
-    }
+    },
     ])
 }
 Element{
@@ -22,7 +21,6 @@ Element{
     Text: None,
     Attrs: [],
     Elements: [
-
     ])
 }
 Element{
@@ -35,9 +33,9 @@ Element{
         Text: Some("test "),
         Attrs: [],
         Elements: [
-
         ])
-    }    Element{
+    },
+    Element{
         Kind: "Italic",
         Text: None,
         Attrs: [],
@@ -52,20 +50,19 @@ Element{
                 Text: Some("test"),
                 Attrs: [],
                 Elements: [
-
                 ])
-            }
+            },
             ])
-        }
+        },
         ])
-    }    Element{
+    },
+    Element{
         Kind: "Text",
         Text: Some(" none"),
         Attrs: [],
         Elements: [
-
         ])
-    }
+    },
     ])
 }
 

@@ -3,9 +3,9 @@ source: bismuth-parser/src/lib.rs
 expression: format_parser(parser)
 ---
 Element{
-    Kind: "Custom{Name: test, Body: Some(\"body\\ntest\"), Values: [(\"other\", \"key\")]}",
-    Text: None,
-    Attrs: [],
+    Kind: "Link",
+    Text: Some("test"),
+    Attrs: [("link", "link")],
     Elements: [
     ])
 }
@@ -17,9 +17,9 @@ Element{
     ])
 }
 Element{
-    Kind: "HorizontalRule",
-    Text: None,
-    Attrs: [],
+    Kind: "FilePrev",
+    Text: Some("prev"),
+    Attrs: [("link", "of a file")],
     Elements: [
     ])
 }
@@ -37,8 +37,15 @@ Element{
     Elements: [
     Element{
         Kind: "Text",
-        Text: Some("test"),
+        Text: Some("test "),
         Attrs: [],
+        Elements: [
+        ])
+    },
+    Element{
+        Kind: "FilePrev",
+        Text: Some("other txt"),
+        Attrs: [("link", "./*test*")],
         Elements: [
         ])
     },
