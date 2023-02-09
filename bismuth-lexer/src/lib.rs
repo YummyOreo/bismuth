@@ -35,10 +35,7 @@ impl Lexer {
     }
 
     pub fn new_test(path: PathBuf, content: String) -> Self {
-        let file = MarkdownFile {
-            content,
-            path
-        };
+        let file = MarkdownFile { content, path };
         Self::new(file)
     }
 
@@ -99,7 +96,11 @@ impl Lexer {
     }
 
     fn peek_back(&self, next: usize) -> Result<&char, LexerError> {
-        self.peek_at(self.position.checked_sub(next).ok_or(LexerError::MathError)?)
+        self.peek_at(
+            self.position
+                .checked_sub(next)
+                .ok_or(LexerError::MathError)?,
+        )
     }
 
     fn peek_at(&self, index: usize) -> Result<&char, LexerError> {
