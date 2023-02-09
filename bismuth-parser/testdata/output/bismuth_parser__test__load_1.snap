@@ -1,0 +1,277 @@
+---
+source: bismuth-parser/src/lib.rs
+expression: "snapshot_path(\"./testdata/tests/test1.md\")"
+---
+FontMatter {
+    title: Some(
+        "Blog post about cats",
+    ),
+    path: Some(
+        "/blogs/cats/",
+    ),
+    kind: Some(
+        "blog",
+    ),
+    values: None,
+}
+Element{
+    Kind: "EndOfLine",
+    Text: None,
+    Attrs: [],
+    Elements: [
+    ])
+}
+Element{
+    Kind: "EndOfLine",
+    Text: None,
+    Attrs: [],
+    Elements: [
+    ])
+}
+Element{
+    Kind: "Header",
+    Text: None,
+    Attrs: [("level", "1")],
+    Elements: [
+    Element{
+        Kind: "Text",
+        Text: Some(" This is a blog about cats"),
+        Attrs: [],
+        Elements: [
+        ])
+    },
+    ])
+}
+Element{
+    Kind: "EndOfLine",
+    Text: None,
+    Attrs: [],
+    Elements: [
+    ])
+}
+Element{
+    Kind: "FilePrev",
+    Text: Some("picture of a cat"),
+    Attrs: [("link", "example.com")],
+    Elements: [
+    ])
+}
+Element{
+    Kind: "EndOfLine",
+    Text: None,
+    Attrs: [],
+    Elements: [
+    ])
+}
+Element{
+    Kind: "EndOfLine",
+    Text: None,
+    Attrs: [],
+    Elements: [
+    ])
+}
+Element{
+    Kind: "Paragraph",
+    Text: None,
+    Attrs: [],
+    Elements: [
+    Element{
+        Kind: "Text",
+        Text: Some("Why? IDK"),
+        Attrs: [],
+        Elements: [
+        ])
+    },
+    ])
+}
+Element{
+    Kind: "EndOfLine",
+    Text: None,
+    Attrs: [],
+    Elements: [
+    ])
+}
+Element{
+    Kind: "EndOfLine",
+    Text: None,
+    Attrs: [],
+    Elements: [
+    ])
+}
+Element{
+    Kind: "Header",
+    Text: None,
+    Attrs: [("level", "2")],
+    Elements: [
+    Element{
+        Kind: "Text",
+        Text: Some(" Facts"),
+        Attrs: [],
+        Elements: [
+        ])
+    },
+    ])
+}
+Element{
+    Kind: "EndOfLine",
+    Text: None,
+    Attrs: [],
+    Elements: [
+    ])
+}
+Element{
+    Kind: "OrderedListElement",
+    Text: None,
+    Attrs: [("level", "0"), ("num", "1")],
+    Elements: [
+    Element{
+        Kind: "Text",
+        Text: Some(" A cat is a cat"),
+        Attrs: [],
+        Elements: [
+        ])
+    },
+    ])
+}
+Element{
+    Kind: "EndOfLine",
+    Text: None,
+    Attrs: [],
+    Elements: [
+    ])
+}
+Element{
+    Kind: "OrderedListElement",
+    Text: None,
+    Attrs: [("level", "0"), ("num", "2")],
+    Elements: [
+    Element{
+        Kind: "Text",
+        Text: Some(" They are animals"),
+        Attrs: [],
+        Elements: [
+        ])
+    },
+    ])
+}
+Element{
+    Kind: "EndOfLine",
+    Text: None,
+    Attrs: [],
+    Elements: [
+    ])
+}
+Element{
+    Kind: "OrderedListElement",
+    Text: None,
+    Attrs: [("level", "0"), ("num", "3")],
+    Elements: [
+    Element{
+        Kind: "Text",
+        Text: Some(" They exist"),
+        Attrs: [],
+        Elements: [
+        ])
+    },
+    ])
+}
+Element{
+    Kind: "EndOfLine",
+    Text: None,
+    Attrs: [],
+    Elements: [
+    ])
+}
+Element{
+    Kind: "EndOfLine",
+    Text: None,
+    Attrs: [],
+    Elements: [
+    ])
+}
+Element{
+    Kind: "Header",
+    Text: None,
+    Attrs: [("level", "3")],
+    Elements: [
+    Element{
+        Kind: "Text",
+        Text: Some(" Photos and links"),
+        Attrs: [],
+        Elements: [
+        ])
+    },
+    ])
+}
+Element{
+    Kind: "EndOfLine",
+    Text: None,
+    Attrs: [],
+    Elements: [
+    ])
+}
+Element{
+    Kind: "FilePrev",
+    Text: Some(""),
+    Attrs: [("link", "example.com")],
+    Elements: [
+    ])
+}
+Element{
+    Kind: "EndOfLine",
+    Text: None,
+    Attrs: [],
+    Elements: [
+    ])
+}
+Element{
+    Kind: "FilePrev",
+    Text: Some("cat in a hole"),
+    Attrs: [("link", "example.com")],
+    Elements: [
+    ])
+}
+Element{
+    Kind: "EndOfLine",
+    Text: None,
+    Attrs: [],
+    Elements: [
+    ])
+}
+Element{
+    Kind: "FilePrev",
+    Text: Some("cat in a box"),
+    Attrs: [("link", "example.com")],
+    Elements: [
+    ])
+}
+Element{
+    Kind: "EndOfLine",
+    Text: None,
+    Attrs: [],
+    Elements: [
+    ])
+}
+Element{
+    Kind: "Link",
+    Text: Some("wiki of a cat"),
+    Attrs: [("link", "example.com")],
+    Elements: [
+    ])
+}
+Element{
+    Kind: "EndOfLine",
+    Text: None,
+    Attrs: [],
+    Elements: [
+    ])
+}
+Element{
+    Kind: "EndOfLine",
+    Text: None,
+    Attrs: [],
+    Elements: [
+    ])
+}
+
+

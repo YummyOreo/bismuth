@@ -791,4 +791,5 @@ mod test {
     snapshot_str!(test_linebreak, "test\n\n---\n");
 
     snapshot_path!(test_load, "./testdata/tests/test.md");
+    snapshot_path!(test_load_1, "./testdata/tests/test1.md");
 }
