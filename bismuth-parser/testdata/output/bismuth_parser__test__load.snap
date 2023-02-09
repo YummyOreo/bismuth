@@ -1,0 +1,388 @@
+---
+source: bismuth-parser/src/lib.rs
+expression: "snapshot_path(\"./testdata/tests/test.md\")"
+---
+FontMatter {
+    title: Some(
+        "test",
+    ),
+    path: Some(
+        "/",
+    ),
+    kind: Some(
+        "default",
+    ),
+    values: Some(
+        [
+            {
+                "value": "not a key",
+            },
+        ],
+    ),
+}
+Element{
+    Kind: "EndOfLine",
+    Text: None,
+    Attrs: [],
+    Elements: [
+    ])
+}
+Element{
+    Kind: "EndOfLine",
+    Text: None,
+    Attrs: [],
+    Elements: [
+    ])
+}
+Element{
+    Kind: "EndOfLine",
+    Text: None,
+    Attrs: [],
+    Elements: [
+    ])
+}
+Element{
+    Kind: "Header",
+    Text: None,
+    Attrs: [("level", "1")],
+    Elements: [
+    Element{
+        Kind: "Text",
+        Text: Some(" This is a test"),
+        Attrs: [],
+        Elements: [
+        ])
+    },
+    ])
+}
+Element{
+    Kind: "EndOfLine",
+    Text: None,
+    Attrs: [],
+    Elements: [
+    ])
+}
+Element{
+    Kind: "Blockquote",
+    Text: None,
+    Attrs: [],
+    Elements: [
+    Element{
+        Kind: "Text",
+        Text: Some(" Block quote"),
+        Attrs: [],
+        Elements: [
+        ])
+    },
+    ])
+}
+Element{
+    Kind: "EndOfLine",
+    Text: None,
+    Attrs: [],
+    Elements: [
+    ])
+}
+Element{
+    Kind: "Header",
+    Text: None,
+    Attrs: [("level", "2")],
+    Elements: [
+    Element{
+        Kind: "Text",
+        Text: Some(" Will it work:"),
+        Attrs: [],
+        Elements: [
+        ])
+    },
+    ])
+}
+Element{
+    Kind: "EndOfLine",
+    Text: None,
+    Attrs: [],
+    Elements: [
+    ])
+}
+Element{
+    Kind: "ListItem",
+    Text: None,
+    Attrs: [("level", "0")],
+    Elements: [
+    Element{
+        Kind: "Text",
+        Text: Some(" List"),
+        Attrs: [],
+        Elements: [
+        ])
+    },
+    ])
+}
+Element{
+    Kind: "EndOfLine",
+    Text: None,
+    Attrs: [],
+    Elements: [
+    ])
+}
+Element{
+    Kind: "Paragraph",
+    Text: None,
+    Attrs: [],
+    Elements: [
+    Element{
+        Kind: "Text",
+        Text: Some("Tab?"),
+        Attrs: [],
+        Elements: [
+        ])
+    },
+    ])
+}
+Element{
+    Kind: "EndOfLine",
+    Text: None,
+    Attrs: [],
+    Elements: [
+    ])
+}
+Element{
+    Kind: "OrderedListElement",
+    Text: None,
+    Attrs: [("level", "0"), ("num", "1")],
+    Elements: [
+    Element{
+        Kind: "Text",
+        Text: Some(" List item"),
+        Attrs: [],
+        Elements: [
+        ])
+    },
+    ])
+}
+Element{
+    Kind: "EndOfLine",
+    Text: None,
+    Attrs: [],
+    Elements: [
+    ])
+}
+Element{
+    Kind: "EndOfLine",
+    Text: None,
+    Attrs: [],
+    Elements: [
+    ])
+}
+Element{
+    Kind: "Bold",
+    Text: None,
+    Attrs: [],
+    Elements: [
+    Element{
+        Kind: "Text",
+        Text: Some("Lorem"),
+        Attrs: [],
+        Elements: [
+        ])
+    },
+    Element{
+        Kind: "Text",
+        Text: Some(" "),
+        Attrs: [],
+        Elements: [
+        ])
+    },
+    Element{
+        Kind: "Bold",
+        Text: None,
+        Attrs: [],
+        Elements: [
+            Element{
+            Kind: "Text",
+            Text: Some("ipsum"),
+            Attrs: [],
+            Elements: [
+            ])
+        },
+        ])
+    },
+    Element{
+        Kind: "Text",
+        Text: Some(" dolor sit amet"),
+        Attrs: [],
+        Elements: [
+        ])
+    },
+    ])
+}
+Element{
+    Kind: "EndOfLine",
+    Text: None,
+    Attrs: [],
+    Elements: [
+    ])
+}
+Element{
+    Kind: "EndOfLine",
+    Text: None,
+    Attrs: [],
+    Elements: [
+    ])
+}
+Element{
+    Kind: "HorizontalRule",
+    Text: None,
+    Attrs: [],
+    Elements: [
+    ])
+}
+Element{
+    Kind: "EndOfLine",
+    Text: None,
+    Attrs: [],
+    Elements: [
+    ])
+}
+Element{
+    Kind: "Header",
+    Text: None,
+    Attrs: [("level", "1")],
+    Elements: [
+    Element{
+        Kind: "Text",
+        Text: Some(" List"),
+        Attrs: [],
+        Elements: [
+        ])
+    },
+    ])
+}
+Element{
+    Kind: "EndOfLine",
+    Text: None,
+    Attrs: [],
+    Elements: [
+    ])
+}
+Element{
+    Kind: "EndOfLine",
+    Text: None,
+    Attrs: [],
+    Elements: [
+    ])
+}
+Element{
+    Kind: "Link",
+    Text: Some("link"),
+    Attrs: [("link", "stuff")],
+    Elements: [
+    ])
+}
+Element{
+    Kind: "EndOfLine",
+    Text: None,
+    Attrs: [],
+    Elements: [
+    ])
+}
+Element{
+    Kind: "FilePrev",
+    Text: Some("file"),
+    Attrs: [("link", "stuff")],
+    Elements: [
+    ])
+}
+Element{
+    Kind: "EndOfLine",
+    Text: None,
+    Attrs: [],
+    Elements: [
+    ])
+}
+Element{
+    Kind: "EndOfLine",
+    Text: None,
+    Attrs: [],
+    Elements: [
+    ])
+}
+Element{
+    Kind: "InlineCode",
+    Text: None,
+    Attrs: [],
+    Elements: [
+    Element{
+        Kind: "Text",
+        Text: Some("inilen"),
+        Attrs: [],
+        Elements: [
+        ])
+    },
+    ])
+}
+Element{
+    Kind: "EndOfLine",
+    Text: None,
+    Attrs: [],
+    Elements: [
+    ])
+}
+Element{
+    Kind: "BlockCode",
+    Text: None,
+    Attrs: [],
+    Elements: [
+    Element{
+        Kind: "Text",
+        Text: Some("\nnon inline\n"),
+        Attrs: [],
+        Elements: [
+        ])
+    },
+    ])
+}
+Element{
+    Kind: "EndOfLine",
+    Text: None,
+    Attrs: [],
+    Elements: [
+    ])
+}
+Element{
+    Kind: "EndOfLine",
+    Text: None,
+    Attrs: [],
+    Elements: [
+    ])
+}
+Element{
+    Kind: "InlineLaTeX",
+    Text: None,
+    Attrs: [],
+    Elements: [
+    Element{
+        Kind: "Text",
+        Text: Some("Math?"),
+        Attrs: [],
+        Elements: [
+        ])
+    },
+    ])
+}
+Element{
+    Kind: "EndOfLine",
+    Text: None,
+    Attrs: [],
+    Elements: [
+    ])
+}
+Element{
+    Kind: "EndOfLine",
+    Text: None,
+    Attrs: [],
+    Elements: [
+    ])
+}
+
+

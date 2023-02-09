@@ -1,10 +1,10 @@
 ---
 source: bismuth-parser/src/lib.rs
-expression: format_parser(parser)
+expression: "snapshot_str(\"---\\ntitle: test title\\npath: /test/path/\\nvalues:\\n    - key: value\\n---\")"
 ---
 FontMatter {
     title: Some(
-        "test",
+        "test title",
     ),
     path: Some(
         "/test/path/",
@@ -27,4 +27,12 @@ Element{
     Elements: [
     ])
 }
+Element{
+    Kind: "EndOfLine",
+    Text: None,
+    Attrs: [],
+    Elements: [
+    ])
+}
+
 

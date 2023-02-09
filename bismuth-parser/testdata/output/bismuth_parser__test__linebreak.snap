@@ -1,0 +1,67 @@
+---
+source: bismuth-parser/src/lib.rs
+expression: "snapshot_str(\"test\\n\\n---\\n\")"
+---
+FontMatter {
+    title: Some(
+        "test",
+    ),
+    path: Some(
+        "/test/",
+    ),
+    kind: Some(
+        "default",
+    ),
+    values: None,
+}
+Element{
+    Kind: "Paragraph",
+    Text: None,
+    Attrs: [],
+    Elements: [
+    Element{
+        Kind: "Text",
+        Text: Some("test"),
+        Attrs: [],
+        Elements: [
+        ])
+    },
+    ])
+}
+Element{
+    Kind: "EndOfLine",
+    Text: None,
+    Attrs: [],
+    Elements: [
+    ])
+}
+Element{
+    Kind: "EndOfLine",
+    Text: None,
+    Attrs: [],
+    Elements: [
+    ])
+}
+Element{
+    Kind: "HorizontalRule",
+    Text: None,
+    Attrs: [],
+    Elements: [
+    ])
+}
+Element{
+    Kind: "EndOfLine",
+    Text: None,
+    Attrs: [],
+    Elements: [
+    ])
+}
+Element{
+    Kind: "EndOfLine",
+    Text: None,
+    Attrs: [],
+    Elements: [
+    ])
+}
+
+

@@ -135,6 +135,9 @@ impl Parser {
                 self.state.new_line = true;
                 return;
             }
+        } else if elm.kind == Kind::EndOfLine {
+            self.ast.elements.push(Some(elm));
+            return;
         }
         self.state.new_line = false;
         self.set_current_elm(elm);
@@ -354,30 +357,43 @@ impl Parser {
             return Ok(());
         }
 
-        let elm = Element::new(elm_kind);
+        let elm = Element::new(elm_kind.clone());
         let elm_id = elm.get_id();
         self.append_element(elm);
         self.state.inside.push(elm_id);
 
         self.advance_n_token(1)?;
-        let inside = self.peek_till_kind(&kind)?;
+        let inside = self.peek_till_kind(&kind).unwrap();
 
-        let mut last_index = self.current_token_index;
-        let mut last_diff = 0;
-        for token in &inside {
-            if last_diff > 0 {
-                last_diff -= 1;
-                continue;
+        if elm_kind == Kind::BlockCode {
+            let mut elm = Element::new(Kind::Text);
+            let s = inside
+                .iter()
+                .map(|t| t.text.iter().collect::<String>())
+                .collect::<String>();
+            elm.text = Some(s);
+
+            self.advance_n_token(inside.len())?;
+            self.append_element(elm);
+        } else {
+            let mut last_index = self.current_token_index;
+            let mut last_diff = 0;
+
+            for token in &inside {
+                if last_diff > 0 {
+                    last_diff -= 1;
+                    continue;
+                }
+
+                self.parse_token(token)?;
+
+                last_diff = (self.current_token_index - last_index) + 1;
+                last_index = self.current_token_index;
+
+                self.advance_n_token(1)?;
             }
-
-            self.parse_token(token)?;
-
-            last_diff = (self.current_token_index - last_index) + 1;
-            last_index = self.current_token_index;
-
-            self.advance_n_token(1)?;
+            self.state.inside.pop();
         }
-        self.state.inside.pop();
         Ok(())
     }
 
@@ -459,7 +475,8 @@ impl Parser {
     }
 
     fn handle_fontmatter(&mut self) -> ParseReturn {
-        let mut inside = self.peek_till_kind(&TokenType::FontmatterEnd)?;
+        let mut inside = self.peek_till_kind(&TokenType::FontmatterEnd).unwrap();
+        inside.remove(0);
         inside.pop();
         let s = inside
             .iter()
@@ -640,8 +657,8 @@ mod test {
     // (ie test_str_$name or test_file_$name)
     use super::*;
     use std::collections::HashMap;
-    use std::path::PathBuf;
     use std::fs;
+    use std::path::PathBuf;
 
     fn init_lexer(content: &str) -> Lexer {
         let content = content.to_string();
@@ -737,29 +754,41 @@ mod test {
     }
 
     macro_rules! snapshot_path {
-        ($name:tt, $content:tt) => {
+        ($name:tt, $path:tt) => {
             #[test]
-            fn test_path_$name() {
+            fn $name() {
                 let mut settings = insta::Settings::clone_current();
                 settings.set_snapshot_path("../testdata/output/");
                 settings.bind(|| {
-                    insta::assert_snapshot!(snapshot_str($content));
+                    insta::assert_snapshot!(snapshot_path($path));
                 });
             }
         };
     }
 
     snapshot_str!(test, "test \n test *__test__* none");
-
-    snapshot_str!(test_1, "## header\n> blockquote\n- list\n\t- item\n        - level _**two??**_");
-
+    snapshot_str!(
+        test_1,
+        "## header\n> blockquote\n- list\n\t- item\n        - level _**two??**_"
+    );
     snapshot_str!(test_2, "1. list item\n\t2. hmm");
+    snapshot_str!(
+        test_3,
+        "[test](link)\n![prev](of a file)\ntest ![other txt](./*test*)"
+    );
+    snapshot_str!(
+        test_custom,
+        "%{{\nname: test\nother: key\n---\nbody\ntest\n}}\n---\ntest"
+    );
+    snapshot_str!(
+        test_custom_1,
+        "%{{\nname: test\nother: key\n---\nbody\ntest\n}}"
+    );
+    snapshot_str!(
+        test_fm,
+        "---\ntitle: test title\npath: /test/path/\nvalues:\n    - key: value\n---"
+    );
+    snapshot_str!(test_linebreak, "test\n\n---\n");
 
-    snapshot_str!(test_3, "[test](link)\n![prev](of a file)\ntest ![other txt](./*test*)");
-
-    snapshot_str!(test_custom, "%{{\nname: test\nother: key\n---\nbody\ntest\n}}\n---\ntest");
-
-    snapshot_str!(test_custom_1, "%{{\nname: test\nother: key\n---\nbody\ntest\n}}");
-
-    snapshot_str!(test_fm, "---\ntitle: test title\npath: /test/path/\nvalues:\n    - key: value\n---");
+    snapshot_path!(test_load, "./testdata/tests/test.md");
 }
