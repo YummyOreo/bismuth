@@ -157,16 +157,20 @@ impl Parser {
         self.current_token()
     }
 
-    fn peek(&self, n: usize) -> Result<&Token, error::ParseError> {
+    fn peek_at(&self, n: usize) -> Result<&Token, error::ParseError> {
         self.lexer.tokens.get(n).ok_or(error::ParseError::Peek(n))
     }
 
-    fn peek_after(&self, n: usize) -> Result<&Token, error::ParseError> {
-        self.peek(self.current_token_index + n)
+    fn peek(&self, n: usize) -> Result<&Token, error::ParseError> {
+        self.peek_at(self.current_token_index + n)
     }
 
-    fn peek_before(&self, n: usize) -> Result<&Token, error::ParseError> {
-        self.peek(self.current_token_index - n)
+    fn peek_back(&self, n: usize) -> Result<&Token, error::ParseError> {
+        self.peek_back(
+            self.current_token_index
+                .checked_sub(n)
+                .ok_or(error::ParseError::MathError)?,
+        )
     }
 
     fn peek_till(&self, n: usize) -> Result<Vec<Token>, error::ParseError> {
@@ -188,13 +192,14 @@ impl Parser {
         Ok(tokens_after.split_at(end).0.to_vec())
     }
 
-    fn till_pattern(&self, kinds: &[TokenType]) -> Result<usize, error::ParseError> {
+    fn peek_till_pattern(&self, kinds: &[TokenType]) -> Result<usize, error::ParseError> {
         let tokens_after = self.lexer.tokens.split_at(self.current_token_index).1;
         let mut pat_index = 0;
         for (index, token) in tokens_after.iter().enumerate() {
-            if pat_index >= kinds.len() - 1 {
+            if pat_index >= kinds.len().checked_sub(1).unwrap_or_default() {
                 return Ok((index - pat_index) + self.current_token_index);
             }
+
             if kinds[pat_index] == token.kind {
                 pat_index += 1;
             } else {
@@ -204,7 +209,7 @@ impl Parser {
         Err(error::ParseError::CouldNotFindPattern)
     }
 
-    fn make_text_at_token(&self) -> Result<Element, error::ParseError> {
+    fn make_text(&self) -> Result<Element, error::ParseError> {
         if self.state.new_line {
             let mut elm = Element::new(Kind::Paragraph);
             let mut elm_txt = Element::new(Kind::Text);
@@ -221,9 +226,7 @@ impl Parser {
     }
 
     fn reset_state(&mut self) {
-        self.state.indent_level = 0;
-        self.state.new_line = false;
-        self.state.inside = vec![];
+        self.state = State::default();
     }
 }
 
@@ -273,13 +276,13 @@ impl Parser {
                 self.append_element(elm);
 
                 return Ok(());
-            } else if diff == 3 && self.peek_after(1)?.kind == TokenType::EndOfLine {
+            } else if diff == 3 && self.peek(1)?.kind == TokenType::EndOfLine {
                 self.append_element(Element::new(Kind::HorizontalRule));
                 return Ok(());
             }
         }
 
-        self.append_element(self.make_text_at_token()?);
+        self.append_element(self.make_text()?);
         Ok(())
     }
 
@@ -300,8 +303,8 @@ impl Parser {
         ];
 
         let end = self
-            .till_pattern(&pattern)
-            .unwrap_or(self.till_pattern(&pattern_or)?);
+            .peek_till_pattern(&pattern)
+            .unwrap_or(self.peek_till_pattern(&pattern_or)?);
 
         let inside_tokens = self.peek_till(end)?;
         // need to -3 because it includes \n}}\n
@@ -320,7 +323,7 @@ impl Parser {
     }
 
     fn handle_precent(&mut self) -> ParseReturn {
-        let peek = self.peek_after(1)?;
+        let peek = self.peek(1)?;
 
         let is_newline = self.state.new_line;
         let is_curlybrace = peek.kind == TokenType::CurlybraceLeft;
@@ -331,7 +334,7 @@ impl Parser {
             self.append_element(elm);
             return Ok(());
         }
-        self.append_element(self.make_text_at_token()?);
+        self.append_element(self.make_text()?);
         Ok(())
     }
 
@@ -347,7 +350,7 @@ impl Parser {
         };
 
         if elm_kind == Kind::Text {
-            self.append_element(self.make_text_at_token()?);
+            self.append_element(self.make_text()?);
             return Ok(());
         }
 
@@ -404,7 +407,7 @@ impl Parser {
                 self.append_element(elm);
             }
             Err(error::ParseError::Peek(_)) => {
-                self.append_element(self.make_text_at_token()?);
+                self.append_element(self.make_text()?);
             }
             Err(e) => {
                 return Err(e);
@@ -424,7 +427,7 @@ impl Parser {
                 self.append_element(elm);
             }
             Err(error::ParseError::Peek(_)) => {
-                self.append_element(self.make_text_at_token()?);
+                self.append_element(self.make_text()?);
             }
             Err(e) => {
                 return Err(e);
@@ -437,20 +440,18 @@ impl Parser {
         self.advance_token()?;
         // this assumes that you are on [
         let text = self.peek_till_kind(&TokenType::BracketRight)?;
-        let mut text_s = String::new();
-
-        for token in &text {
-            text_s.push_str(&token.text.iter().collect::<String>());
-        }
+        let text_s = text
+            .iter()
+            .map(|t| t.text.iter().collect::<String>())
+            .collect::<String>();
 
         self.advance_n_token(text.len() + 2)?;
 
         let url = self.peek_till_kind(&TokenType::ParenthesisRight)?;
-        let mut url_s = String::new();
-
-        for token in &url {
-            url_s.push_str(&token.text.iter().collect::<String>());
-        }
+        let url_s = url
+            .iter()
+            .map(|t| t.text.iter().collect::<String>())
+            .collect::<String>();
 
         self.advance_n_token(url.len())?;
 
@@ -460,10 +461,11 @@ impl Parser {
     fn handle_fontmatter(&mut self) -> ParseReturn {
         let mut inside = self.peek_till_kind(&TokenType::FontmatterEnd)?;
         inside.pop();
-        let mut s = String::new();
-        for token in &inside {
-            s.push_str(&token.text.iter().collect::<String>());
-        }
+        let s = inside
+            .iter()
+            .map(|t| t.text.iter().collect::<String>())
+            .collect::<String>();
+
         self.advance_n_token(inside.len())?;
         self.metadata
             .fontmatter
@@ -475,37 +477,32 @@ impl Parser {
     fn parse_token(&mut self, token: &Token) -> ParseReturn {
         match token.kind {
             TokenType::Text | TokenType::CurlybraceLeft | TokenType::CurlybraceRight => {
-                self.append_element(self.make_text_at_token()?);
-                Ok(())
-            }
-            TokenType::EndOfLine => {
-                self.append_element(Element::new(Kind::EndOfLine));
-                Ok(())
-            }
-            TokenType::Tab => self.handle_tab(),
-            TokenType::Whitespace => self.handle_whitespace(),
-
-            TokenType::Hash => self.handle_hash(),
-            TokenType::Percent => self.handle_precent(),
-            TokenType::Dash => self.handle_dash(),
-            TokenType::ListNumber => self.handle_num(),
-
-            TokenType::GreaterThan => {
-                self.append_element(Element::new(Kind::Blockquote));
-                Ok(())
+                self.append_element(self.make_text()?)
             }
 
-            TokenType::Asterisk => self.handle_container(TokenType::Asterisk),
-            TokenType::Backtick => self.handle_container(TokenType::Backtick),
-            TokenType::DollarSign => self.handle_container(TokenType::DollarSign),
-            TokenType::Underscore => self.handle_container(TokenType::Underscore),
+            TokenType::EndOfLine => self.append_element(Element::new(Kind::EndOfLine)),
+            TokenType::Tab => self.handle_tab()?,
+            TokenType::Whitespace => self.handle_whitespace()?,
 
-            TokenType::BracketLeft => self.handle_bracket(),
-            TokenType::Exclamation => self.handle_exclamation(),
+            TokenType::Hash => self.handle_hash()?,
+            TokenType::Percent => self.handle_precent()?,
+            TokenType::Dash => self.handle_dash()?,
+            TokenType::ListNumber => self.handle_num()?,
 
-            TokenType::FontmatterStart => self.handle_fontmatter(),
-            _ => Ok(()),
-        }
+            TokenType::GreaterThan => self.append_element(Element::new(Kind::Blockquote)),
+
+            TokenType::Asterisk => self.handle_container(TokenType::Asterisk)?,
+            TokenType::Backtick => self.handle_container(TokenType::Backtick)?,
+            TokenType::DollarSign => self.handle_container(TokenType::DollarSign)?,
+            TokenType::Underscore => self.handle_container(TokenType::Underscore)?,
+
+            TokenType::BracketLeft => self.handle_bracket()?,
+            TokenType::Exclamation => self.handle_exclamation()?,
+
+            TokenType::FontmatterStart => self.handle_fontmatter()?,
+            _ => {}
+        };
+        Ok(())
     }
 
     pub fn parse(&mut self) -> Result<(), error::ParseError> {
@@ -515,7 +512,7 @@ impl Parser {
                 Err(e) => match e {
                     error::ParseError::Move(_) => Err(e),
                     _ => {
-                        panic!("{e:#?}");
+                        return Err(e);
                     }
                 },
             }
@@ -621,7 +618,7 @@ mod test_utils {
         ];
 
         let l = 2;
-        let r = parser.till_pattern(&pattern).unwrap();
+        let r = parser.peek_till_pattern(&pattern).unwrap();
         assert_eq!(l, r);
 
         let lexer = init_lexer("this is a test \n[]\n another line \n[]\n");
@@ -630,7 +627,7 @@ mod test_utils {
         parser.advance_n_token(4).unwrap();
 
         let l = 8;
-        let r = parser.till_pattern(&pattern).unwrap();
+        let r = parser.peek_till_pattern(&pattern).unwrap();
         assert_eq!(l, r);
     }
 }
@@ -644,10 +641,19 @@ mod test {
     use super::*;
     use std::collections::HashMap;
     use std::path::PathBuf;
+    use std::fs;
 
     fn init_lexer(content: &str) -> Lexer {
         let content = content.to_string();
         let path = PathBuf::from("/test/");
+        let mut l = Lexer::new_test(path, content);
+        l.run_lexer().unwrap();
+        l
+    }
+
+    fn init_lexer_path(path: &str) -> Lexer {
+        let path = PathBuf::from(path);
+        let content = fs::read_to_string(&path).unwrap();
         let mut l = Lexer::new_test(path, content);
         l.run_lexer().unwrap();
         l
@@ -703,81 +709,57 @@ mod test {
         s
     }
 
-    macro_rules! snapshot {
-        ($content:tt) => {
-            // #[test]
-            // fn $name() {
-            let mut settings = insta::Settings::clone_current();
-            settings.set_snapshot_path("../testdata/output/");
-            settings.bind(|| {
-                insta::assert_snapshot!(format_parser($content));
-            });
-            // }
+    fn snapshot_str(content: &str) -> String {
+        let lexer = init_lexer(content);
+        let mut parser = Parser::new(lexer);
+        parser.parse().unwrap();
+        format_parser(parser)
+    }
+
+    macro_rules! snapshot_str {
+        ($name:tt, $content:tt) => {
+            #[test]
+            fn $name() {
+                let mut settings = insta::Settings::clone_current();
+                settings.set_snapshot_path("../testdata/output/");
+                settings.bind(|| {
+                    insta::assert_snapshot!(snapshot_str($content));
+                });
+            }
         };
     }
 
-    #[test]
-    fn test() {
-        let lexer = init_lexer("test \n test *__test__* none");
+    fn snapshot_path(path: &str) -> String {
+        let lexer = init_lexer_path(path);
         let mut parser = Parser::new(lexer);
         parser.parse().unwrap();
-
-        snapshot!(parser);
+        format_parser(parser)
     }
 
-    #[test]
-    fn test_1() {
-        let lexer =
-            init_lexer("## header\n> blockquote\n- list\n\t- item\n        - level _**two??**_");
-        let mut parser = Parser::new(lexer);
-        parser.parse().unwrap();
-
-        snapshot!(parser);
+    macro_rules! snapshot_path {
+        ($name:tt, $content:tt) => {
+            #[test]
+            fn test_path_$name() {
+                let mut settings = insta::Settings::clone_current();
+                settings.set_snapshot_path("../testdata/output/");
+                settings.bind(|| {
+                    insta::assert_snapshot!(snapshot_str($content));
+                });
+            }
+        };
     }
 
-    #[test]
-    fn test_2() {
-        let lexer = init_lexer("1. list item\n\t2. hmm");
-        let mut parser = Parser::new(lexer);
-        parser.parse().unwrap();
+    snapshot_str!(test, "test \n test *__test__* none");
 
-        snapshot!(parser);
-    }
+    snapshot_str!(test_1, "## header\n> blockquote\n- list\n\t- item\n        - level _**two??**_");
 
-    #[test]
-    fn test_3() {
-        let lexer = init_lexer("[test](link)\n![prev](of a file)\ntest ![other txt](./*test*)");
-        let mut parser = Parser::new(lexer);
-        parser.parse().unwrap();
+    snapshot_str!(test_2, "1. list item\n\t2. hmm");
 
-        snapshot!(parser);
-    }
+    snapshot_str!(test_3, "[test](link)\n![prev](of a file)\ntest ![other txt](./*test*)");
 
-    #[test]
-    fn test_custom() {
-        let lexer = init_lexer("%{{\nname: test\nother: key\n---\nbody\ntest\n}}\n---\ntest");
-        let mut parser = Parser::new(lexer);
-        parser.parse().unwrap();
+    snapshot_str!(test_custom, "%{{\nname: test\nother: key\n---\nbody\ntest\n}}\n---\ntest");
 
-        snapshot!(parser);
-    }
+    snapshot_str!(test_custom_1, "%{{\nname: test\nother: key\n---\nbody\ntest\n}}");
 
-    #[test]
-    fn test_custom_1() {
-        let lexer = init_lexer("%{{\nname: test\nother: key\n---\nbody\ntest\n}}");
-        let mut parser = Parser::new(lexer);
-        parser.parse().unwrap();
-
-        snapshot!(parser);
-    }
-
-    #[test]
-    fn test_fm() {
-        let lexer =
-            init_lexer("---\ntitle: test title\npath: /test/path/\nvalues:\n    - key: value\n---");
-        let mut parser = Parser::new(lexer);
-        parser.parse().unwrap();
-
-        snapshot!(parser);
-    }
+    snapshot_str!(test_fm, "---\ntitle: test title\npath: /test/path/\nvalues:\n    - key: value\n---");
 }

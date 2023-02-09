@@ -1,4 +1,4 @@
-#![allow(unused_doc_comments, dead_code)]
+#![allow(unused_doc_comments)]
 use regex::Regex;
 
 use bismuth_md::MarkdownFile;
@@ -35,17 +35,11 @@ impl Lexer {
     }
 
     pub fn new_test(path: PathBuf, content: String) -> Self {
-        let mut content = content.chars().collect::<Vec<char>>();
-        content.retain(|c| c != &'\r');
-        content.push('\n');
-        Lexer {
-            path,
-            chars: content,
-            position: 0,
-
-            current_token: token::Token::new(token::TokenType::StartOfFile, vec![], 0, 0),
-            tokens: vec![],
-        }
+        let file = MarkdownFile {
+            content,
+            path
+        };
+        Self::new(file)
     }
 
     pub fn get_lines(&self) -> Vec<(usize, String)> {
@@ -348,7 +342,6 @@ impl Lexer {
             | token::TokenType::Tab
             | token::TokenType::EndOfLine
             | token::TokenType::StartOfFile => {
-                println!("num");
                 let till_dot =
                     self.peek_regex(Regex::new(r"\d*\.").expect("Should be valid regex"));
                 let end = *till_dot.end();
@@ -361,7 +354,6 @@ impl Lexer {
                     text,
                 };
                 self.move_to(end)?;
-                println!("num");
                 Ok(t)
             }
             _ => self.make_token_at_pos(token::TokenType::Text),

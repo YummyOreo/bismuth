@@ -11,6 +11,8 @@ pub enum ParseError {
 
     CustomElementError(CustomElmError),
     FontMatterError(Error),
+
+    MathError,
 }
 
 #[derive(Debug, PartialEq)]
