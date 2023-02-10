@@ -5,7 +5,7 @@ use crate::{custom, error::ElementError};
 
 #[derive(Default, Debug)]
 pub struct Ast {
-    pub elements: Vec<Option<Element>>,
+    pub elements: Vec<Element>,
 }
 
 #[derive(Clone, PartialEq, Debug)]

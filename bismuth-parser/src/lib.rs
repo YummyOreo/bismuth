@@ -10,6 +10,7 @@ mod error;
 mod fontmatter;
 mod tree;
 use crate::{
+    error::ParseError,
     fontmatter::FontMatter,
     tree::{Ast, Element, Kind},
 };
@@ -46,15 +47,15 @@ impl Default for State {
     }
 }
 
-type ParseReturn = Result<(), error::ParseError>;
+type ParseReturn = Result<(), ParseError>;
 
 #[derive(Debug)]
 pub struct Parser {
     pub lexer: Lexer,
 
-    current_token_index: usize,
+    index: usize,
 
-    metadata: Metadata,
+    pub metadata: Metadata,
 
     current_element: Option<Element>,
 
@@ -71,7 +72,7 @@ impl Parser {
         Parser {
             lexer,
 
-            current_token_index: 0,
+            index: 0,
 
             metadata,
 
@@ -82,18 +83,18 @@ impl Parser {
         }
     }
 
-    fn current_token(&self) -> Result<&Token, error::ParseError> {
+    fn current_token(&self) -> Result<&Token, ParseError> {
         self.lexer
             .tokens
-            .get(self.current_token_index)
-            .ok_or(error::ParseError::GetToken(self.current_token_index))
+            .get(self.index)
+            .ok_or(ParseError::GetToken(self.index))
     }
 
-    fn current_token_chars(&self) -> Result<&Vec<char>, error::ParseError> {
+    fn current_token_chars(&self) -> Result<&Vec<char>, ParseError> {
         Ok(&self.current_token()?.text)
     }
 
-    fn current_token_type(&self) -> Result<&TokenType, error::ParseError> {
+    fn current_token_type(&self) -> Result<&TokenType, ParseError> {
         Ok(&self.current_token()?.kind)
     }
 
@@ -101,7 +102,7 @@ impl Parser {
         (token.end - token.start) + 1
     }
 
-    fn current_token_len(&self) -> Result<usize, error::ParseError> {
+    fn current_token_len(&self) -> Result<usize, ParseError> {
         Ok(self.token_len(self.current_token()?))
     }
 
@@ -127,16 +128,17 @@ impl Parser {
                 curr_elm.append_node(elm);
                 return;
             } else {
-                self.ast.elements.push(self.current_element.clone());
-                self.ast.elements.push(Some(elm));
+                self.ast
+                    .elements
+                    .push(self.current_element.clone().unwrap());
+                self.ast.elements.push(elm);
                 self.current_element = None;
 
                 self.reset_state();
-                self.state.new_line = true;
                 return;
             }
         } else if elm.kind == Kind::EndOfLine {
-            self.ast.elements.push(Some(elm));
+            self.ast.elements.push(elm);
             return;
         }
         self.state.new_line = false;
@@ -147,60 +149,56 @@ impl Parser {
         self.current_element = Some(elm);
     }
 
-    fn advance_token(&mut self) -> Result<&Token, error::ParseError> {
+    fn advance_token(&mut self) -> Result<&Token, ParseError> {
         self.advance_n_token(1)
     }
 
-    fn advance_n_token(&mut self, n: usize) -> Result<&Token, error::ParseError> {
-        if self.current_token_index + n >= self.lexer.tokens.len() {
-            return Err(error::ParseError::Move(self.current_token_index + n));
+    fn advance_n_token(&mut self, n: usize) -> Result<&Token, ParseError> {
+        if self.index + n >= self.lexer.tokens.len() {
+            return Err(ParseError::Move(self.index + n));
         }
-        self.current_token_index += n;
+        self.index += n;
 
         self.current_token()
     }
 
-    fn peek_at(&self, n: usize) -> Result<&Token, error::ParseError> {
-        self.lexer.tokens.get(n).ok_or(error::ParseError::Peek(n))
+    fn peek_at(&self, n: usize) -> Result<&Token, ParseError> {
+        self.lexer.tokens.get(n).ok_or(ParseError::Peek(n))
     }
 
-    fn peek(&self, n: usize) -> Result<&Token, error::ParseError> {
-        self.peek_at(self.current_token_index + n)
+    fn peek(&self, n: usize) -> Result<&Token, ParseError> {
+        self.peek_at(self.index + n)
     }
 
-    fn peek_back(&self, n: usize) -> Result<&Token, error::ParseError> {
-        self.peek_back(
-            self.current_token_index
-                .checked_sub(n)
-                .ok_or(error::ParseError::MathError)?,
-        )
+    fn peek_back(&self, n: usize) -> Result<&Token, ParseError> {
+        self.peek_back(self.index.checked_sub(n).ok_or(ParseError::MathError)?)
     }
 
-    fn peek_till(&self, n: usize) -> Result<Vec<Token>, error::ParseError> {
-        if n >= self.lexer.tokens.len() || n < self.current_token_index {
-            return Err(error::ParseError::Peek(n));
+    fn peek_till(&self, n: usize) -> Result<Vec<Token>, ParseError> {
+        if n >= self.lexer.tokens.len() || n < self.index {
+            return Err(ParseError::Peek(n));
         }
 
-        let tokens_after = self.lexer.tokens.split_at(self.current_token_index).1;
+        let tokens_after = self.lexer.tokens.split_at(self.index).1;
         Ok(tokens_after.split_at(n).0.to_vec())
     }
 
-    fn peek_till_kind(&self, kind: &TokenType) -> Result<Vec<Token>, error::ParseError> {
-        let tokens_after = self.lexer.tokens.split_at(self.current_token_index).1;
+    fn peek_till_kind(&self, kind: &TokenType) -> Result<Vec<Token>, ParseError> {
+        let tokens_after = self.lexer.tokens.split_at(self.index).1;
         let end = tokens_after
             .iter()
             .position(|t| &t.kind == kind)
-            .ok_or(error::ParseError::Peek(0))?;
+            .ok_or(ParseError::Peek(0))?;
 
         Ok(tokens_after.split_at(end).0.to_vec())
     }
 
-    fn peek_till_pattern(&self, kinds: &[TokenType]) -> Result<usize, error::ParseError> {
-        let tokens_after = self.lexer.tokens.split_at(self.current_token_index).1;
+    fn peek_till_pattern(&self, kinds: &[TokenType]) -> Result<usize, ParseError> {
+        let tokens_after = self.lexer.tokens.split_at(self.index).1;
         let mut pat_index = 0;
         for (index, token) in tokens_after.iter().enumerate() {
             if pat_index >= kinds.len().checked_sub(1).unwrap_or_default() {
-                return Ok((index - pat_index) + self.current_token_index);
+                return Ok((index - pat_index) + self.index);
             }
 
             if kinds[pat_index] == token.kind {
@@ -209,10 +207,10 @@ impl Parser {
                 pat_index = 0;
             }
         }
-        Err(error::ParseError::CouldNotFindPattern)
+        Err(ParseError::CouldNotFindPattern)
     }
 
-    fn make_text(&self) -> Result<Element, error::ParseError> {
+    fn make_text(&self) -> Result<Element, ParseError> {
         if self.state.new_line {
             let mut elm = Element::new(Kind::Paragraph);
             let mut elm_txt = Element::new(Kind::Text);
@@ -289,7 +287,7 @@ impl Parser {
         Ok(())
     }
 
-    fn make_custom(&mut self) -> Result<Element, error::ParseError> {
+    fn make_custom(&mut self) -> Result<Element, ParseError> {
         // advance past %{{
         self.advance_n_token(2)?;
 
@@ -320,8 +318,8 @@ impl Parser {
         self.advance_n_token(inside_tokens.len() - 2)?;
 
         // makes the custom element
-        let c = custom::CustomElm::from_string(&inside_str)
-            .map_err(error::ParseError::CustomElementError)?;
+        let c =
+            custom::CustomElm::from_string(&inside_str).map_err(ParseError::CustomElementError)?;
         Ok(Element::new(Kind::CustomElement(c)))
     }
 
@@ -376,7 +374,7 @@ impl Parser {
             self.advance_n_token(inside.len())?;
             self.append_element(elm);
         } else {
-            let mut last_index = self.current_token_index;
+            let mut last_index = self.index;
             let mut last_diff = 0;
 
             for token in &inside {
@@ -387,8 +385,8 @@ impl Parser {
 
                 self.parse_token(token)?;
 
-                last_diff = (self.current_token_index - last_index) + 1;
-                last_index = self.current_token_index;
+                last_diff = (self.index - last_index) + 1;
+                last_index = self.index;
 
                 self.advance_n_token(1)?;
             }
@@ -422,7 +420,7 @@ impl Parser {
                 elm.add_attr("link", &url);
                 self.append_element(elm);
             }
-            Err(error::ParseError::Peek(_)) => {
+            Err(ParseError::Peek(_)) => {
                 self.append_element(self.make_text()?);
             }
             Err(e) => {
@@ -442,7 +440,7 @@ impl Parser {
                 elm.add_attr("link", &url);
                 self.append_element(elm);
             }
-            Err(error::ParseError::Peek(_)) => {
+            Err(ParseError::Peek(_)) => {
                 self.append_element(self.make_text()?);
             }
             Err(e) => {
@@ -452,7 +450,7 @@ impl Parser {
         Ok(())
     }
 
-    fn get_url(&mut self) -> Result<(String, String), error::ParseError> {
+    fn get_url(&mut self) -> Result<(String, String), ParseError> {
         self.advance_token()?;
         // this assumes that you are on [
         let text = self.peek_till_kind(&TokenType::BracketRight)?;
@@ -487,7 +485,7 @@ impl Parser {
         self.metadata
             .fontmatter
             .update_from_str(&s)
-            .map_err(error::ParseError::FontMatterError)?;
+            .map_err(ParseError::FontMatterError)?;
         Ok(())
     }
 
@@ -522,12 +520,12 @@ impl Parser {
         Ok(())
     }
 
-    pub fn parse(&mut self) -> Result<(), error::ParseError> {
+    pub fn parse(&mut self) -> Result<(), ParseError> {
         while {
             match self.advance_token() {
                 Ok(t) => Ok(t),
                 Err(e) => match e {
-                    error::ParseError::Move(_) => Err(e),
+                    ParseError::Move(_) => Err(e),
                     _ => {
                         return Err(e);
                     }
@@ -543,7 +541,9 @@ impl Parser {
             self.parse_token(&token)?;
         }
         // append the last element
-        self.ast.elements.push(self.current_element.clone());
+        if let Some(elm) = self.current_element.clone() {
+            self.ast.elements.push(elm);
+        }
         self.current_element = None;
         Ok(())
     }
@@ -718,9 +718,7 @@ mod test {
         let mut s = String::new();
         s.push_str(&format!("{:#?}\n", parser.metadata.fontmatter));
         for element in &ast.elements {
-            if element.is_some() {
-                s.push_str(&render_element(&element.clone().unwrap(), 0));
-            }
+            s.push_str(&render_element(&element.clone(), 0));
             s.push('\n');
         }
         s
