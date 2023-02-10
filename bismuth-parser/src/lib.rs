@@ -481,7 +481,7 @@ impl Parser {
             .map(|t| t.text.iter().collect::<String>())
             .collect::<String>();
 
-        self.advance_n_token(inside.len())?;
+        self.advance_n_token(inside.len() + 1)?;
         self.metadata
             .fontmatter
             .update_from_str(&s)

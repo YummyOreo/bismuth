@@ -27,12 +27,4 @@ Element{
     Elements: [
     ])
 }
-Element{
-    Kind: "EndOfLine",
-    Text: None,
-    Attrs: [],
-    Elements: [
-    ])
-}
-
 

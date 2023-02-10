@@ -22,13 +22,6 @@ Element{
     ])
 }
 Element{
-    Kind: "EndOfLine",
-    Text: None,
-    Attrs: [],
-    Elements: [
-    ])
-}
-Element{
     Kind: "Header",
     Text: None,
     Attrs: [("level", "1")],
@@ -273,5 +266,4 @@ Element{
     Elements: [
     ])
 }
-
 
