@@ -195,18 +195,39 @@ impl Parser {
 
     fn peek_till_pattern(&self, kinds: &[TokenType]) -> Result<usize, ParseError> {
         let tokens_after = self.lexer.tokens.split_at(self.index).1;
-        let mut pat_index = 0;
-        for (index, token) in tokens_after.iter().enumerate() {
-            if pat_index >= kinds.len().checked_sub(1).unwrap_or_default() {
-                return Ok((index - pat_index) + self.index);
+
+        let mut p_i = 0;
+        let mut r_n = 0;
+
+        for (i, token) in tokens_after.iter().enumerate() {
+            if p_i >= kinds.len() {
+                return Ok((i - (p_i - r_n)) + self.index);
             }
 
-            if kinds[pat_index] == token.kind {
-                pat_index += 1;
+            if kinds[p_i] == token.kind {
+                let len = self.token_len(token);
+                if len > 1 {
+                    let mut r = 1;
+                    while r < len {
+                        if token.kind == kinds[p_i + r] {
+                            r += 1;
+                            p_i += 1;
+                        } else {
+                            p_i = 0;
+                            break;
+                        }
+                    }
+                    if r == len {
+                        r_n += 1;
+                    }
+                }
+                p_i += 1
             } else {
-                pat_index = 0;
+                p_i = 0;
+                r_n = 0;
             }
         }
+
         Err(ParseError::CouldNotFindPattern)
     }
 
@@ -293,17 +314,20 @@ impl Parser {
         let pattern = vec![
             TokenType::EndOfLine,
             TokenType::CurlybraceRight,
+            TokenType::CurlybraceRight,
             TokenType::EndOfLine,
         ];
         let pattern_or = vec![
             TokenType::EndOfLine,
             TokenType::CurlybraceRight,
+            TokenType::CurlybraceRight,
             TokenType::EndOfFile,
         ];
 
-        let end = self
-            .peek_till_pattern(&pattern)
-            .unwrap_or(self.peek_till_pattern(&pattern_or)?);
+        let end = match self.peek_till_pattern(&pattern) {
+            Ok(e) => e,
+            Err(_) => self.peek_till_pattern(&pattern_or)?,
+        };
 
         let inside_tokens = self.peek_till(end)?;
         // need to -3 because it includes \n}}\n
@@ -621,7 +645,7 @@ mod test_utils {
 
     #[test]
     fn peek_pattern_test() {
-        let lexer = init_lexer("this is a test \n[]\n");
+        let lexer = init_lexer("this is a test \n[]\n, [[]]");
         let mut parser = Parser::new(lexer);
         // skip start of file
         parser.advance_token().unwrap();
@@ -634,6 +658,32 @@ mod test_utils {
 
         let l = 2;
         let r = parser.peek_till_pattern(&pattern).unwrap();
+        assert_eq!(l, r);
+
+        let pattern_2: Vec<TokenType> = vec![
+            TokenType::Text,
+            TokenType::BracketLeft,
+            TokenType::BracketLeft,
+            TokenType::BracketRight,
+            TokenType::BracketRight,
+            TokenType::EndOfLine,
+        ];
+        let l = 6;
+        let r = parser.peek_till_pattern(&pattern_2).unwrap();
+        assert_eq!(l, r);
+
+        let lexer = init_lexer("\ntest\n}}\ntest");
+        let parser = Parser::new(lexer);
+
+        let pattern_2: Vec<TokenType> = vec![
+            TokenType::EndOfLine,
+            TokenType::CurlybraceRight,
+            TokenType::CurlybraceRight,
+            TokenType::EndOfLine,
+        ];
+
+        let l = 3;
+        let r = parser.peek_till_pattern(&pattern_2).unwrap();
         assert_eq!(l, r);
 
         let lexer = init_lexer("this is a test \n[]\n another line \n[]\n");
