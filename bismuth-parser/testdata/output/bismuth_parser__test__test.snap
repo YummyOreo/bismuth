@@ -1,6 +1,6 @@
 ---
 source: bismuth-parser/src/lib.rs
-expression: format_parser(parser)
+expression: "snapshot_str(\"test \\n test *__test__* none\")"
 ---
 FontMatter {
     title: Some(
@@ -40,6 +40,13 @@ Element{
     Text: None,
     Attrs: [],
     Elements: [
+    Element{
+        Kind: "Text",
+        Text: Some(" "),
+        Attrs: [],
+        Elements: [
+        ])
+    },
     Element{
         Kind: "Text",
         Text: Some("test "),
@@ -84,5 +91,4 @@ Element{
     Elements: [
     ])
 }
-
 

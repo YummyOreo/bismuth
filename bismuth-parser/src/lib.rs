@@ -142,10 +142,10 @@ impl Parser {
             return;
         }
         self.state.new_line = false;
-        self.set_current_elm(elm);
+        self.set_current(elm);
     }
 
-    fn set_current_elm(&mut self, elm: Element) {
+    fn set_current(&mut self, elm: Element) {
         self.current_element = Some(elm);
     }
 
@@ -232,7 +232,6 @@ impl Parser {
 }
 
 // Parsing
-
 impl Parser {
     fn handle_tab(&mut self) -> ParseReturn {
         let tabs = self.current_token_len()?;
@@ -242,8 +241,7 @@ impl Parser {
     fn handle_whitespace(&mut self) -> ParseReturn {
         let diff = self.current_token_len()?;
         if diff % 4 != 0 {
-            let mut elm = Element::new(Kind::Text);
-            elm.text = Some(self.current_token_chars()?.iter().collect::<String>());
+            self.append_element(self.make_text()?);
             return Ok(());
         }
 
