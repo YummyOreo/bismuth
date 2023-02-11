@@ -31,6 +31,9 @@ dependencies = [
 [[package]]
 name = "bismuth-custom"
 version = "0.1.0"
+dependencies = [
+ "bismuth-parser",
+]
 
 [[package]]
 name = "bismuth-error"

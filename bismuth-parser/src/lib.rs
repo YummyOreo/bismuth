@@ -357,8 +357,9 @@ impl Parser {
 
         if is_newline && is_curlybrace && is_2_len {
             let elm = self.make_custom()?;
-            self.has_custom = true;
             self.append_element(elm);
+
+            self.has_custom = true;
             return Ok(());
         }
         self.append_element(self.make_text()?);
