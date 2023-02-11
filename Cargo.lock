@@ -29,6 +29,10 @@ dependencies = [
 ]
 
 [[package]]
+name = "bismuth-custom"
+version = "0.1.0"
+
+[[package]]
 name = "bismuth-error"
 version = "0.1.0"
 dependencies = [

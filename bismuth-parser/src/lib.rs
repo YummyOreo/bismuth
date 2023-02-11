@@ -60,6 +60,7 @@ pub struct Parser {
     current_element: Option<Element>,
 
     state: State,
+    has_custom: bool,
 
     pub ast: Ast,
 }
@@ -79,7 +80,9 @@ impl Parser {
             current_element: None,
 
             ast: Default::default(),
+
             state: Default::default(),
+            has_custom: false,
         }
     }
 
@@ -354,6 +357,7 @@ impl Parser {
 
         if is_newline && is_curlybrace && is_2_len {
             let elm = self.make_custom()?;
+            self.has_custom = true;
             self.append_element(elm);
             return Ok(());
         }
