@@ -1,10 +1,14 @@
 use serde_yaml::{from_str, Error};
 use std::collections::{BTreeMap, HashMap};
+use thiserror::Error;
 
-#[derive(Debug)]
+#[derive(Debug, Error)]
 pub enum CustomElmError {
+    #[error("Error parsing yaml {0}")]
     YamlParse(Error),
+    #[error("no keys")]
     NoKeys,
+    #[error("no name")]
     NoName,
 }
 

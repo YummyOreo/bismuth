@@ -12,3 +12,12 @@ pub fn parse_custom(mut target: Parser, others: Vec<&Parser>) -> Parser {
     let custom_elms: Vec<&Element> = get_customs(&target.ast);
     todo!()
 }
+
+#[cfg(test)]
+mod test_utils {
+    #[test]
+    fn get_customs_test() {
+
+    }
+
+}

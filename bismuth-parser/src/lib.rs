@@ -86,11 +86,15 @@ impl Parser {
         }
     }
 
+    pub fn new_test(path: &str, content: &str) -> Self {
+        Parser::new(Lexer::new_test(PathBuf::from(path), content.to_string()))
+    }
+
     fn current_token(&self) -> Result<&Token, ParseError> {
         self.lexer
             .tokens
             .get(self.index)
-            .ok_or(ParseError::GetToken(self.index))
+            .ok_or(ParseError::GetToken(self.index).into())
     }
 
     fn current_token_chars(&self) -> Result<&Vec<char>, ParseError> {
