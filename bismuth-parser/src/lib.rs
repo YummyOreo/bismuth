@@ -5,10 +5,10 @@ use bismuth_lexer::{
 };
 use std::path::{Path, PathBuf};
 
-mod custom;
-mod error;
+pub mod custom;
+pub mod error;
 mod fontmatter;
-mod tree;
+pub mod tree;
 use crate::{
     error::ParseError,
     fontmatter::FontMatter,
