@@ -17,6 +17,17 @@ For internal/default templates, use:
 
 Lazyload all images
 
+# Built In Customs:
+## Header:
+Like the footer:
+- Customizable for each file
+- Can make a "default" one
+### Sections:
+- page name: link (will auto gray out if it is the current link)
+- name
+## Footer:
+TODO
+
 # Support:
 ## Langs:
 - Wasm
