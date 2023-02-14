@@ -1,4 +1,4 @@
-#![allow(dead_code)]
+#![allow(dead_code, unused)]
 use std::collections::HashMap;
 
 use bismuth_parser::{
@@ -7,6 +7,7 @@ use bismuth_parser::{
     Metadata, Parser,
 };
 
+mod builtin;
 pub mod plugin;
 pub mod template;
 
@@ -31,12 +32,30 @@ impl Custom {
         Self::new(elm.name.clone(), elm.values.clone())
     }
 
-    pub fn set_template(&mut self, t: template::Template) {
-        self.template = Some(t)
+    fn find_plugin(&mut self) -> Option<plugin::Plugin> {
+        // REDO THIS WHEN YOU IMPLEMENT PLUGINS
+        match self.name.to_string().as_str() {
+            "blog list" | "blogs" | "bloglist" => {}
+            "navbar" => {}
+            "footer" => {}
+            _ => {}
+        }
+        None
+    }
+    fn find_template(&mut self) -> Option<template::Template> {
+        // REDO THIS WHEN YOU IMPLEMENT TEMPLATE
+        match self.name.to_string().as_str() {
+            "blog list" | "blogs" | "bloglist" => {}
+            "navbar" => {}
+            "footer" => {}
+            _ => {}
+        }
+        None
     }
 
-    pub fn set_plugin(&mut self, p: plugin::Plugin) {
-        self.plugin = Some(p)
+    pub fn find(&mut self) {
+        self.plugin = self.find_plugin();
+        self.template = self.find_template();
     }
 }
 
@@ -60,7 +79,9 @@ pub fn parse_custom(mut target: Parser, others: Vec<&Parser>) -> Parser {
         .iter()
         .filter_map(|e| {
             if let Kind::CustomElement(c) = &e.kind {
-                Some(Custom::from_elm(c))
+                let mut custom = Custom::from_elm(c);
+                custom.find();
+                Some(custom)
             } else {
                 None
             }
