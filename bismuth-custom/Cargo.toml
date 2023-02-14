@@ -10,3 +10,4 @@ bismuth-parser = {version = "0.1.0", path = "../bismuth-parser"}
 
 [dev-dependencies]
 insta = "1.26.0"
+regex = "1.7.1"
