@@ -1,5 +1,5 @@
-mod tui;
 pub mod path;
+mod tui;
 
 pub struct State {
     pub position: usize,

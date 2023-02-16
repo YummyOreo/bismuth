@@ -35,8 +35,8 @@ impl Custom {
     fn find_plugin(&mut self) -> Option<plugin::Plugin> {
         // REDO THIS WHEN YOU IMPLEMENT PLUGINS
         builtin::match_plugin(&self.name)
-
     }
+
     fn find_template(&mut self) -> Option<template::Template> {
         // REDO THIS WHEN YOU IMPLEMENT TEMPLATE
         builtin::match_template(&self.name)

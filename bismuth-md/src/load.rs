@@ -46,10 +46,14 @@ mod test {
         let path = PathBuf::from(path).canonicalize().unwrap();
         let mut files = load_from_dir(&path).unwrap();
         for mut file in &mut files {
-            let new_path = file.path.to_string_lossy().replace('\\', "/").to_lowercase();
+            let new_path = file
+                .path
+                .to_string_lossy()
+                .replace('\\', "/")
+                .to_lowercase();
             file.path = PathBuf::from(new_path);
         }
-        files.sort_by(|a,b| a.path.cmp(&b.path));
+        files.sort_by(|a, b| a.path.cmp(&b.path));
         format!("{files:#?}")
     }
 

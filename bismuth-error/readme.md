@@ -1,4 +1,3 @@
-
 ## This needs to be re-written to use traits:
 Make a trait that implements into a error and has field:
 Getting the options

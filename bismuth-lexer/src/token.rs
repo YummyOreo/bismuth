@@ -27,7 +27,14 @@ impl Token {
 impl std::fmt::Display for Token {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         // write!(f, "{:?}(start: {}, end: {})", self.kind, self.start, self.end)
-        write!(f, "Token({:?}, {:?}, {} -> {})", self.kind, self.text.iter().collect::<String>(), self.start, self.end)
+        write!(
+            f,
+            "Token({:?}, {:?}, {} -> {})",
+            self.kind,
+            self.text.iter().collect::<String>(),
+            self.start,
+            self.end
+        )
     }
 }
 

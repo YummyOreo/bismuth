@@ -1,6 +1,6 @@
 #![allow(dead_code)]
 use std::fs;
-use std::path::{ PathBuf, Path };
+use std::path::{Path, PathBuf};
 
 pub mod load;
 
@@ -54,7 +54,12 @@ mod test {
     fn snapshot(path: &str) -> String {
         let path = PathBuf::from(path);
         let mut file = MarkdownFile::load_file(&path, &path).unwrap();
-        file.path = PathBuf::from(file.path.to_string_lossy().replace('\\', "/").to_lowercase());
+        file.path = PathBuf::from(
+            file.path
+                .to_string_lossy()
+                .replace('\\', "/")
+                .to_lowercase(),
+        );
         format!("{file:#?}")
     }
 
@@ -74,5 +79,4 @@ mod test {
     snapshot!(test_load_file, "./testdata/tests/test.markdown");
 
     snapshot!(test_load_file_1, "./testdata/tests/test1.md");
-
 }

@@ -36,9 +36,7 @@ fn update_input(path: &mut String) -> Option<()> {
 }
 
 pub fn md_file_error(description: &str) -> Option<PathBuf> {
-    let options = vec![
-        "Chose another path".to_string(),
-    ];
+    let options = vec!["Chose another path".to_string()];
 
     let option = error_ui(&options, description)?;
 
