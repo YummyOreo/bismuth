@@ -11,10 +11,19 @@ env:
 
 jobs:
   build:
+    strategy:
+          matrix:
+            os: [ubuntu-latest, windows-latest, macos-latest]
 
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
+
 
     steps:
     - uses: actions/checkout@v3
+    - uses: dtolnay/rust-toolchain@nightly
+      with:
+        components: clippy, rustfmt
     - name: Run tests
       run: cargo test
+    - name: Validate formatting
+      run: cargo fmt --all -- --check
