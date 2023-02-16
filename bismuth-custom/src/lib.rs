@@ -34,23 +34,12 @@ impl Custom {
 
     fn find_plugin(&mut self) -> Option<plugin::Plugin> {
         // REDO THIS WHEN YOU IMPLEMENT PLUGINS
-        match self.name.to_string().as_str() {
-            "blog list" | "blogs" | "bloglist" => {}
-            "navbar" => {}
-            "footer" => {}
-            _ => {}
-        }
-        None
+        builtin::match_plugin(&self.name)
+
     }
     fn find_template(&mut self) -> Option<template::Template> {
         // REDO THIS WHEN YOU IMPLEMENT TEMPLATE
-        match self.name.to_string().as_str() {
-            "blog list" | "blogs" | "bloglist" => {}
-            "navbar" => {}
-            "footer" => {}
-            _ => {}
-        }
-        None
+        builtin::match_template(&self.name)
     }
 
     pub fn find(&mut self) {
