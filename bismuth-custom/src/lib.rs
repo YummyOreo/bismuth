@@ -11,25 +11,28 @@ mod builtin;
 pub mod plugin;
 pub mod template;
 
+#[derive(Debug)]
 pub struct Custom {
     name: String,
+    id: u32,
     data: HashMap<String, String>,
     template: Option<template::Template>,
     plugin: Option<Box<dyn plugin::Plugin>>,
 }
 
 impl Custom {
-    pub fn new(name: String, data: HashMap<String, String>) -> Self {
+    pub fn new(name: String, data: HashMap<String, String>, id: u32) -> Self {
         Custom {
             name,
+            id,
             data,
             template: None,
             plugin: None,
         }
     }
 
-    pub fn from_elm(elm: &CustomElm) -> Self {
-        Self::new(elm.name.clone(), elm.values.clone())
+    pub fn from_elm(elm: &CustomElm, id: u32) -> Self {
+        Self::new(elm.name.clone(), elm.values.clone(), id)
     }
 
     fn find_plugin(&mut self) -> Option<Box<dyn plugin::Plugin>> {
@@ -40,6 +43,20 @@ impl Custom {
     fn find_template(&mut self) -> Option<template::Template> {
         // REDO THIS WHEN YOU IMPLEMENT TEMPLATE
         builtin::match_template(&self.name)
+    }
+
+    fn pre_load(&mut self, target: &Parser) {
+        if let Some(mut p) = self.plugin.take() {
+            p.pre_load(target, self);
+            self.plugin = Some(p);
+        }
+    }
+
+    fn run(&mut self, target: &mut Parser, others: &[&Parser]) {
+        if let Some(mut p) = self.plugin.take() {
+            p.run(target, others);
+            self.plugin = Some(p);
+        }
     }
 
     pub fn find(&mut self) {
@@ -64,19 +81,24 @@ fn get_customs(ast: &Ast) -> Vec<&Element> {
 
 pub fn parse_custom(mut target: Parser, others: Vec<&Parser>) -> Parser {
     let custom_elms = get_customs(&target.ast);
-    let customs: Vec<Custom> = custom_elms
+    let mut customs: Vec<Custom> = custom_elms
         .iter()
         .filter_map(|e| {
             if let Kind::CustomElement(c) = &e.kind {
-                let mut custom = Custom::from_elm(c);
+                let mut custom = Custom::from_elm(c, e.get_id());
                 custom.find();
+                custom.pre_load(&target);
                 Some(custom)
             } else {
                 None
             }
         })
         .collect();
-    todo!()
+    println!("{customs:#?}");
+    for custom in &mut customs {
+        custom.run(&mut target, &others);
+    }
+    target
 }
 
 #[cfg(test)]
@@ -93,6 +115,7 @@ mod test_utils {
             });
         };
     }
+
     #[test]
     fn get_customs_test() {
         let mut parser =
@@ -102,6 +125,19 @@ mod test_utils {
         let customs = format!("{:#?}", get_customs(&parser.ast));
         let re = Regex::new(r"id: \d+").unwrap();
         let customs = re.replace_all(&customs, "id: [redacted]").to_string();
+        snapshot!(customs);
+    }
+
+    #[test]
+    fn test() {
+        let mut parser =
+            bismuth_parser::Parser::new_test("/test/", "%{{\nname: navbar\nother: key\n}}");
+        parser.parse().unwrap();
+
+        let customs = format!("{:#?}", parse_custom(parser, vec![]));
+        let re = Regex::new(r"id: \d+").unwrap();
+        let customs = re.replace_all(&customs, "id: [redacted]").to_string();
+        // panic!("");
         snapshot!(customs);
     }
 }

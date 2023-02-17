@@ -8,6 +8,52 @@ pub struct Ast {
     pub elements: Vec<Element>,
 }
 
+impl Ast {
+    pub fn find(&self, id: u32) -> Option<&Element> {
+        for element in &self.elements {
+            if let Some(elm) = Self::find_in_element(element, id) {
+                return Some(elm);
+            }
+        }
+        None
+    }
+
+    fn find_in_element(elm: &Element, id: u32) -> Option<&Element> {
+        if elm.id == id {
+            return Some(elm);
+        } else {
+            for element in &elm.elements {
+                if let Some(elm) = Self::find_in_element(element, id) {
+                    return Some(elm);
+                }
+            }
+        }
+        None
+    }
+
+    pub fn find_mut(&mut self, id: u32) -> Option<&mut Element> {
+        for element in &mut self.elements {
+            if let Some(elm) = Self::find_in_element_mut(element, id) {
+                return Some(elm);
+            }
+        }
+        None
+    }
+
+    fn find_in_element_mut(elm: &mut Element, id: u32) -> Option<&mut Element> {
+        if elm.id == id {
+            return Some(elm);
+        } else {
+            for element in &mut elm.elements {
+                if let Some(elm) = Self::find_in_element_mut(element, id) {
+                    return Some(elm);
+                }
+            }
+        }
+        None
+    }
+}
+
 #[derive(Clone, PartialEq, Debug)]
 pub enum Kind {
     Paragraph,
@@ -96,5 +142,24 @@ impl Element {
 
     pub fn get_id(&self) -> u32 {
         self.id
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    #[test]
+    fn find() {
+        let mut element1 = Element::new(Kind::Paragraph);
+        let mut element2 = Element::new(Kind::Header);
+        element2.id = 1;
+        element1.id = 10;
+        element1.elements = vec![Element::new(Kind::Text), element2.clone()];
+        let mut ast = Ast {
+            elements: vec![Element::new(Kind::Text), Element::new(Kind::Text), element1],
+        };
+
+        assert_eq!(&mut element2, ast.find_mut(1).unwrap());
+        assert_eq!(&element2, ast.find(1).unwrap());
     }
 }

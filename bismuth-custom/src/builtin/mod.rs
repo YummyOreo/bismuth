@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 pub mod bloglist;
 pub mod footer;
 pub mod navbar;
@@ -16,7 +18,12 @@ pub fn match_template(name: &str) -> Option<Template> {
 
 pub fn match_plugin(name: &str) -> Option<Box<dyn Plugin>> {
     match name {
-        navbar::NAME => {}
+        navbar::NAME => {
+            return Some(Box::new(navbar::Navbar {
+                values: HashMap::new(),
+                id: 0,
+            }));
+        }
         footer::NAME => {}
         bloglist::NAME1 | bloglist::NAME2 | bloglist::NAME3 => {}
         _ => {}
