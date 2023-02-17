@@ -1,5 +1,3 @@
-use std::error::Error;
-
 pub mod path;
 mod tui;
 
@@ -43,53 +41,61 @@ pub fn error_ui(options: &[String], description: &str) -> Option<usize> {
     }
 }
 
-pub trait Recover<T> {
-    fn try_recover(self) -> T;
-}
+mod test {
+    #![allow(unused, dead_code)]
+    use std::error::Error;
+    // ME TESTING SHIT
 
-pub trait Recoverable<T> {
-    fn get_recoverd(&self) -> T;
-}
+    pub trait Recover<T> {
+        fn try_recover(self) -> T;
+    }
 
-pub enum TestError<T> {
-    Recoverable(Box<dyn Recoverable<T>>),
-    Unrecoverable(Box<dyn Error>),
-}
+    pub trait Recoverable<T> {
+        fn get_recoverd(&self) -> T;
+    }
 
-impl<T> Recover<T> for TestError<T> {
-    fn try_recover(self) -> T {
-        match self {
-            Self::Recoverable(e) => e.get_recoverd(),
-            Self::Unrecoverable(e) => panic!("{e}"),
+    pub enum TestError<T> {
+        Recoverable(Box<dyn Recoverable<T>>),
+        Unrecoverable(Box<dyn Error>),
+    }
+
+    impl<T> Recover<T> for TestError<T> {
+        fn try_recover(self) -> T {
+            match self {
+                Self::Recoverable(e) => e.get_recoverd(),
+                Self::Unrecoverable(e) => panic!("{e}"),
+            }
         }
     }
-}
 
-pub struct TestError2 {}
+    pub struct TestError2 {}
 
-impl<T> Recover<T> for Result<T, TestError<T>> {
-    fn try_recover(self) -> T {
-        match self {
-            Ok(t) => t,
-            Err(e) => e.try_recover(),
+    type Result<T, E = TestError<T>> = core::result::Result<T, E>;
+
+    impl<T> Recover<T> for Result<T, TestError<T>> {
+        fn try_recover(self) -> T {
+            match self {
+                Ok(t) => t,
+                Err(e) => e.try_recover(),
+            }
         }
     }
-}
 
-impl Recoverable<bool> for TestError2 {
-    fn get_recoverd(&self) -> bool {
-        true
+    impl Recoverable<bool> for TestError2 {
+        fn get_recoverd(&self) -> bool {
+            true
+        }
     }
-}
 
-pub fn test_2() {
-    let t = test().unwrap_err();
-    let t = match t {
-        TestError::Recoverable(e) => e.get_recoverd(),
-        TestError::Unrecoverable(e) => panic!("{e}"),
-    };
-}
+    pub fn test_2() {
+        let t = test().unwrap_err();
+        let t = match t {
+            TestError::Recoverable(e) => e.get_recoverd(),
+            TestError::Unrecoverable(e) => panic!("{e}"),
+        };
+    }
 
-pub fn test() -> Result<bool, TestError<bool>> {
-    Err(TestError::Recoverable(Box::new(TestError2 {})))
+    pub fn test() -> Result<bool> {
+        Err(TestError::Recoverable(Box::new(TestError2 {})))
+    }
 }

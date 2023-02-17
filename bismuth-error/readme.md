@@ -47,8 +47,11 @@ impl<T> Recover<T> for Result<T, Error<T>> {
 ```
 
 ### Using this type:
-Here is a example on how to use this type:
-> It is not perfect because there is some code duplication w/ the "good" type:
+First, there will be a type called `Result` that you can import:
+```rust
+type Result<T, E = Test<T>> = core::result::Result<T, E>;
+```
+This allows you to just use it like this:
 ```rust
 pub fn test_2() {
     let t = test().unwrap_err();
@@ -58,7 +61,7 @@ pub fn test_2() {
     };
 }
 
-pub fn test() -> Result<bool, TestError<bool>> {
+pub fn test() -> Result<bool> {
     Err(Error::Recoverable(Box::new(TestError {})))
 }
 ```
