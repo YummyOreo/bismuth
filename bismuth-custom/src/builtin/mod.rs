@@ -14,7 +14,7 @@ pub fn match_template(name: &str) -> Option<Template> {
     None
 }
 
-pub fn match_plugin(name: &str) -> Option<Plugin> {
+pub fn match_plugin(name: &str) -> Option<Box<dyn Plugin>> {
     match name {
         navbar::NAME => {}
         footer::NAME => {}

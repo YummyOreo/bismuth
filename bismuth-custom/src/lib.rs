@@ -15,7 +15,7 @@ pub struct Custom {
     name: String,
     data: HashMap<String, String>,
     template: Option<template::Template>,
-    plugin: Option<plugin::Plugin>,
+    plugin: Option<Box<dyn plugin::Plugin>>,
 }
 
 impl Custom {
@@ -32,7 +32,7 @@ impl Custom {
         Self::new(elm.name.clone(), elm.values.clone())
     }
 
-    fn find_plugin(&mut self) -> Option<plugin::Plugin> {
+    fn find_plugin(&mut self) -> Option<Box<dyn plugin::Plugin>> {
         // REDO THIS WHEN YOU IMPLEMENT PLUGINS
         builtin::match_plugin(&self.name)
     }
