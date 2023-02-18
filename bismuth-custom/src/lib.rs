@@ -76,40 +76,62 @@ impl Custom {
     }
 }
 
-fn get_customs(ast: &Ast) -> Vec<&Element> {
-    let elements: Vec<&Element> = ast.elements.iter().collect();
-    elements
+fn get_customs(ast: Ast) -> Vec<Element> {
+    ast.elements
         .iter()
-        .filter_map(|&e| {
+        .filter_map(|e| {
             if let Kind::CustomElement(_) = &e.kind {
-                Some(e)
+                Some(e.clone())
             } else {
                 None
             }
         })
-        .collect::<Vec<&Element>>()
+        .collect::<Vec<Element>>()
 }
 
-pub fn parse_custom(mut target: Parser, others: Vec<&Parser>) -> Parser {
-    let custom_elms = get_customs(&target.ast);
+fn run_customs(target: &mut Parser, others: &[&Parser], custom_elms: &[Element]) {
     let mut customs: Vec<Custom> = custom_elms
         .iter()
         .filter_map(|e| {
             if let Kind::CustomElement(c) = &e.kind {
                 let mut custom = Custom::from_elm(c, e.get_id());
                 custom.find();
-                custom.pre_load(&target);
+                custom.pre_load(target);
                 Some(custom)
             } else {
                 None
             }
         })
         .collect();
-    println!("{customs:#?}");
+
     for custom in &mut customs {
-        custom.run(&mut target, &others);
-        custom.insert_template(&mut target);
+        custom.run(target, others);
+        custom.insert_template(target);
     }
+}
+
+pub fn parse_custom(mut target: Parser, others: Vec<&Parser>) -> Parser {
+    let mut old_elms: Vec<Element> = vec![];
+    let mut i = 0;
+
+    loop {
+        i += 1;
+        let mut new_elms = get_customs(target.ast.clone());
+
+        if !new_elms
+            .iter()
+            .any(|a| !old_elms.iter().any(|b| b.get_id() == a.get_id()))
+        {
+            break;
+        }
+
+        new_elms.retain(|e| !old_elms.contains(e));
+        run_customs(&mut target, &others, &new_elms);
+
+        old_elms = new_elms;
+    }
+    // panic!("");
+
     target
 }
 
@@ -134,7 +156,7 @@ mod test_utils {
             bismuth_parser::Parser::new_test("/test/", "%{{\nname: test\nother: key\n}}");
         parser.parse().unwrap();
 
-        let customs = format!("{:#?}", get_customs(&parser.ast));
+        let customs = format!("{:#?}", get_customs(parser.ast));
         let re = Regex::new(r"id: \d+").unwrap();
         let customs = re.replace_all(&customs, "id: [redacted]").to_string();
         snapshot!(customs);
@@ -152,6 +174,17 @@ mod test_utils {
         snapshot!(customs);
     }
 
+    #[test]
+    fn test_plugin_2() {
+        let mut parser =
+            bismuth_parser::Parser::new_test("/test/", "%{{\nname: bloglist\nother: key\n}}");
+        parser.parse().unwrap();
+
+        let customs = format!("{:#?}", parse_custom(parser, vec![]));
+        let re = Regex::new(r"id: \d+").unwrap();
+        let customs = re.replace_all(&customs, "id: [redacted]").to_string();
+        snapshot!(customs);
+    }
     #[test]
     fn test_template() {
         let mut parser = bismuth_parser::Parser::new_test("/test/", "%{{\nname: footer\n}}");

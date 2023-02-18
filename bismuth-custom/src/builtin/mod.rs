@@ -29,7 +29,12 @@ pub fn match_plugin(name: &str) -> Option<Box<dyn Plugin>> {
             }));
         }
         footer::NAME => {}
-        bloglist::NAME1 | bloglist::NAME2 | bloglist::NAME3 => {}
+        bloglist::NAME1 | bloglist::NAME2 | bloglist::NAME3 => {
+            return Some(Box::new(bloglist::BlogList {
+                values: HashMap::new(),
+                id: 0,
+            }));
+        }
         _ => {}
     }
     None

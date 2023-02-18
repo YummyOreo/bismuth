@@ -1,0 +1,230 @@
+---
+source: bismuth-custom/src/lib.rs
+expression: customs
+---
+Parser {
+    lexer: Lexer {
+        path: "/test/",
+        chars: [
+            '%',
+            '{',
+            '{',
+            '\n',
+            'n',
+            'a',
+            'm',
+            'e',
+            ':',
+            ' ',
+            'b',
+            'l',
+            'o',
+            'g',
+            'l',
+            'i',
+            's',
+            't',
+            '\n',
+            'o',
+            't',
+            'h',
+            'e',
+            'r',
+            ':',
+            ' ',
+            'k',
+            'e',
+            'y',
+            '\n',
+            '}',
+            '}',
+            '\n',
+        ],
+        position: 33,
+        current_token: Token {
+            start: 33,
+            end: 33,
+            kind: EndOfFile,
+            text: [],
+        },
+        tokens: [
+            Token {
+                start: 0,
+                end: 0,
+                kind: StartOfFile,
+                text: [],
+            },
+            Token {
+                start: 0,
+                end: 0,
+                kind: Percent,
+                text: [
+                    '%',
+                ],
+            },
+            Token {
+                start: 1,
+                end: 2,
+                kind: CurlybraceLeft,
+                text: [
+                    '{',
+                    '{',
+                ],
+            },
+            Token {
+                start: 3,
+                end: 3,
+                kind: EndOfLine,
+                text: [
+                    '\n',
+                ],
+            },
+            Token {
+                start: 4,
+                end: 17,
+                kind: Text,
+                text: [
+                    'n',
+                    'a',
+                    'm',
+                    'e',
+                    ':',
+                    ' ',
+                    'b',
+                    'l',
+                    'o',
+                    'g',
+                    'l',
+                    'i',
+                    's',
+                    't',
+                ],
+            },
+            Token {
+                start: 18,
+                end: 18,
+                kind: EndOfLine,
+                text: [
+                    '\n',
+                ],
+            },
+            Token {
+                start: 19,
+                end: 28,
+                kind: Text,
+                text: [
+                    'o',
+                    't',
+                    'h',
+                    'e',
+                    'r',
+                    ':',
+                    ' ',
+                    'k',
+                    'e',
+                    'y',
+                ],
+            },
+            Token {
+                start: 29,
+                end: 29,
+                kind: EndOfLine,
+                text: [
+                    '\n',
+                ],
+            },
+            Token {
+                start: 30,
+                end: 31,
+                kind: CurlybraceRight,
+                text: [
+                    '}',
+                    '}',
+                ],
+            },
+            Token {
+                start: 32,
+                end: 32,
+                kind: EndOfLine,
+                text: [
+                    '\n',
+                ],
+            },
+            Token {
+                start: 33,
+                end: 33,
+                kind: EndOfFile,
+                text: [],
+            },
+        ],
+    },
+    index: 10,
+    metadata: Metadata {
+        absolute_path: "/test/",
+        fontmatter: FontMatter {
+            title: Some(
+                "test",
+            ),
+            path: Some(
+                "/test/",
+            ),
+            kind: Some(
+                "default",
+            ),
+            values: None,
+        },
+    },
+    current_element: None,
+    state: State {
+        new_line: true,
+        inside: [],
+        indent_level: 0,
+    },
+    has_custom: true,
+    ast: Ast {
+        elements: [
+            Element {
+                kind: CustomElement(
+                    CustomElm {
+                        name: "bloglist",
+                        values: {
+                            "other": "key",
+                        },
+                        body: None,
+                        template: None,
+                    },
+                ),
+                elements: [
+                    Element {
+                        kind: CustomElement(
+                            CustomElm {
+                                name: "navbar",
+                                values: {
+                                    "other": "key",
+                                },
+                                body: None,
+                                template: None,
+                            },
+                        ),
+                        elements: [],
+                        text: Some(
+                            "other: key",
+                        ),
+                        attrs: {},
+                        id: [redacted],
+                    },
+                ],
+                text: None,
+                attrs: {},
+                id: [redacted],
+            },
+            Element {
+                kind: EndOfLine,
+                elements: [],
+                text: None,
+                attrs: {},
+                id: [redacted],
+            },
+        ],
+    },
+}

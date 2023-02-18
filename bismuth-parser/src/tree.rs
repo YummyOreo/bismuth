@@ -3,7 +3,7 @@ use std::collections::HashMap;
 
 use crate::{custom, error::ElementError};
 
-#[derive(Default, Debug)]
+#[derive(Default, Debug, Clone)]
 pub struct Ast {
     pub elements: Vec<Element>,
 }
