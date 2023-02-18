@@ -3,6 +3,7 @@ use bismuth_lexer::{
     token::{Token, TokenType},
     Lexer,
 };
+use std::collections::HashMap;
 use std::path::{Path, PathBuf};
 
 pub mod custom;
@@ -49,7 +50,7 @@ impl Default for State {
 
 type ParseReturn = Result<(), ParseError>;
 
-#[derive(Debug)]
+// #[derive(Debug)]
 pub struct Parser {
     pub lexer: Lexer,
 
@@ -582,6 +583,58 @@ impl Parser {
     }
 }
 
+fn sort_hm(map: &HashMap<String, String>) -> String {
+    let mut keys_values = map.iter().collect::<Vec<(&String, &String)>>();
+    keys_values.sort();
+    format!("{keys_values:?}")
+}
+
+fn format_kind(kind: &Kind) -> String {
+    match kind {
+        Kind::CustomElement(c) => {
+            format!(
+                "Custom{{Name: {}, Body: {:?}, Values: {}, Template: {:?}}}",
+                c.name,
+                c.body,
+                sort_hm(&c.values),
+                c.template
+            )
+        }
+        _ => format!("{kind:?}"),
+    }
+}
+
+fn render_element(element: &Element, level: usize) -> String {
+    let t = "    ";
+    let ts = t.repeat(level);
+    let mut s = format!(
+        "Element{{\n{ts}{t}Kind: {:#?},\n{ts}{t}Text: {:?},\n{ts}{t}Attrs: {},\n{ts}{t}Elements: [",
+        format_kind(&element.kind),
+        element.text,
+        sort_hm(&element.attrs)
+    );
+    for elm in &element.elements {
+        let inside_s = format!("\n{ts}{ts}{t}{},", render_element(elm, level + 1));
+        s.push_str(&inside_s);
+    }
+    s.push_str(&format!("\n{ts}{t}])\n{ts}}}"));
+    s
+}
+
+impl core::fmt::Debug for Parser {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let ast = &self.ast;
+        let mut s = String::new();
+        s.push_str(&format!("{:#?}\n", self.metadata.fontmatter));
+        for element in &ast.elements {
+            s.push_str(&render_element(&element.clone(), 0));
+            s.push('\n');
+        }
+
+        write!(f, "{}", s)
+    }
+}
+
 #[cfg(test)]
 mod test_utils {
     use super::*;
@@ -715,7 +768,6 @@ mod test {
     // adding it to the start of the name along with test
     // (ie test_str_$name or test_file_$name)
     use super::*;
-    use std::collections::HashMap;
     use std::fs;
     use std::path::PathBuf;
 
@@ -735,59 +787,11 @@ mod test {
         l
     }
 
-    fn sort_hm(map: &HashMap<String, String>) -> String {
-        let mut keys_values = map.iter().collect::<Vec<(&String, &String)>>();
-        keys_values.sort();
-        format!("{keys_values:?}")
-    }
-
-    fn format_kind(kind: &Kind) -> String {
-        match kind {
-            Kind::CustomElement(c) => {
-                format!(
-                    "Custom{{Name: {}, Body: {:?}, Values: {}}}",
-                    c.name,
-                    c.body,
-                    sort_hm(&c.values)
-                )
-            }
-            _ => format!("{kind:?}"),
-        }
-    }
-
-    fn render_element(element: &Element, level: usize) -> String {
-        let t = "    ";
-        let ts = t.repeat(level);
-        let mut s = format!(
-            "Element{{\n{ts}{t}Kind: {:#?},\n{ts}{t}Text: {:?},\n{ts}{t}Attrs: {},\n{ts}{t}Elements: [",
-            format_kind(&element.kind),
-            element.text,
-            sort_hm(&element.attrs)
-        );
-        for elm in &element.elements {
-            let inside_s = format!("\n{ts}{ts}{t}{},", render_element(elm, level + 1));
-            s.push_str(&inside_s);
-        }
-        s.push_str(&format!("\n{ts}{t}])\n{ts}}}"));
-        s
-    }
-
-    fn format_parser(parser: Parser) -> String {
-        let ast = &parser.ast;
-        let mut s = String::new();
-        s.push_str(&format!("{:#?}\n", parser.metadata.fontmatter));
-        for element in &ast.elements {
-            s.push_str(&render_element(&element.clone(), 0));
-            s.push('\n');
-        }
-        s
-    }
-
     fn snapshot_str(content: &str) -> String {
         let lexer = init_lexer(content);
         let mut parser = Parser::new(lexer);
         parser.parse().unwrap();
-        format_parser(parser)
+        format!("{parser:#?}")
     }
 
     macro_rules! snapshot_str {
@@ -807,7 +811,7 @@ mod test {
         let lexer = init_lexer_path(path);
         let mut parser = Parser::new(lexer);
         parser.parse().unwrap();
-        format_parser(parser)
+        format!("{parser:#?}")
     }
 
     macro_rules! snapshot_path {
