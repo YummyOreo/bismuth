@@ -51,17 +51,21 @@ First, there will be a type called `Result` that you can import:
 ```rust
 type Result<T, E = Test<T>> = core::result::Result<T, E>;
 ```
+There is also a helper function `recover`. This will box your error for you:
+```rust
+impl<T> Error<T> {
+    pub fn recover<E: Recoverable<T> + 'static>(error: E) -> Self {
+        Self::Recoverable(Box::new(error))
+    }
+}
+```
 This allows you to just use it like this:
 ```rust
 pub fn test_2() {
-    let t = test().unwrap_err();
-    let t = match t {
-        Error::Recoverable(e) => e.get_recoverd(),
-        Error::Unrecoverable(e) => panic!("{e}"),
-    };
+    let t = test().try_recover();
 }
 
 pub fn test() -> Result<bool> {
-    Err(Error::Recoverable(Box::new(TestError {})))
+    Err(Error::recover(TestError {}))
 }
 ```

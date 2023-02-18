@@ -9,7 +9,11 @@ use crate::{plugin::Plugin, template::Template};
 pub fn match_template(name: &str) -> Option<Template> {
     match name {
         navbar::NAME => {}
-        footer::NAME => {}
+        footer::NAME => {
+            return Some(Template {
+                content: "<h1>Test template</h1>".to_string(),
+            });
+        }
         bloglist::NAME1 | bloglist::NAME2 | bloglist::NAME3 => {}
         _ => {}
     }

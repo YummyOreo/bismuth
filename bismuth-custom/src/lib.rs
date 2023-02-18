@@ -59,6 +59,17 @@ impl Custom {
         }
     }
 
+    pub fn insert_template(&self, target: &mut Parser) {
+        if let Some(t) = &self.template {
+            let id = self.id;
+            let mut elm = target.ast.find_mut(id).expect("Should be there");
+
+            if let Kind::CustomElement(c) = &mut elm.kind {
+                c.template = Some(t.content.clone())
+            }
+        }
+    }
+
     pub fn find(&mut self) {
         self.plugin = self.find_plugin();
         self.template = self.find_template();
@@ -97,6 +108,7 @@ pub fn parse_custom(mut target: Parser, others: Vec<&Parser>) -> Parser {
     println!("{customs:#?}");
     for custom in &mut customs {
         custom.run(&mut target, &others);
+        custom.insert_template(&mut target);
     }
     target
 }
@@ -129,7 +141,7 @@ mod test_utils {
     }
 
     #[test]
-    fn test() {
+    fn test_plugin() {
         let mut parser =
             bismuth_parser::Parser::new_test("/test/", "%{{\nname: navbar\nother: key\n}}");
         parser.parse().unwrap();
@@ -137,7 +149,17 @@ mod test_utils {
         let customs = format!("{:#?}", parse_custom(parser, vec![]));
         let re = Regex::new(r"id: \d+").unwrap();
         let customs = re.replace_all(&customs, "id: [redacted]").to_string();
-        // panic!("");
+        snapshot!(customs);
+    }
+
+    #[test]
+    fn test_template() {
+        let mut parser = bismuth_parser::Parser::new_test("/test/", "%{{\nname: footer\n}}");
+        parser.parse().unwrap();
+
+        let customs = format!("{:#?}", parse_custom(parser, vec![]));
+        let re = Regex::new(r"id: \d+").unwrap();
+        let customs = re.replace_all(&customs, "id: [redacted]").to_string();
         snapshot!(customs);
     }
 }

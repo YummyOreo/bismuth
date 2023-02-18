@@ -59,6 +59,12 @@ mod test {
         Unrecoverable(Box<dyn Error>),
     }
 
+    impl<T> TestError<T> {
+        pub fn recover<E: Recoverable<T> + 'static>(error: E) -> Self {
+            Self::Recoverable(Box::new(error))
+        }
+    }
+
     impl<T> Recover<T> for TestError<T> {
         fn try_recover(self) -> T {
             match self {
@@ -96,6 +102,6 @@ mod test {
     }
 
     pub fn test() -> Result<bool> {
-        Err(TestError::Recoverable(Box::new(TestError2 {})))
+        Err(TestError::recover(TestError2 {}))
     }
 }

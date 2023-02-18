@@ -17,6 +17,7 @@ pub struct CustomElm {
     pub name: String,
     pub values: HashMap<String, String>,
     pub body: Option<String>,
+    pub template: Option<String>,
 }
 
 impl CustomElm {
@@ -55,7 +56,12 @@ impl CustomElm {
             let _ = values.insert(key, value);
         }
 
-        Ok(CustomElm { name, values, body })
+        Ok(CustomElm {
+            name,
+            values,
+            body,
+            template: None,
+        })
     }
 }
 
