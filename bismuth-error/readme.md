@@ -2,7 +2,7 @@
 The error system will revolve around a single enum:
 ```rust
 pub enum Error<'a>  {
-    Recoverable(&'a dyn Recover),
+    Recoverable(Box<dyn Recover>),
     Unrecoverable(anyhow::Error),
 }
 ```
