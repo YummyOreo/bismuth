@@ -1,6 +1,6 @@
 ---
 source: bismuth-custom/src/lib.rs
-expression: customs
+expression: "snapshot(\"%{{\\nname: footer\\n}}\")"
 ---
 Parser {
     lexer: Lexer {
@@ -16,34 +16,21 @@ Parser {
             'e',
             ':',
             ' ',
-            'b',
-            'l',
+            'f',
             'o',
-            'g',
-            'l',
-            'i',
-            's',
-            't',
-            '\n',
             'o',
             't',
-            'h',
             'e',
             'r',
-            ':',
-            ' ',
-            'k',
-            'e',
-            'y',
             '\n',
             '}',
             '}',
             '\n',
         ],
-        position: 33,
+        position: 20,
         current_token: Token {
-            start: 33,
-            end: 33,
+            start: 20,
+            end: 20,
             kind: EndOfFile,
             text: [],
         },
@@ -81,7 +68,7 @@ Parser {
             },
             Token {
                 start: 4,
-                end: 17,
+                end: 15,
                 kind: Text,
                 text: [
                     'n',
@@ -90,52 +77,25 @@ Parser {
                     'e',
                     ':',
                     ' ',
-                    'b',
-                    'l',
+                    'f',
                     'o',
-                    'g',
-                    'l',
-                    'i',
-                    's',
-                    't',
-                ],
-            },
-            Token {
-                start: 18,
-                end: 18,
-                kind: EndOfLine,
-                text: [
-                    '\n',
-                ],
-            },
-            Token {
-                start: 19,
-                end: 28,
-                kind: Text,
-                text: [
                     'o',
                     't',
-                    'h',
                     'e',
                     'r',
-                    ':',
-                    ' ',
-                    'k',
-                    'e',
-                    'y',
                 ],
             },
             Token {
-                start: 29,
-                end: 29,
+                start: 16,
+                end: 16,
                 kind: EndOfLine,
                 text: [
                     '\n',
                 ],
             },
             Token {
-                start: 30,
-                end: 31,
+                start: 17,
+                end: 18,
                 kind: CurlybraceRight,
                 text: [
                     '}',
@@ -143,22 +103,22 @@ Parser {
                 ],
             },
             Token {
-                start: 32,
-                end: 32,
+                start: 19,
+                end: 19,
                 kind: EndOfLine,
                 text: [
                     '\n',
                 ],
             },
             Token {
-                start: 33,
-                end: 33,
+                start: 20,
+                end: 20,
                 kind: EndOfFile,
                 text: [],
             },
         ],
     },
-    index: 10,
+    index: 8,
     metadata: Metadata {
         absolute_path: "/test/",
         fontmatter: FontMatter {
@@ -186,34 +146,15 @@ Parser {
             Element {
                 kind: CustomElement(
                     CustomElm {
-                        name: "bloglist",
-                        values: {
-                            "other": "key",
-                        },
+                        name: "footer",
+                        values: {},
                         body: None,
-                        template: None,
+                        template: Some(
+                            "<h1>Test template</h1>",
+                        ),
                     },
                 ),
-                elements: [
-                    Element {
-                        kind: CustomElement(
-                            CustomElm {
-                                name: "navbar",
-                                values: {
-                                    "other": "key",
-                                },
-                                body: None,
-                                template: None,
-                            },
-                        ),
-                        elements: [],
-                        text: Some(
-                            "other: key",
-                        ),
-                        attrs: {},
-                        id: [redacted],
-                    },
-                ],
+                elements: [],
                 text: None,
                 attrs: {},
                 id: [redacted],

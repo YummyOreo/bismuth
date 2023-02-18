@@ -143,7 +143,7 @@ mod test_utils {
     macro_rules! snapshot {
         ($content:tt) => {
             let mut settings = insta::Settings::clone_current();
-            settings.set_snapshot_path("../testdata/output/");
+            settings.set_snapshot_path("../testdata/output/utils/");
             settings.bind(|| {
                 insta::assert_snapshot!($content);
             });
@@ -161,38 +161,37 @@ mod test_utils {
         let customs = re.replace_all(&customs, "id: [redacted]").to_string();
         snapshot!(customs);
     }
+}
 
-    #[test]
-    fn test_plugin() {
-        let mut parser =
-            bismuth_parser::Parser::new_test("/test/", "%{{\nname: navbar\nother: key\n}}");
+#[cfg(test)]
+mod test {
+    use super::*;
+    use regex::Regex;
+
+    fn snapshot(content: &str) -> String {
+        let mut parser = bismuth_parser::Parser::new_test("/test/", content);
         parser.parse().unwrap();
 
         let customs = format!("{:#?}", parse_custom(parser, vec![]));
         let re = Regex::new(r"id: \d+").unwrap();
-        let customs = re.replace_all(&customs, "id: [redacted]").to_string();
-        snapshot!(customs);
+        re.replace_all(&customs, "id: [redacted]").to_string()
     }
 
-    #[test]
-    fn test_plugin_2() {
-        let mut parser =
-            bismuth_parser::Parser::new_test("/test/", "%{{\nname: bloglist\nother: key\n}}");
-        parser.parse().unwrap();
-
-        let customs = format!("{:#?}", parse_custom(parser, vec![]));
-        let re = Regex::new(r"id: \d+").unwrap();
-        let customs = re.replace_all(&customs, "id: [redacted]").to_string();
-        snapshot!(customs);
+    macro_rules! snapshot {
+        ($name:tt, $content:tt) => {
+            #[test]
+            fn $name() {
+                let mut settings = insta::Settings::clone_current();
+                settings.set_snapshot_path("../testdata/output/");
+                settings.bind(|| {
+                    insta::assert_snapshot!(snapshot($content));
+                });
+            }
+        };
     }
-    #[test]
-    fn test_template() {
-        let mut parser = bismuth_parser::Parser::new_test("/test/", "%{{\nname: footer\n}}");
-        parser.parse().unwrap();
 
-        let customs = format!("{:#?}", parse_custom(parser, vec![]));
-        let re = Regex::new(r"id: \d+").unwrap();
-        let customs = re.replace_all(&customs, "id: [redacted]").to_string();
-        snapshot!(customs);
-    }
+    snapshot!(test_plugin, "%{{\nname: navbar\nother: key\n}}");
+    snapshot!(test_plugin_2, "%{{\nname: bloglist\nother: key\n}}");
+
+    snapshot!(test_template, "%{{\nname: footer\n}}");
 }

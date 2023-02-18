@@ -1,6 +1,6 @@
 ---
 source: bismuth-custom/src/lib.rs
-expression: customs
+expression: "snapshot(\"%{{\\nname: bloglist\\nother: key\\n}}\")"
 ---
 Parser {
     lexer: Lexer {
@@ -16,12 +16,14 @@ Parser {
             'e',
             ':',
             ' ',
-            'n',
-            'a',
-            'v',
             'b',
-            'a',
-            'r',
+            'l',
+            'o',
+            'g',
+            'l',
+            'i',
+            's',
+            't',
             '\n',
             'o',
             't',
@@ -38,10 +40,10 @@ Parser {
             '}',
             '\n',
         ],
-        position: 31,
+        position: 33,
         current_token: Token {
-            start: 31,
-            end: 31,
+            start: 33,
+            end: 33,
             kind: EndOfFile,
             text: [],
         },
@@ -79,7 +81,7 @@ Parser {
             },
             Token {
                 start: 4,
-                end: 15,
+                end: 17,
                 kind: Text,
                 text: [
                     'n',
@@ -88,25 +90,27 @@ Parser {
                     'e',
                     ':',
                     ' ',
-                    'n',
-                    'a',
-                    'v',
                     'b',
-                    'a',
-                    'r',
+                    'l',
+                    'o',
+                    'g',
+                    'l',
+                    'i',
+                    's',
+                    't',
                 ],
             },
             Token {
-                start: 16,
-                end: 16,
+                start: 18,
+                end: 18,
                 kind: EndOfLine,
                 text: [
                     '\n',
                 ],
             },
             Token {
-                start: 17,
-                end: 26,
+                start: 19,
+                end: 28,
                 kind: Text,
                 text: [
                     'o',
@@ -122,16 +126,16 @@ Parser {
                 ],
             },
             Token {
-                start: 27,
-                end: 27,
+                start: 29,
+                end: 29,
                 kind: EndOfLine,
                 text: [
                     '\n',
                 ],
             },
             Token {
-                start: 28,
-                end: 29,
+                start: 30,
+                end: 31,
                 kind: CurlybraceRight,
                 text: [
                     '}',
@@ -139,16 +143,16 @@ Parser {
                 ],
             },
             Token {
-                start: 30,
-                end: 30,
+                start: 32,
+                end: 32,
                 kind: EndOfLine,
                 text: [
                     '\n',
                 ],
             },
             Token {
-                start: 31,
-                end: 31,
+                start: 33,
+                end: 33,
                 kind: EndOfFile,
                 text: [],
             },
@@ -182,16 +186,26 @@ Parser {
             Element {
                 kind: CustomElement(
                     CustomElm {
-                        name: "navbar",
+                        name: "bloglist",
                         values: {
                             "other": "key",
                         },
                         body: None,
+                        template: None,
                     },
                 ),
                 elements: [
                     Element {
-                        kind: Text,
+                        kind: CustomElement(
+                            CustomElm {
+                                name: "navbar",
+                                values: {
+                                    "other": "key",
+                                },
+                                body: None,
+                                template: None,
+                            },
+                        ),
                         elements: [],
                         text: Some(
                             "other: key",

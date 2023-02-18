@@ -1,6 +1,6 @@
 ---
 source: bismuth-custom/src/lib.rs
-expression: customs
+expression: "snapshot(\"%{{\\nname: navbar\\nother: key\\n}}\")"
 ---
 Parser {
     lexer: Lexer {
