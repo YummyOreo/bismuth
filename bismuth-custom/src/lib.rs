@@ -130,7 +130,6 @@ pub fn parse_custom(mut target: Parser, others: Vec<&Parser>) -> Parser {
 
         old_elms = new_elms;
     }
-    // panic!("");
 
     target
 }
