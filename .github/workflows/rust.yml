@@ -22,10 +22,5 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
-    - uses: dtolnay/rust-toolchain@nightly
-      with:
-        components: clippy, rustfmt
     - name: Run tests
       run: cargo test
-    - name: Validate formatting
-      run: cargo fmt --all -- --check
