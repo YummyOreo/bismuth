@@ -21,7 +21,9 @@ impl Plugin for BlogList {
 
     fn run(&mut self, target: &mut bismuth_parser::Parser, _: &[&bismuth_parser::Parser]) {
         let mut mod_element = target.ast.find_mut(self.id).unwrap();
-        for (key, value) in self.values.iter() {
+        let mut values = self.values.iter().collect::<Vec<(&String, &String)>>();
+        values.sort();
+        for (key, value) in values {
             let mut custom = CustomElm::new();
             custom.name = "navbar".to_string();
             custom.values.insert(key.to_string(), value.to_string());
