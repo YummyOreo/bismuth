@@ -126,10 +126,10 @@ impl Lexer {
                 - 1
     }
 
+    /// something that from the current position
+    /// will match regex to the chars going forward
+    /// (get thi first match)
     fn peek_regex(&self, re: Regex) -> std::ops::RangeInclusive<usize> {
-        //! something that from the current position
-        //! will match regex to the chars going forward
-        //! (get thi first match)
         let s = String::from_iter(self.chars.split_at(self.position).1);
 
         match re.find(&s) {
@@ -185,9 +185,9 @@ impl Lexer {
 
     // Fontmatter
 
+    /// Checks if the current position is the start of the fontmatter
+    /// if it is, it will return the range of the fontmatter
     fn get_fm_start(&self) -> Option<RangeInclusive<usize>> {
-        //! Checks if the current position is the start of the fontmatter
-        //! if it is, it will return the range of the fontmatter
         // gets till change in char
         let diff = self.peek_till_diff();
         let diff_end = *diff.end();

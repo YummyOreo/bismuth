@@ -176,18 +176,18 @@ impl Parser {
         self.lexer.tokens.get(n).ok_or(ParseError::Peek(n))
     }
 
+    /// This is relitive
     fn peek(&self, n: usize) -> Result<&Token, ParseError> {
-        //! This is relitive
         self.peek_at(self.index + n)
     }
 
+    /// This is relitive
     fn peek_back(&self, n: usize) -> Result<&Token, ParseError> {
-        //! This is relitive
         self.peek_at(self.index.checked_sub(n).ok_or(ParseError::MathError)?)
     }
 
+    /// This is relitive
     fn peek_till(&self, n: usize) -> Result<Vec<Token>, ParseError> {
-        //! This is relitive
         if n >= self.lexer.tokens.len() {
             return Err(ParseError::Peek(n));
         }
@@ -196,8 +196,8 @@ impl Parser {
         Ok(tokens_after.split_at(n).0.to_vec())
     }
 
+    /// This is relitive
     fn peek_till_kind(&self, kind: &TokenType) -> Result<Vec<Token>, ParseError> {
-        //! This is relitive
         let tokens_after = self.lexer.tokens.split_at(self.index).1;
         let end = tokens_after
             .iter()
@@ -207,8 +207,8 @@ impl Parser {
         Ok(tokens_after.split_at(end).0.to_vec())
     }
 
+    /// This is relitive
     fn peek_till_pattern(&self, kinds: &[TokenType]) -> Result<usize, ParseError> {
-        //! This is relitive
         let tokens_after = self.lexer.tokens.split_at(self.index).1;
 
         let mut p_i = 0;
