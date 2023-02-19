@@ -200,6 +200,6 @@ mod test {
     snapshot!(test_template, "%{{\nname: footer\n}}");
     snapshot!(
         test_template_2,
-        "%{{\nname: footer\n}}n, this is a test \n%{{\nname: footer\nkey: value\n}}"
+        "%{{\nname: footer\n}}\n, this is a test \n%{{\nname: footer\nkey: value\n}}"
     );
 }
