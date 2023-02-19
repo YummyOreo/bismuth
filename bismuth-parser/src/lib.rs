@@ -209,6 +209,9 @@ impl Parser {
         let mut p_i = 0;
         let mut r_n = 0;
 
+        // we have to do this complecated stuff because one token may have 2 or more of its kind
+        // So if you specify 2 text tokens, the len must be 2. But we don't know the next token in
+        // kinds. So we have to freeze p_i when there is more then one.
         for (i, token) in tokens_after.iter().enumerate() {
             if p_i >= kinds.len() {
                 return Ok((i - (p_i - r_n)) + self.index);
