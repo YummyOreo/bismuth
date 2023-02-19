@@ -29,7 +29,10 @@ impl CustomElm {
 
     pub fn from_string(s: &str) -> Result<Self, CustomElmError> {
         let sections = s.splitn(2, "---\n").collect::<Vec<&str>>();
+        println!("{sections:?}");
+        println!("{s:?}");
         let yaml = sections.first().ok_or(CustomElmError::NoKeys)?;
+        println!("{yaml}");
         let body = sections.get(1).map(|p| p.to_string());
 
         let mut parsed_yaml: BTreeMap<String, String> =

@@ -185,7 +185,7 @@ impl Parser {
     }
 
     fn peek_till(&self, n: usize) -> Result<Vec<Token>, ParseError> {
-        if n >= self.lexer.tokens.len() || n < self.index {
+        if n >= self.lexer.tokens.len() {
             return Err(ParseError::Peek(n));
         }
 
@@ -214,6 +214,8 @@ impl Parser {
                 return Ok((i - (p_i - r_n)) + self.index);
             }
 
+            println!("{token:?}");
+            println!("{:?} | {p_i}", kinds[p_i]);
             if kinds[p_i] == token.kind {
                 let len = self.token_len(token);
                 if len > 1 {
@@ -339,15 +341,15 @@ impl Parser {
             Err(_) => self.peek_till_pattern(&pattern_or)?,
         };
 
-        let inside_tokens = self.peek_till(end)?;
+        let inside_tokens = self.peek_till(end - self.index)?;
         // need to -3 because it includes \n}}\n
-        let inside_str = inside_tokens[0..inside_tokens.len() - 3]
+        let inside_str = inside_tokens[0..inside_tokens.len()]
             .iter()
             .map(|t| t.text.iter().collect::<String>())
             .collect::<String>();
 
         // advance past inside till last \n
-        self.advance_n_token(inside_tokens.len() - 2)?;
+        self.advance_n_token(inside_tokens.len() + 1)?;
 
         // makes the custom element
         let c =

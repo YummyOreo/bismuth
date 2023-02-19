@@ -76,7 +76,19 @@ impl Custom {
     }
 }
 
-fn get_customs(ast: Ast) -> Vec<Element> {
+fn get_customs(elements: Vec<Element>, mut current_list: Vec<Element>) -> Vec<Element> {
+    for element in elements {
+        if let Kind::CustomElement(_) = element.kind {
+            current_list.push(element.clone());
+        }
+        if !element.elements.is_empty() {
+            current_list = get_customs(element.elements, current_list);
+        }
+    }
+    current_list
+}
+
+fn _get_customs(ast: Ast) -> Vec<Element> {
     ast.elements
         .iter()
         .filter_map(|e| {
@@ -116,20 +128,24 @@ pub fn parse_custom(mut target: Parser, others: Vec<&Parser>) -> Parser {
 
     loop {
         i += 1;
-        let mut new_elms = get_customs(target.ast.clone());
+        let mut new_elms = get_customs(target.ast.elements.clone(), vec![]);
 
-        if !new_elms
+        if new_elms
             .iter()
-            .any(|a| !old_elms.iter().any(|b| b.get_id() == a.get_id()))
+            .all(|a| old_elms.iter().any(|b| b.get_id() == a.get_id()))
+            || i == 5
         {
             break;
         }
 
-        new_elms.retain(|e| !old_elms.contains(e));
-        run_customs(&mut target, &others, &new_elms);
+        let mut run_elms = new_elms.clone();
+        run_elms.retain(|e| !old_elms.iter().any(|b| b.get_id() == e.get_id()));
+        println!("{run_elms:#?}");
+        run_customs(&mut target, &others, &run_elms);
 
         old_elms = new_elms;
     }
+    // panic!("");
 
     target
 }
@@ -155,7 +171,7 @@ mod test_utils {
             bismuth_parser::Parser::new_test("/test/", "%{{\nname: test\nother: key\n}}");
         parser.parse().unwrap();
 
-        let customs = format!("{:#?}", get_customs(parser.ast));
+        let customs = format!("{:#?}", get_customs(parser.ast.elements, vec![]));
         let re = Regex::new(r"id: \d+").unwrap();
         let customs = re.replace_all(&customs, "id: [redacted]").to_string();
         snapshot!(customs);
@@ -191,6 +207,7 @@ mod test {
 
     snapshot!(test_plugin, "%{{\nname: navbar\nother: key\n}}");
     snapshot!(test_plugin_2, "%{{\nname: bloglist\nother: key\n}}");
+    snapshot!(test_plugin_3, "this is a test \n%{{\nname: navbar\nkey: value\nbloglist: true? will this work\n}}\n%{{\nname: blog list\nother: key\n}}");
 
     snapshot!(test_template, "%{{\nname: footer\n}}");
 }
