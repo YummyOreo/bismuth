@@ -214,8 +214,6 @@ impl Parser {
                 return Ok((i - (p_i - r_n)) + self.index);
             }
 
-            println!("{token:?}");
-            println!("{:?} | {p_i}", kinds[p_i]);
             if kinds[p_i] == token.kind {
                 let len = self.token_len(token);
                 if len > 1 {

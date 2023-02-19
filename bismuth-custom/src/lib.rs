@@ -88,19 +88,6 @@ fn get_customs(elements: Vec<Element>, mut current_list: Vec<Element>) -> Vec<El
     current_list
 }
 
-fn _get_customs(ast: Ast) -> Vec<Element> {
-    ast.elements
-        .iter()
-        .filter_map(|e| {
-            if let Kind::CustomElement(_) = &e.kind {
-                Some(e.clone())
-            } else {
-                None
-            }
-        })
-        .collect::<Vec<Element>>()
-}
-
 fn run_customs(target: &mut Parser, others: &[&Parser], custom_elms: &[Element]) {
     let mut customs: Vec<Custom> = custom_elms
         .iter()
@@ -140,12 +127,10 @@ pub fn parse_custom(mut target: Parser, others: Vec<&Parser>) -> Parser {
 
         let mut run_elms = new_elms.clone();
         run_elms.retain(|e| !old_elms.iter().any(|b| b.get_id() == e.get_id()));
-        println!("{run_elms:#?}");
         run_customs(&mut target, &others, &run_elms);
 
         old_elms = new_elms;
     }
-    // panic!("");
 
     target
 }
