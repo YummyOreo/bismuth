@@ -4,11 +4,11 @@ use thiserror::Error;
 
 #[derive(Debug, Error)]
 pub enum CustomElmError {
-    #[error("Error parsing yaml {0}")]
+    #[error("\nError parsing custom element. This could be because: \n\t- You did not put a new line after your custom element. \n\t- You failed to clone the custom element.\n\t- You supplied invalid yaml\n\t- Or you did not put a \"---\" before your body\nHere is the yaml error: ```{0}```\n")]
     YamlParse(Error),
-    #[error("no keys")]
+    #[error("No yaml was supplied")]
     NoKeys,
-    #[error("no name")]
+    #[error("No name was supplied")]
     NoName,
 }
 

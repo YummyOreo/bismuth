@@ -170,7 +170,10 @@ mod test {
 
     fn snapshot(content: &str) -> String {
         let mut parser = bismuth_parser::Parser::new_test("/test/", content);
-        parser.parse().unwrap();
+        match parser.parse() {
+            Ok(_) => {}
+            Err(e) => panic!("{e}"),
+        }
 
         let customs = format!("{:#?}", parse_custom(parser, vec![]));
         let re = Regex::new(r"id: \d+").unwrap();
@@ -195,5 +198,8 @@ mod test {
     snapshot!(test_plugin_3, "this is a test \n%{{\nname: navbar\nkey: value\nbloglist: true? will this work\n}}\n%{{\nname: blog list\nother: key\n}}");
 
     snapshot!(test_template, "%{{\nname: footer\n}}");
-    snapshot!(test_template_2, "%{{\nname: footer\n}}\n, this is a test \n%{{\nname: footer\nkey: value\n}}");
+    snapshot!(
+        test_template_2,
+        "%{{\nname: footer\n}}n, this is a test \n%{{\nname: footer\nkey: value\n}}"
+    );
 }
