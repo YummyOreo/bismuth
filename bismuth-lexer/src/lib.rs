@@ -186,8 +186,8 @@ impl Lexer {
     // Fontmatter
 
     fn get_fm_start(&self) -> Option<RangeInclusive<usize>> {
-        /// Checks if the current position is the start of the fontmatter
-        /// if it is, it will return the range of the fontmatter
+        //! Checks if the current position is the start of the fontmatter
+        //! if it is, it will return the range of the fontmatter
         // gets till change in char
         let diff = self.peek_till_diff();
         let diff_end = *diff.end();

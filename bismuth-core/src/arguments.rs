@@ -9,7 +9,7 @@ pub struct CliArguments {
 }
 #[derive(Debug, Subcommand)]
 pub enum Commands {
-    /// Run the app in the current directory
+    //! Run the app in the current directory
     Run,
 }
 
