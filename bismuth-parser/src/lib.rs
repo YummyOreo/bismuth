@@ -211,39 +211,45 @@ impl Parser {
     fn peek_till_pattern(&self, kinds: &[TokenType]) -> Result<usize, ParseError> {
         let tokens_after = self.lexer.tokens.split_at(self.index).1;
 
-        let mut p_i = 0;
-        let mut r_n = 0;
+        let mut pat_index = 0;
+        let mut repeate_len = 0;
 
         // we have to do this complecated stuff because one token may have 2 or more of its kind
-        // So if you specify 2 text tokens, the len must be 2. But we don't know the next token in
-        // kinds. So we have to freeze p_i when there is more then one.
+        // So for each token, we will get the len, then check if there is the same ammount of kinds
+        // in the list of kinds (`kinds`). If it is then we will add the len to pat_index (skipping
+        // the checked ones) and add len - 1 to repeate_len to be subtraced because they were
+        // condinced.
+        // Then to get the return value we will subtract the index of the tokens to the (pat index
+        // - repeate_len), then add it all w/ our current index
         for (i, token) in tokens_after.iter().enumerate() {
-            if p_i >= kinds.len() {
-                return Ok((i - (p_i - r_n)) + self.index);
+            if pat_index >= kinds.len() {
+                return Ok((i - (pat_index - repeate_len)) + self.index);
             }
+            let kind = &kinds[pat_index];
 
-            if kinds[p_i] == token.kind {
-                let len = self.token_len(token);
-                if len > 1 {
-                    let mut r = 1;
-                    while r < len {
-                        if token.kind == kinds[p_i + r] {
-                            r += 1;
-                            p_i += 1;
-                        } else {
-                            p_i = 0;
-                            break;
+            if kind == &token.kind {
+                match kind {
+                    // handle text edge case
+                    TokenType::Text => {
+                        pat_index += 1;
+                        continue;
+                    }
+                    _ => {
+                        let len = self.token_len(token);
+                        let kinds_after = kinds.split_at(pat_index).1;
+                        let diff = kinds_after
+                            .iter()
+                            .position(|k| k != kind)
+                            .unwrap_or(kinds_after.len());
+                        if diff == len {
+                            pat_index += len;
+                            repeate_len += len - 1;
+                            continue;
                         }
                     }
-                    if r == len {
-                        r_n += 1;
-                    }
                 }
-                p_i += 1
-            } else {
-                p_i = 0;
-                r_n = 0;
             }
+            pat_index = 0;
         }
 
         Err(ParseError::CouldNotFindPattern)

@@ -5,6 +5,7 @@
 | bismuth-md | The main interface for markdown files |
 | bismuth-lexer | Tokenizing markdown files |
 | bismuth-parser | Parses tokenized files |
+| bismuth-custom | Handles running plugins and templates |
 
 # Bismuth-Core:
 The main entry point for the app. This handles cli argument and configuration details.
@@ -17,3 +18,5 @@ This is the Markdown file handling. This loads the markdown files from a dir, or
 This is handling for the tokenizing a markdown file. Read more about this [here](../bismuth-lexer/readme.md)
 ## Bismuth-Parser:
 This is for parsing a tokenized file into a AST
+### Bismuth-Custom:
+This handles running and inserting templates into custom elements
