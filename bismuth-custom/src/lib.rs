@@ -109,7 +109,7 @@ fn run_customs(target: &mut Parser, others: &[&Parser], custom_elms: &[Element])
     }
 }
 
-pub fn parse_custom(mut target: Parser, others: Vec<&Parser>) -> Parser {
+pub fn parse_custom(mut target: Parser, others: &[&Parser]) -> Parser {
     let mut old_elms: Vec<Element> = vec![];
     let mut i = 0;
 
@@ -127,7 +127,7 @@ pub fn parse_custom(mut target: Parser, others: Vec<&Parser>) -> Parser {
 
         let mut run_elms = new_elms.clone();
         run_elms.retain(|e| !old_elms.iter().any(|b| b.get_id() == e.get_id()));
-        run_customs(&mut target, &others, &run_elms);
+        run_customs(&mut target, others, &run_elms);
 
         old_elms = new_elms;
     }
@@ -175,7 +175,7 @@ mod test {
             Err(e) => panic!("{e}"),
         }
 
-        let customs = format!("{:#?}", parse_custom(parser, vec![]));
+        let customs = format!("{:#?}", parse_custom(parser, &[]));
         let re = Regex::new(r"id: \d+").unwrap();
         re.replace_all(&customs, "id: [redacted]").to_string()
     }

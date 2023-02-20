@@ -27,9 +27,11 @@ checksum = "d468802bab17cbc0cc575e9b053f41e72aa36bfa6b7f55e3529ffa43161b97fa"
 name = "bismuth-core"
 version = "0.1.0"
 dependencies = [
+ "bismuth-custom",
  "bismuth-error",
  "bismuth-lexer",
  "bismuth-md",
+ "bismuth-parser",
  "clap",
  "insta",
 ]
@@ -48,6 +50,14 @@ name = "bismuth-error"
 version = "0.1.0"
 dependencies = [
  "crossterm",
+]
+
+[[package]]
+name = "bismuth-html"
+version = "0.1.0"
+dependencies = [
+ "insta",
+ "regex",
 ]
 
 [[package]]

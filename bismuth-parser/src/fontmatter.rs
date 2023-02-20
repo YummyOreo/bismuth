@@ -3,7 +3,7 @@ use serde_yaml::{from_str, Error};
 use std::collections::BTreeMap;
 use std::path::Path;
 
-#[derive(Default, Deserialize, Debug)]
+#[derive(Default, Deserialize, Debug, Clone)]
 pub struct FontMatter {
     title: Option<String>,
     path: Option<String>,

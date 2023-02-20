@@ -2,11 +2,11 @@
 
 - Get a list of all the markdown files and their paths [Done]
 - Parse markdown files and update path based on info in markdown
-    - This will be stored in a File struct with a Markdown struct and a Metadata struct
-    - For this you can use [insta.rs](https://insta.rs/) for testing the parsing
-    - For "reactive" files (ie. lists of blogs), they will be parsed. Just put a place holder for the reactive list
-    - Then re-parse the list ones
-    - ALSO: TEST ALL THE LEXER WITH ALL TEH MD FILESS
+    - This will be stored in a File struct with a Markdown struct and a Metadata struct [Done]
+    - For this you can use [insta.rs](https://insta.rs/) for testing the parsing [Done]
+    - For "reactive" files (ie. lists of blogs), they will be parsed. Just put a place holder for the reactive list 0Done
+    - Then re-parse the list ones [Done]
+    - ALSO: TEST ALL THE LEXER WITH ALL TEH MD FILESS [N/A]
 - Make html files using the tree
     - The html file template is basted no the File struct `type` field (or in Metadat)
 - Make Rss based on the markdown files
@@ -18,7 +18,7 @@ For internal/default templates, use:
 Lazyload all images
 
 # Built In Customs:
-## Header:
+## Header/Navbar:
 Like the footer:
 - Customizable for each file
 - Can make a "default" one

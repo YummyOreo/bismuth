@@ -329,7 +329,7 @@ Element{
     Element{
         Kind: "Text",
         Text: Some("\nnon inline\n"),
-        Attrs: [],
+        Attrs: [("lang", "rust")],
         Elements: [
         ])
     },

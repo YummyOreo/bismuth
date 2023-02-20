@@ -21,13 +21,34 @@ pub fn run_lexer(files: Vec<bismuth_md::MarkdownFile>) -> Vec<bismuth_lexer::Lex
     lexer_files
 }
 
+pub fn run_parser(files: Vec<bismuth_lexer::Lexer>) -> Vec<bismuth_parser::Parser> {
+    let mut parsed_files_pre: Vec<bismuth_parser::Parser> = vec![];
+    let mut parsed_files_post: Vec<bismuth_parser::Parser> = vec![];
+    for file in files {
+        let mut parser = bismuth_parser::Parser::new(file);
+        parser.parse().unwrap();
+        parsed_files_pre.push(parser)
+    }
+    for parser in parsed_files_pre.clone() {
+        let parser = bismuth_custom::parse_custom(
+            parser,
+            &parsed_files_pre
+                .iter()
+                .collect::<Vec<&bismuth_parser::Parser>>(),
+        );
+        parsed_files_post.push(parser)
+    }
+    parsed_files_post
+}
+
 pub fn run(dir: String) {
     let path = Path::new(&dir).canonicalize().unwrap();
 
     let _config = config::Config::new(&path);
 
     let md_files = get_files(&path);
-    println!("{:#?}", run_lexer(md_files));
+    let tokenized_file = run_lexer(md_files);
+    println!("{:#?}", run_parser(tokenized_file));
 }
 
 pub fn entry(dir: String) {

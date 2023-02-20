@@ -16,7 +16,7 @@ use crate::{
     tree::{Ast, Element, Kind},
 };
 
-#[derive(Default, Debug)]
+#[derive(Default, Debug, Clone)]
 pub struct Metadata {
     absolute_path: PathBuf,
     fontmatter: FontMatter,
@@ -31,7 +31,7 @@ impl Metadata {
     }
 }
 
-#[derive(Debug)]
+#[derive(Clone)]
 struct State {
     pub new_line: bool,
     pub inside: Vec<u32>,
@@ -50,7 +50,7 @@ impl Default for State {
 
 type ParseReturn = Result<(), ParseError>;
 
-// #[derive(Debug)]
+#[derive(Clone)]
 pub struct Parser {
     pub lexer: Lexer,
 
@@ -228,25 +228,22 @@ impl Parser {
             let kind = &kinds[pat_index];
 
             if kind == &token.kind {
-                match kind {
-                    // handle text edge case
-                    TokenType::Text => {
-                        pat_index += 1;
-                        continue;
-                    }
-                    _ => {
-                        let len = self.token_len(token);
-                        let kinds_after = kinds.split_at(pat_index).1;
-                        let diff = kinds_after
-                            .iter()
-                            .position(|k| k != kind)
-                            .unwrap_or(kinds_after.len());
-                        if diff == len {
-                            pat_index += len;
-                            repeate_len += len - 1;
-                            continue;
-                        }
-                    }
+                // handle text edge case
+                if kind == &TokenType::Text {
+                    pat_index += 1;
+                    continue;
+                }
+
+                let len = self.token_len(token);
+                let kinds_after = kinds.split_at(pat_index).1;
+                let diff = kinds_after
+                    .iter()
+                    .position(|k| k != kind)
+                    .unwrap_or(kinds_after.len());
+                if diff == len {
+                    pat_index += len;
+                    repeate_len += len - 1;
+                    continue;
                 }
             }
             pat_index = 0;
@@ -387,14 +384,53 @@ impl Parser {
         Ok(())
     }
 
+    fn handle_backtick(&mut self) -> ParseReturn {
+        let len = self.current_token_len()?;
+        if len == 1 {
+            return self.handle_container(TokenType::Backtick);
+        } else if len == 3 {
+            let elm = Element::new(Kind::BlockCode);
+            let elm_id = elm.get_id();
+            self.append_element(elm);
+            self.state.inside.push(elm_id);
+
+            self.advance_token()?;
+            let inside = self.peek_till_kind(&TokenType::Backtick)?;
+
+            let (lang, code) = inside.split_at(
+                inside
+                    .iter()
+                    .position(|t| t.kind == TokenType::EndOfLine)
+                    .ok_or(error::ParseError::Peek(0))?,
+            );
+            let lang = lang
+                .iter()
+                .map(|e| e.text.iter().collect::<String>())
+                .collect::<String>();
+
+            let mut elm = Element::new(Kind::Text);
+            let s = code
+                .iter()
+                .map(|t| t.text.iter().collect::<String>())
+                .collect::<String>();
+            elm.text = Some(s);
+            elm.add_attr("lang", &lang);
+
+            self.advance_n_token(inside.len())?;
+            self.append_element(elm);
+        } else {
+            self.append_element(self.make_text()?);
+        }
+        Ok(())
+    }
+
     fn handle_container(&mut self, kind: TokenType) -> ParseReturn {
-        let elm_kind = match (kind.clone(), self.token_len(self.current_token()?)) {
+        let elm_kind = match (kind.clone(), self.current_token_len()?) {
             (TokenType::Asterisk, 1) | (TokenType::Underscore, 1) => Kind::Italic,
             (TokenType::Asterisk, 2) | (TokenType::Underscore, 2) => Kind::Bold,
             (TokenType::DollarSign, 1) => Kind::InlineLaTeX,
             (TokenType::DollarSign, 3) => Kind::BlockLaTeX,
             (TokenType::Backtick, 1) => Kind::InlineCode,
-            (TokenType::Backtick, 3) => Kind::BlockCode,
             _ => Kind::Text,
         };
 
@@ -403,7 +439,7 @@ impl Parser {
             return Ok(());
         }
 
-        let elm = Element::new(elm_kind.clone());
+        let elm = Element::new(elm_kind);
         let elm_id = elm.get_id();
         self.append_element(elm);
         self.state.inside.push(elm_id);
@@ -411,35 +447,23 @@ impl Parser {
         self.advance_n_token(1)?;
         let inside = self.peek_till_kind(&kind).unwrap();
 
-        if elm_kind == Kind::BlockCode {
-            let mut elm = Element::new(Kind::Text);
-            let s = inside
-                .iter()
-                .map(|t| t.text.iter().collect::<String>())
-                .collect::<String>();
-            elm.text = Some(s);
+        let mut last_index = self.index;
+        let mut last_diff = 0;
 
-            self.advance_n_token(inside.len())?;
-            self.append_element(elm);
-        } else {
-            let mut last_index = self.index;
-            let mut last_diff = 0;
-
-            for token in &inside {
-                if last_diff > 0 {
-                    last_diff -= 1;
-                    continue;
-                }
-
-                self.parse_token(token)?;
-
-                last_diff = (self.index - last_index) + 1;
-                last_index = self.index;
-
-                self.advance_n_token(1)?;
+        for token in &inside {
+            if last_diff > 0 {
+                last_diff -= 1;
+                continue;
             }
-            self.state.inside.pop();
+
+            self.parse_token(token)?;
+
+            last_diff = (self.index - last_index) + 1;
+            last_index = self.index;
+
+            self.advance_n_token(1)?;
         }
+        self.state.inside.pop();
         Ok(())
     }
 
@@ -555,7 +579,7 @@ impl Parser {
             TokenType::GreaterThan => self.append_element(Element::new(Kind::Blockquote)),
 
             TokenType::Asterisk => self.handle_container(TokenType::Asterisk)?,
-            TokenType::Backtick => self.handle_container(TokenType::Backtick)?,
+            TokenType::Backtick => self.handle_backtick()?,
             TokenType::DollarSign => self.handle_container(TokenType::DollarSign)?,
             TokenType::Underscore => self.handle_container(TokenType::Underscore)?,
 

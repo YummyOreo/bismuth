@@ -21,7 +21,7 @@ values:
 ![file](stuff)
 
 `inilen`
-```
+```rust
 non inline
 ```
 

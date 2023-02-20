@@ -1,4 +1,11 @@
 [workspace]
 
-members = ["bismuth-core", "bismuth-md", "bismuth-error", "bismuth-lexer", "bismuth-parser", "bismuth-custom"]
-
+members = [
+    "bismuth-core",
+    "bismuth-md",
+    "bismuth-error",
+    "bismuth-lexer",
+    "bismuth-parser",
+    "bismuth-custom",
+    "bismuth-html",
+]
