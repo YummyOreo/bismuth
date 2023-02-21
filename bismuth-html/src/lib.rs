@@ -1,2 +1,2 @@
-mod template;
 mod render;
+mod template;

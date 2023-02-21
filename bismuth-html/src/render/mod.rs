@@ -32,7 +32,7 @@ impl Renderer {
             parser,
             output: String::new(),
             path,
-            current_elements: vec![]
+            current_elements: vec![],
         }
     }
 }

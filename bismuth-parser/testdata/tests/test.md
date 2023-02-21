@@ -22,7 +22,11 @@ values:
 
 `inilen`
 ```rust
-non inline
+// non inline
+// rust
+fn test() {
+    println!("Should work?");
+}
 ```
 
 $Math?$
