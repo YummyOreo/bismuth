@@ -1,4 +1,3 @@
-#![allow(unused_doc_comments)]
 use regex::Regex;
 
 use bismuth_md::MarkdownFile;
@@ -105,13 +104,6 @@ impl Lexer {
 
     fn peek_at(&self, index: usize) -> Result<&char, LexerError> {
         self.chars.get(index).ok_or(LexerError::PeekError(index))
-    }
-
-    fn peek_till(&self, c: &char) -> std::ops::RangeInclusive<usize> {
-        let mut chars = self.chars.split_at(self.position).1.iter();
-        let len = chars.len();
-
-        self.position..=chars.position(|s| s == c).unwrap_or(len) + self.position - 1
     }
 
     fn peek_till_diff(&self) -> std::ops::RangeInclusive<usize> {
@@ -463,21 +455,6 @@ mod test_utils {
             content,
             path: PathBuf::new(),
         }
-    }
-
-    #[test]
-    fn test_peek_till() {
-        let file = setup("this is a test aaaaabc");
-        let mut lexer = Lexer::new(file);
-        lexer.move_to(15).unwrap();
-
-        assert_eq!(lexer.peek_till(&'c'), 15..=lexer.chars.len() - 3);
-
-        let file = setup("this is a test aaaaaab");
-        let mut lexer = Lexer::new(file);
-        lexer.move_to(15).unwrap();
-
-        assert_eq!(lexer.peek_till(&'b'), 15..=lexer.chars.len() - 3);
     }
 
     #[test]

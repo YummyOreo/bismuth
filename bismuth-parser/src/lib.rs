@@ -1,4 +1,3 @@
-#![allow(dead_code)]
 use bismuth_lexer::{
     token::{Token, TokenType},
     Lexer,
@@ -104,10 +103,6 @@ impl Parser {
         Ok(&self.current_token()?.text)
     }
 
-    fn current_token_type(&self) -> Result<&TokenType, ParseError> {
-        Ok(&self.current_token()?.kind)
-    }
-
     fn token_len(&self, token: &Token) -> usize {
         (token.end - token.start) + 1
     }
@@ -179,11 +174,6 @@ impl Parser {
     /// This is relitive
     fn peek(&self, n: usize) -> Result<&Token, ParseError> {
         self.peek_at(self.index + n)
-    }
-
-    /// This is relitive
-    fn peek_back(&self, n: usize) -> Result<&Token, ParseError> {
-        self.peek_at(self.index.checked_sub(n).ok_or(ParseError::MathError)?)
     }
 
     /// This is relitive
