@@ -8,6 +8,10 @@ use std::path::PathBuf;
 
 mod element;
 
+pub trait Render {
+    fn render(&mut self) -> String;
+}
+
 pub struct Renderer {
     pub parser: Parser,
 
