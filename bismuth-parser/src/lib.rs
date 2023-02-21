@@ -18,8 +18,8 @@ use crate::{
 
 #[derive(Default, Debug, Clone)]
 pub struct Metadata {
-    absolute_path: PathBuf,
-    fontmatter: FontMatter,
+    pub absolute_path: PathBuf,
+    pub fontmatter: FontMatter,
 }
 
 impl Metadata {
