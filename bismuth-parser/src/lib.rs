@@ -130,7 +130,7 @@ impl Parser {
 
             if elm.kind != Kind::EndOfLine {
                 self.state.new_line = false;
-                curr_elm.append_node(elm);
+                curr_elm.append_element(elm);
                 return;
             } else {
                 self.ast
@@ -249,7 +249,7 @@ impl Parser {
 
             elm_txt.text = Some(self.current_token_chars()?.iter().collect::<String>());
 
-            elm.append_node(elm_txt);
+            elm.append_element(elm_txt);
             Ok(elm)
         } else {
             let mut elm = Element::new(Kind::Text);
@@ -401,16 +401,13 @@ impl Parser {
 
             // make the blockcode element
             let mut elm = Element::new(Kind::BlockCode);
-            let elm_id = elm.get_id();
-
             elm.add_attr("lang", &lang);
 
-            self.append_element(elm);
-            self.state.inside.push(elm_id);
-
             // append the text inside the blockcode
-            let mut elm = Element::new(Kind::Text);
-            elm.text = Some(code);
+            let mut elm_text = Element::new(Kind::Text);
+            elm_text.text = Some(code);
+
+            elm.append_element(elm_text);
 
             self.advance_n_token(inside.len())?;
             self.append_element(elm);
@@ -434,11 +431,6 @@ impl Parser {
             return Ok(());
         }
 
-        let elm = Element::new(elm_kind);
-        let elm_id = elm.get_id();
-        self.append_element(elm);
-        self.state.inside.push(elm_id);
-
         self.advance_token()?;
         let pattern = vec![kind].repeat(len);
         let pat_start = self.peek_till_pattern(&pattern)?;
@@ -448,9 +440,14 @@ impl Parser {
             .iter()
             .map(|t| t.text.iter().collect::<String>())
             .collect::<String>();
-        let mut elm = Element::new(Kind::Text);
-        elm.text = Some(text);
+
+        let mut elm = Element::new(elm_kind);
+
+        let mut elm_text = Element::new(Kind::Text);
+        elm_text.text = Some(text);
+
         self.advance_n_token(inside.len())?;
+        elm.append_element(elm_text);
         self.append_element(elm);
 
         Ok(())

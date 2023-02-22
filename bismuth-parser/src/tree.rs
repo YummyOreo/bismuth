@@ -111,7 +111,7 @@ impl Element {
         }
     }
 
-    pub fn append_node(&mut self, elm: Element) -> &Element {
+    pub fn append_element(&mut self, elm: Element) -> &Element {
         self.elements.push(elm);
         self.elements.last().expect("Should be there")
     }

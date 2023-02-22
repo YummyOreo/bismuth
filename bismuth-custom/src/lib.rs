@@ -76,10 +76,10 @@ impl Custom {
     }
 }
 
-fn get_customs(elements: Vec<Element>, mut current_list: Vec<Element>) -> Vec<Element> {
+fn get_customs(elements: Vec<Element>, mut current_list: Vec<u32>) -> Vec<u32> {
     for element in elements {
         if let Kind::CustomElement(_) = element.kind {
-            current_list.push(element.clone());
+            current_list.push(element.get_id());
         }
         if !element.elements.is_empty() {
             current_list = get_customs(element.elements, current_list);
@@ -88,10 +88,11 @@ fn get_customs(elements: Vec<Element>, mut current_list: Vec<Element>) -> Vec<El
     current_list
 }
 
-fn run_customs(target: &mut Parser, others: &[&Parser], custom_elms: &[Element]) {
+fn run_customs(target: &mut Parser, others: &[&Parser], custom_elms: &[u32]) {
     let mut customs: Vec<Custom> = custom_elms
         .iter()
-        .filter_map(|e| {
+        .filter_map(|id| {
+            let e = target.ast.find(*id).expect("Should be there").clone();
             if let Kind::CustomElement(c) = &e.kind {
                 let mut custom = Custom::from_elm(c, e.get_id());
                 custom.find();
@@ -102,6 +103,7 @@ fn run_customs(target: &mut Parser, others: &[&Parser], custom_elms: &[Element])
             }
         })
         .collect();
+    println!("{customs:#?}");
 
     for custom in &mut customs {
         custom.run(target, others);
@@ -110,28 +112,26 @@ fn run_customs(target: &mut Parser, others: &[&Parser], custom_elms: &[Element])
 }
 
 pub fn parse_custom(mut target: Parser, others: &[&Parser]) -> Parser {
-    let mut old_elms: Vec<Element> = vec![];
+    let mut old_elms: Vec<u32> = vec![];
     let mut i = 0;
 
     loop {
         i += 1;
         let mut new_elms = get_customs(target.ast.elements.clone(), vec![]);
+        // println!("{new_elms:#?} | {old_elms:#?}");
 
-        if new_elms
-            .iter()
-            .all(|a| old_elms.iter().any(|b| b.get_id() == a.get_id()))
-            || i == 5
-        {
+        if new_elms == old_elms {
             break;
         }
 
         let mut run_elms = new_elms.clone();
-        run_elms.retain(|e| !old_elms.iter().any(|b| b.get_id() == e.get_id()));
+        run_elms.retain(|e| !old_elms.contains(e));
         run_customs(&mut target, others, &run_elms);
 
         old_elms = new_elms;
     }
 
+    // panic!("");
     target
 }
 
@@ -156,7 +156,12 @@ mod test_utils {
             bismuth_parser::Parser::new_test("/test/", "%{{\nname: test\nother: key\n}}");
         parser.parse().unwrap();
 
-        let customs = format!("{:#?}", get_customs(parser.ast.elements, vec![]));
+        let custom_ids = get_customs(parser.ast.elements.clone(), vec![]);
+        let customs = custom_ids
+            .iter()
+            .map(|id| parser.ast.find(*id).unwrap().clone())
+            .collect::<Vec<Element>>();
+        let customs = format!("{:#?}", customs);
         let re = Regex::new(r"id: \d+").unwrap();
         let customs = re.replace_all(&customs, "id: [redacted]").to_string();
         snapshot!(customs);
