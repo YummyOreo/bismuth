@@ -60,7 +60,7 @@ pub struct Parser {
     current_element: Option<Element>,
 
     state: State,
-    has_custom: bool,
+    pub has_custom: bool,
 
     pub ast: Ast,
 }

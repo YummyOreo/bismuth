@@ -112,6 +112,9 @@ fn run_customs(target: &mut Parser, others: &[&Parser], custom_elms: &[u32]) {
 }
 
 pub fn parse_custom(mut target: Parser, others: &[&Parser]) -> Parser {
+    if !target.has_custom {
+        return target;
+    }
     let mut old_elms: Vec<u32> = vec![];
     let mut i = 0;
 
