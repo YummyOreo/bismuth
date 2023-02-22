@@ -2,7 +2,7 @@
 source: bismuth-custom/src/lib.rs
 expression: "snapshot(\"%{{\\nname: bloglist\\nother: key\\n}}\")"
 ---
-FontMatter {
+FrontMatter {
     title: Some(
         "test",
     ),

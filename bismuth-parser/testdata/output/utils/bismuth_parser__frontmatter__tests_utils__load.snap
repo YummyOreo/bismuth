@@ -1,8 +1,8 @@
 ---
-source: bismuth-parser/src/fontmatter.rs
-expression: "format!(\"{:#?}\", fm)"
+source: bismuth-parser/src/frontmatter.rs
+expression: "run_snapshot(fm,\n    \"\n        title: Test\n        path: /test\n        kind: test\n        values:\n            - test: te\n        \")"
 ---
-FontMatter {
+FrontMatter {
     title: Some(
         "Test",
     ),

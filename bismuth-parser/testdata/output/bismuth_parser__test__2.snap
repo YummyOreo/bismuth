@@ -1,8 +1,8 @@
 ---
 source: bismuth-parser/src/lib.rs
-expression: format_parser(parser)
+expression: "snapshot_str(\"1. list item\\n\\t2. hmm\")"
 ---
-FontMatter {
+FrontMatter {
     title: Some(
         "test",
     ),
@@ -56,5 +56,4 @@ Element{
     Elements: [
     ])
 }
-
 

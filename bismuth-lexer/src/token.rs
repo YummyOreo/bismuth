@@ -76,9 +76,9 @@ pub enum TokenType {
 
     Percent,
 
-    FontmatterStart,
-    FontmatterInside,
-    FontmatterEnd,
+    FrontmatterStart,
+    FrontmatterInside,
+    FrontmatterEnd,
 }
 
 impl Default for TokenType {

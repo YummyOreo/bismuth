@@ -2,7 +2,7 @@
 source: bismuth-parser/src/lib.rs
 expression: "snapshot_path(\"./testdata/tests/test1.md\")"
 ---
-FontMatter {
+FrontMatter {
     title: Some(
         "Blog post about cats",
     ),

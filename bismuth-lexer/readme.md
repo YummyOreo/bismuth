@@ -18,9 +18,9 @@ A token can be more than one character. All tokens (with the exception of EOL to
 - `ParenthesisLeft` + `ParenthesisRight:` Any `(` or `)` in the program
 - `Exclamation`: Same imlp as `Hash`, but with exclamation marks
 - `GreaterThan`: Any greaterthan that is at the start of a line and has a space after it. See the `Lexer::handle_greaterthan` function for more detials
-- `Dash`: Could be: fontmatter, 3 dashes, or just text. This is really complicated because of the fontmatter so see [dash.md in the docs](docs/dash.md) for info on this
+- `Dash`: Could be: frontmatter, 3 dashes, or just text. This is really complicated because of the frontmatter so see [dash.md in the docs](docs/dash.md) for info on this
 - `ListNumber`: Any number that has a `.` after it. See the `Lexer::handle_number` function for mare detials
 - `Backtick`: Any ` char in the program
 - `CurlybraceLeft` + `CurlybraceRight:` Any `{` or `}` in the program
 - `Percent`: Any `%` char in the program
-- `FontmatterStart` + `FontmatterInside` + `FontmatterEnd`: [See here for info](docs/dash.md)
+- `FrontmatterStart` + `FrontmatterInside` + `FrontmatterEnd`: [See here for info](docs/dash.md)

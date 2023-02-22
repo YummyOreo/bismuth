@@ -1,14 +1,14 @@
 ---
 source: bismuth-lexer/src/lib.rs
-expression: "snapshot(\"./testdata/tests/test_fontmatter.md\")"
+expression: "snapshot(\"./testdata/tests/test_frontmatter.md\")"
 ---
 ---↲
-^^^ Token(FontmatterStart, "---", 0 -> 2)
+^^^ Token(FrontmatterStart, "---", 0 -> 2)
 this: "font matter"↲
-^^^^^^^^^^^^^^^^^^^ Token(FontmatterInside, "this: \"font matter\"", 4 -> 22)
+^^^^^^^^^^^^^^^^^^^ Token(FrontmatterInside, "this: \"font matter\"", 4 -> 22)
                    ^ Token(EndOfLine, "\n", 23 -> 23)
 ---↲
-^^^ Token(FontmatterEnd, "---", 24 -> 26)
+^^^ Token(FrontmatterEnd, "---", 24 -> 26)
    ^ Token(EndOfLine, "\n", 27 -> 27)
 # TEST↲
 ^ Token(Hash, "#", 28 -> 28)

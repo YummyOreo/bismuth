@@ -17,8 +17,8 @@ pub enum ParseError {
 
     #[error("{0}")]
     CustomElementError(CustomElmError),
-    #[error("error parsing fontmatter: {0}")]
-    FontMatterError(Error),
+    #[error("error parsing frontmatter: {0}")]
+    FrontMatterError(Error),
 
     #[error("math error")]
     MathError,

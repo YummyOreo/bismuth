@@ -29,7 +29,7 @@ impl Renderer {
         let path = PathBuf::from(
             parser
                 .metadata
-                .fontmatter
+                .frontmatter
                 .get_path()
                 .expect("Should have a path"),
         );

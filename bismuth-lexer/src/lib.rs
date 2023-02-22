@@ -175,10 +175,10 @@ impl Lexer {
         self.make_token_at_pos(token::TokenType::Text)
     }
 
-    // Fontmatter
+    // Frontmatter
 
-    /// Checks if the current position is the start of the fontmatter
-    /// if it is, it will return the range of the fontmatter
+    /// Checks if the current position is the start of the frontmatter
+    /// if it is, it will return the range of the frontmatter
     fn get_fm_start(&self) -> Option<RangeInclusive<usize>> {
         // gets till change in char
         let diff = self.peek_till_diff();
@@ -191,16 +191,16 @@ impl Lexer {
     }
 
     fn append_fm_start_token(&mut self, start: usize, end: usize) -> Result<(), LexerError> {
-        // makes the fontmatter start token
-        let fontmatter_start_token = token::Token {
+        // makes the frontmatter start token
+        let frontmatter_start_token = token::Token {
             start,
             end,
-            kind: token::TokenType::FontmatterStart,
+            kind: token::TokenType::FrontmatterStart,
             text: vec!['-', '-', '-'],
         };
 
         // appends the token
-        self.new_token(fontmatter_start_token);
+        self.new_token(frontmatter_start_token);
 
         // moves past the token
         self.move_to(end + 1)?;
@@ -227,7 +227,7 @@ impl Lexer {
                 let t = token::Token {
                     start: self.position,
                     end: next_line - 1,
-                    kind: token::TokenType::FontmatterInside,
+                    kind: token::TokenType::FrontmatterInside,
                     text: inside_text,
                 };
                 self.new_token(t);
@@ -243,21 +243,21 @@ impl Lexer {
             self.move_to(next_line + 1)?;
         }
 
-        // moves to after the inside of the fontmatter
+        // moves to after the inside of the frontmatter
         self.move_to(end + 1)?;
         Ok(())
     }
 
     fn get_fm_end(&self) -> Option<RangeInclusive<usize>> {
-        let fontmatter_end = self.peek_regex(Regex::new("---\n").expect("Should be valid regex"));
-        if fontmatter_end.start() == fontmatter_end.end() {
+        let frontmatter_end = self.peek_regex(Regex::new("---\n").expect("Should be valid regex"));
+        if frontmatter_end.start() == frontmatter_end.end() {
             None
         } else {
-            Some(*fontmatter_end.start()..=*fontmatter_end.end() - 1)
+            Some(*frontmatter_end.start()..=*frontmatter_end.end() - 1)
         }
     }
 
-    fn handle_fontmatter(&mut self) -> Result<token::Token, LexerError> {
+    fn handle_frontmatter(&mut self) -> Result<token::Token, LexerError> {
         // use self.peek_till_diff and self.peek_till
 
         // ie self.peek_till_diff to know when the --- end and to test if there are 3
@@ -270,19 +270,19 @@ impl Lexer {
 
             self.append_fm_start_token(self.position, diff_end)?;
 
-            let fontmatter_end = self.get_fm_end().ok_or(LexerError::FontmatterError)?;
+            let frontmatter_end = self.get_fm_end().ok_or(LexerError::FrontmatterError)?;
 
-            self.append_fm_inside(diff_end + 2..=*fontmatter_end.start() - 1)?;
+            self.append_fm_inside(diff_end + 2..=*frontmatter_end.start() - 1)?;
 
             // appending fm_end
 
-            // Moves to the end of the fontmatter
-            self.move_to(*fontmatter_end.end())?;
+            // Moves to the end of the frontmatter
+            self.move_to(*frontmatter_end.end())?;
 
             return Ok(token::Token {
-                start: *fontmatter_end.start(),
-                end: *fontmatter_end.end(),
-                kind: token::TokenType::FontmatterEnd,
+                start: *frontmatter_end.start(),
+                end: *frontmatter_end.end(),
+                kind: token::TokenType::FrontmatterEnd,
                 text: vec!['-', '-', '-'],
             });
         }
@@ -291,7 +291,7 @@ impl Lexer {
 
     fn handle_dash(&mut self) -> Result<token::Token, LexerError> {
         if self.current_token.kind == token::TokenType::StartOfFile {
-            return self.handle_fontmatter();
+            return self.handle_frontmatter();
         }
 
         let before_after = (self.peek_back(1).unwrap_or(&'\n'), self.peek(1)?);
@@ -573,7 +573,7 @@ mod test {
                 output += &format!(" {t}");
                 output += "\n";
                 match t.kind {
-                    token::TokenType::EndOfLine | token::TokenType::FontmatterStart => {
+                    token::TokenType::EndOfLine | token::TokenType::FrontmatterStart => {
                         break;
                     }
                     _ => {}
@@ -600,6 +600,6 @@ mod test {
     snapshot!(test_load_file, "./testdata/tests/test1.md");
     snapshot!(test_load_file_1, "./testdata/tests/test2.md");
     snapshot!(test_load_file_2, "./testdata/tests/test3.md");
-    snapshot!(fontmatter_test, "./testdata/tests/test_fontmatter.md");
-    snapshot!(fontmatter_test_1, "./testdata/tests/test_fontmatter_2.md");
+    snapshot!(frontmatter_test, "./testdata/tests/test_frontmatter.md");
+    snapshot!(frontmatter_test_1, "./testdata/tests/test_frontmatter_2.md");
 }

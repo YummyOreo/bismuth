@@ -4,7 +4,7 @@ use std::collections::BTreeMap;
 use std::path::Path;
 
 #[derive(Default, Deserialize, Debug, Clone)]
-pub struct FontMatter {
+pub struct FrontMatter {
     title: Option<String>,
     path: Option<String>,
 
@@ -13,7 +13,7 @@ pub struct FontMatter {
     values: Option<Vec<BTreeMap<String, String>>>,
 }
 
-impl FontMatter {
+impl FrontMatter {
     pub fn new(path: &Path) -> Self {
         let title = path
             .file_name()
@@ -21,7 +21,7 @@ impl FontMatter {
             .to_string_lossy()
             .to_string();
 
-        FontMatter {
+        FrontMatter {
             title: Some(title),
             path: Some(path.to_string_lossy().to_string()),
             kind: Some(String::from("default")),
@@ -56,7 +56,7 @@ impl FontMatter {
     }
 
     pub fn update_from_str(&mut self, s: &str) -> Result<(), Error> {
-        let updated_fm: FontMatter = from_str(s)?;
+        let updated_fm: FrontMatter = from_str(s)?;
 
         if let Some(p) = updated_fm.path {
             let p = Some(p);
@@ -93,7 +93,7 @@ impl FontMatter {
 mod tests_utils {
     use super::*;
 
-    pub fn run_snapshot(mut fm: FontMatter, update: &str) -> String {
+    pub fn run_snapshot(mut fm: FrontMatter, update: &str) -> String {
         fm.update_from_str(update).unwrap();
         if let Some(mut values) = fm.values.clone() {
             values.sort();
@@ -106,7 +106,7 @@ mod tests_utils {
         ($name:tt, $update:tt) => {
             #[test]
             fn $name() {
-                let fm: FontMatter = Default::default();
+                let fm: FrontMatter = Default::default();
                 let mut settings = insta::Settings::clone_current();
                 settings.set_snapshot_path("../testdata/output/utils/");
                 settings.bind(|| {
@@ -118,7 +118,7 @@ mod tests_utils {
         ($name:tt, $update:tt, $($key:tt, $value:expr),*) => {
             #[test]
             fn $name() {
-                let fm = FontMatter {
+                let fm = FrontMatter {
                     $(
                         $key: Some($value),
                     )*

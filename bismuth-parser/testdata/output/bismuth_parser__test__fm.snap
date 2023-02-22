@@ -2,7 +2,7 @@
 source: bismuth-parser/src/lib.rs
 expression: "snapshot_str(\"---\\ntitle: test title\\npath: /test/path/\\nvalues:\\n    - key: value\\n---\")"
 ---
-FontMatter {
+FrontMatter {
     title: Some(
         "test title",
     ),

@@ -7,25 +7,25 @@ use std::path::{Path, PathBuf};
 
 pub mod custom;
 pub mod error;
-mod fontmatter;
+mod frontmatter;
 pub mod tree;
 use crate::{
     error::ParseError,
-    fontmatter::FontMatter,
+    frontmatter::FrontMatter,
     tree::{Ast, Element, Kind},
 };
 
 #[derive(Default, Debug, Clone)]
 pub struct Metadata {
     pub absolute_path: PathBuf,
-    pub fontmatter: FontMatter,
+    pub frontmatter: FrontMatter,
 }
 
 impl Metadata {
     pub fn new(path: &Path) -> Self {
         Metadata {
             absolute_path: path.to_path_buf(),
-            fontmatter: FontMatter::new(path),
+            frontmatter: FrontMatter::new(path),
         }
     }
 }
@@ -573,8 +573,8 @@ impl Parser {
         Ok((text_s, url_s))
     }
 
-    fn handle_fontmatter(&mut self) -> ParseReturn {
-        let mut inside = self.peek_till_kind(&TokenType::FontmatterEnd).unwrap();
+    fn handle_frontmatter(&mut self) -> ParseReturn {
+        let mut inside = self.peek_till_kind(&TokenType::FrontmatterEnd).unwrap();
         inside.remove(0);
         inside.pop();
         let s = inside
@@ -584,9 +584,9 @@ impl Parser {
 
         self.advance_n_token(inside.len() + 1)?;
         self.metadata
-            .fontmatter
+            .frontmatter
             .update_from_str(&s)
-            .map_err(ParseError::FontMatterError)?;
+            .map_err(ParseError::FrontMatterError)?;
         Ok(())
     }
 
@@ -615,7 +615,7 @@ impl Parser {
             TokenType::BracketLeft => self.handle_bracket()?,
             TokenType::Exclamation => self.handle_exclamation()?,
 
-            TokenType::FontmatterStart => self.handle_fontmatter()?,
+            TokenType::FrontmatterStart => self.handle_frontmatter()?,
             _ => {}
         };
         Ok(())
@@ -692,7 +692,7 @@ impl core::fmt::Debug for Parser {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let ast = &self.ast;
         let mut s = String::new();
-        s.push_str(&format!("{:#?}\n", self.metadata.fontmatter));
+        s.push_str(&format!("{:#?}\n", self.metadata.frontmatter));
         for element in &ast.elements {
             s.push_str(&render_element(&element.clone(), 0));
             s.push('\n');

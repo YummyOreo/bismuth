@@ -2,7 +2,7 @@
 source: bismuth-parser/src/lib.rs
 expression: "snapshot_str(\"test\\n\\n---\\n\")"
 ---
-FontMatter {
+FrontMatter {
     title: Some(
         "test",
     ),
@@ -63,5 +63,4 @@ Element{
     Elements: [
     ])
 }
-
 

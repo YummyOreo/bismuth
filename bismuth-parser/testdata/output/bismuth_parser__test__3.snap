@@ -1,8 +1,8 @@
 ---
 source: bismuth-parser/src/lib.rs
-expression: format_parser(parser)
+expression: "snapshot_str(\"[test](link)\\n![prev](of a file)\\ntest ![other txt](./*test*)\")"
 ---
-FontMatter {
+FrontMatter {
     title: Some(
         "test",
     ),
@@ -70,5 +70,4 @@ Element{
     Elements: [
     ])
 }
-
 

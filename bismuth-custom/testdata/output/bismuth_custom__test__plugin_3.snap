@@ -2,7 +2,7 @@
 source: bismuth-custom/src/lib.rs
 expression: "snapshot(\"this is a test \\n%{{\\nname: navbar\\nkey: value\\nbloglist: true? will this work\\n}}\\n%{{\\nname: blog list\\nother: key\\n}}\")"
 ---
-FontMatter {
+FrontMatter {
     title: Some(
         "test",
     ),
