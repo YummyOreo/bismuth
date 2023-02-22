@@ -9,9 +9,10 @@ use std::path::PathBuf;
 mod element;
 
 pub trait Render {
-    fn render(&mut self) -> String;
+    fn render<T: Render + Clone>(&mut self, content: &[T]) -> String;
 }
 
+#[derive(Clone)]
 pub struct Renderer {
     pub parser: Parser,
 

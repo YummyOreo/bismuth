@@ -1,7 +1,9 @@
 use crate::render::Render;
 
+#[derive(Clone)]
 pub enum HtmlElement {
-    Paragraph { text: String },
+    Paragraph,
+    Text { text: String },
     Bold { text: String },
     Italic { text: String },
     Blockquote { text: String },
@@ -28,7 +30,16 @@ pub enum HtmlElement {
 }
 
 impl Render for HtmlElement {
-    fn render(&mut self) -> String {
+    fn render<T: Render + Clone>(&mut self, content: &[T]) -> String {
+        let mut inside = String::new();
+        for (index, r) in content.iter().enumerate() {
+            inside.push_str(&r.clone().render(content.split_at(index + 1).1));
+        }
+        let (start, end) = match self {
+            Self::Paragraph => ("<p>".to_owned(), "</p>".to_owned()),
+            Self::Text { text } => (text.clone(), "".to_owned()),
+            _ => ("".to_owned(), "".to_owned()),
+        };
         todo!();
     }
 }

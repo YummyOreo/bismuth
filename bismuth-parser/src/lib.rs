@@ -377,13 +377,8 @@ impl Parser {
     fn handle_backtick(&mut self) -> ParseReturn {
         let len = self.current_token_len()?;
         if len == 1 {
-            return self.handle_container(TokenType::Backtick);
+            return self.handle_container_text(TokenType::Backtick);
         } else if len == 3 {
-            let elm = Element::new(Kind::BlockCode);
-            let elm_id = elm.get_id();
-            self.append_element(elm);
-            self.state.inside.push(elm_id);
-
             self.advance_token()?;
             let inside = self.peek_till_kind(&TokenType::Backtick)?;
 
@@ -393,18 +388,29 @@ impl Parser {
                     .position(|t| t.kind == TokenType::EndOfLine)
                     .ok_or(error::ParseError::Peek(0))?,
             );
+
+            // get code and lang
             let lang = lang
                 .iter()
                 .map(|e| e.text.iter().collect::<String>())
                 .collect::<String>();
-
-            let mut elm = Element::new(Kind::Text);
-            let s = code
+            let code = code
                 .iter()
                 .map(|t| t.text.iter().collect::<String>())
                 .collect::<String>();
-            elm.text = Some(s);
+
+            // make the blockcode element
+            let mut elm = Element::new(Kind::BlockCode);
+            let elm_id = elm.get_id();
+
             elm.add_attr("lang", &lang);
+
+            self.append_element(elm);
+            self.state.inside.push(elm_id);
+
+            // append the text inside the blockcode
+            let mut elm = Element::new(Kind::Text);
+            elm.text = Some(code);
 
             self.advance_n_token(inside.len())?;
             self.append_element(elm);
@@ -414,13 +420,46 @@ impl Parser {
         Ok(())
     }
 
-    fn handle_container(&mut self, kind: TokenType) -> ParseReturn {
-        let elm_kind = match (kind.clone(), self.current_token_len()?) {
-            (TokenType::Asterisk, 1) | (TokenType::Underscore, 1) => Kind::Italic,
-            (TokenType::Asterisk, 2) | (TokenType::Underscore, 2) => Kind::Bold,
+    fn handle_container_text(&mut self, kind: TokenType) -> ParseReturn {
+        let len = self.current_token_len()?;
+        let elm_kind = match (kind, len) {
             (TokenType::DollarSign, 1) => Kind::InlineLaTeX,
             (TokenType::DollarSign, 3) => Kind::BlockLaTeX,
             (TokenType::Backtick, 1) => Kind::InlineCode,
+            _ => Kind::Text,
+        };
+
+        if elm_kind == Kind::Text {
+            self.append_element(self.make_text()?);
+            return Ok(());
+        }
+
+        let elm = Element::new(elm_kind);
+        let elm_id = elm.get_id();
+        self.append_element(elm);
+        self.state.inside.push(elm_id);
+
+        self.advance_token()?;
+        let pattern = vec![kind].repeat(len);
+        let pat_start = self.peek_till_pattern(&pattern)?;
+        let inside = self.peek_till(pat_start - self.index)?;
+
+        let text = inside
+            .iter()
+            .map(|t| t.text.iter().collect::<String>())
+            .collect::<String>();
+        let mut elm = Element::new(Kind::Text);
+        elm.text = Some(text);
+        self.advance_n_token(inside.len())?;
+        self.append_element(elm);
+
+        Ok(())
+    }
+
+    fn handle_container(&mut self, kind: TokenType) -> ParseReturn {
+        let elm_kind = match (kind, self.current_token_len()?) {
+            (TokenType::Asterisk, 1) | (TokenType::Underscore, 1) => Kind::Italic,
+            (TokenType::Asterisk, 2) | (TokenType::Underscore, 2) => Kind::Bold,
             _ => Kind::Text,
         };
 
@@ -570,7 +609,7 @@ impl Parser {
 
             TokenType::Asterisk => self.handle_container(TokenType::Asterisk)?,
             TokenType::Backtick => self.handle_backtick()?,
-            TokenType::DollarSign => self.handle_container(TokenType::DollarSign)?,
+            TokenType::DollarSign => self.handle_container_text(TokenType::DollarSign)?,
             TokenType::Underscore => self.handle_container(TokenType::Underscore)?,
 
             TokenType::BracketLeft => self.handle_bracket()?,

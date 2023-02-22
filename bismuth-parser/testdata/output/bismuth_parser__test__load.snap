@@ -324,12 +324,12 @@ Element{
 Element{
     Kind: "BlockCode",
     Text: None,
-    Attrs: [],
+    Attrs: [("lang", "rust")],
     Elements: [
     Element{
         Kind: "Text",
         Text: Some("\n// non inline\n// rust\nfn test() {\n    println!(\"Should work?\");\n}\n"),
-        Attrs: [("lang", "rust")],
+        Attrs: [],
         Elements: [
         ])
     },

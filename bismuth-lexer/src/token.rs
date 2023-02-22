@@ -38,7 +38,7 @@ impl std::fmt::Display for Token {
     }
 }
 
-#[derive(PartialEq, Eq, Clone, Debug)]
+#[derive(PartialEq, Eq, Clone, Copy, Debug)]
 pub enum TokenType {
     Text,
 
