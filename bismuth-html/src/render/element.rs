@@ -64,6 +64,6 @@ impl Render for HtmlElement {
             Self::LineBreak => ("<br>".to_string(), "".to_string()),
             _ => ("".to_owned(), "".to_owned()),
         };
-        todo!();
+        format!("{start}{inside}{end}")
     }
 }
