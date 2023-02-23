@@ -302,16 +302,9 @@ Element{
 }
 Element{
     Kind: "InlineCode",
-    Text: None,
+    Text: Some("inilen"),
     Attrs: [],
     Elements: [
-    Element{
-        Kind: "Text",
-        Text: Some("inilen"),
-        Attrs: [],
-        Elements: [
-        ])
-    },
     ])
 }
 Element{
@@ -323,16 +316,9 @@ Element{
 }
 Element{
     Kind: "BlockCode",
-    Text: None,
+    Text: Some("\n// non inline\n// rust\nfn test() {\n    println!(\"Should work?\");\n}\n"),
     Attrs: [("lang", "rust")],
     Elements: [
-    Element{
-        Kind: "Text",
-        Text: Some("\n// non inline\n// rust\nfn test() {\n    println!(\"Should work?\");\n}\n"),
-        Attrs: [],
-        Elements: [
-        ])
-    },
     ])
 }
 Element{
@@ -351,16 +337,9 @@ Element{
 }
 Element{
     Kind: "InlineLaTeX",
-    Text: None,
+    Text: Some("Math?"),
     Attrs: [],
     Elements: [
-    Element{
-        Kind: "Text",
-        Text: Some("Math?"),
-        Attrs: [],
-        Elements: [
-        ])
-    },
     ])
 }
 Element{

@@ -4,9 +4,9 @@ use crate::render::Render;
 pub enum HtmlElement {
     Paragraph,
     Text { text: String },
-    Bold { text: String },
-    Italic { text: String },
-    Blockquote { text: String },
+    Bold,
+    Italic,
+    Blockquote,
 
     Link { text: String, link: String },
     Filelink { text: String, link: String },
@@ -38,6 +38,30 @@ impl Render for HtmlElement {
         let (start, end) = match self {
             Self::Paragraph => ("<p>".to_owned(), "</p>".to_owned()),
             Self::Text { text } => (text.clone(), "".to_owned()),
+            Self::Bold => ("<b>".to_string(), "</b>".to_string()),
+            Self::Italic => ("<i>".to_string(), "</i>".to_string()),
+            Self::Blockquote => ("<blockquote>".to_string(), "</blockquote>".to_string()),
+            Self::Link { text, link } => (
+                format!("<a href=\"{}\" target=\"_blank\">{}", link, text),
+                "</a>".to_string(),
+            ),
+            Self::Filelink { text, link } => (
+                format!("<img src=\"{}\" alt=\"{}\">", link, text),
+                "".to_string(),
+            ),
+
+            Self::ListItem { level } => (
+                format!("<li class=\"level-{}\">", level),
+                "</li>".to_string(),
+            ),
+            Self::NumList { level, num } => (
+                format!("<li class=\"level-{}\">{}.", level, num),
+                "</li>".to_string(),
+            ),
+
+            // TODO: InlineCode + BLockcode + InlineLaTeX + BlockLaTeX
+            Self::HorizontalRule => ("<hr>".to_string(), "".to_string()),
+            Self::LineBreak => ("<br>".to_string(), "".to_string()),
             _ => ("".to_owned(), "".to_owned()),
         };
         todo!();

@@ -404,10 +404,7 @@ impl Parser {
             elm.add_attr("lang", &lang);
 
             // append the text inside the blockcode
-            let mut elm_text = Element::new(Kind::Text);
-            elm_text.text = Some(code);
-
-            elm.append_element(elm_text);
+            elm.text = Some(code);
 
             self.advance_n_token(inside.len())?;
             self.append_element(elm);
@@ -443,11 +440,9 @@ impl Parser {
 
         let mut elm = Element::new(elm_kind);
 
-        let mut elm_text = Element::new(Kind::Text);
-        elm_text.text = Some(text);
+        elm.text = Some(text);
 
         self.advance_n_token(inside.len())?;
-        elm.append_element(elm_text);
         self.append_element(elm);
 
         Ok(())
