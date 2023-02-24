@@ -1,5 +1,10 @@
 use crate::render::Render;
 
+pub struct Element {
+    inside: Vec<Element>,
+    kind: HtmlElement,
+}
+
 #[derive(Clone)]
 pub enum HtmlElement {
     Paragraph,
@@ -28,13 +33,25 @@ pub enum HtmlElement {
     // todo: Later impl this, after above
     CustomElm,
 }
+impl Render for String {
+    fn render<T: Render + Clone>(&mut self, _: &[T]) -> String {
+        self.to_string()
+    }
+}
 
 impl Render for HtmlElement {
+    // have to re impl this in element and rewrite inside too
     fn render<T: Render + Clone>(&mut self, content: &[T]) -> String {
-        let mut inside = String::new();
-        for (index, r) in content.iter().enumerate() {
-            inside.push_str(&r.clone().render(content.split_at(index + 1).1));
-        }
+        let first = content.first();
+        let inside = match first {
+            Some(r) => {
+                let mut other = content.to_vec();
+                other.remove(0);
+                r.clone().render(&other)
+            }
+            None => String::new(),
+        };
+
         let (start, end) = match self {
             Self::Paragraph => ("<p>".to_owned(), "</p>".to_owned()),
             Self::Text { text } => (text.clone(), "".to_owned()),
@@ -65,5 +82,35 @@ impl Render for HtmlElement {
             _ => ("".to_owned(), "".to_owned()),
         };
         format!("{start}{inside}{end}")
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use super::*;
+    macro_rules! snapshot {
+        ($content:tt) => {
+            let mut settings = insta::Settings::clone_current();
+            settings.set_snapshot_path("../testdata/output/");
+            settings.bind(|| {
+                insta::assert_snapshot!($content);
+            });
+        };
+    }
+
+    #[test]
+    fn test() {
+        let mut element = HtmlElement::Paragraph;
+        let inside_elements = vec![
+            HtmlElement::Text {
+                text: "this is a test".to_string(),
+            },
+            HtmlElement::Link {
+                text: "test".to_string(),
+                link: "example.com".to_string(),
+            },
+        ];
+        let rendered = element.render(&inside_elements);
+        snapshot!(rendered);
     }
 }

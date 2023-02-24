@@ -19,8 +19,6 @@ pub struct Renderer {
     output: String,
     path: PathBuf,
 
-    /// The element to the right is inside of the element to the left,
-    /// if there is no element to the left, it is the "root" element
     current_elements: Vec<element::HtmlElement>,
 }
 
@@ -41,3 +39,4 @@ impl Renderer {
         }
     }
 }
+
