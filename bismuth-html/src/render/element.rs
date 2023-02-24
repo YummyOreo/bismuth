@@ -1,8 +1,15 @@
 use crate::render::Render;
 
+#[derive(Clone)]
 pub struct Element {
     inside: Vec<Element>,
     kind: HtmlElement,
+}
+
+impl Render for Element {
+    fn render<T: Render + Clone>(&mut self, content: &[T]) -> String {
+        self.kind.render(&self.inside)
+    }
 }
 
 #[derive(Clone)]
@@ -112,5 +119,41 @@ mod test {
         ];
         let rendered = element.render(&inside_elements);
         snapshot!(rendered);
+    }
+
+    #[test]
+    fn test_2() {
+        let inside_inside = vec![Element {
+            inside: vec![],
+            kind: HtmlElement::Text {
+                text: "test".to_string(),
+            },
+        }];
+        let inside = vec![Element {
+            inside: inside_inside,
+            kind: HtmlElement::Bold,
+        }];
+        let inside_2 = vec![Element {
+            inside: vec![],
+            kind: HtmlElement::Text {
+                text: "Blockquote inside".to_string(),
+            },
+        }];
+        let elements = vec![
+            Element {
+                inside,
+                kind: HtmlElement::Paragraph,
+            },
+            Element {
+                inside: inside_2,
+                kind: HtmlElement::Blockquote,
+            },
+        ];
+        let mut full_str = String::new();
+        for mut element in elements {
+            full_str.push_str(&element.render::<Element>(&[]));
+            full_str.push_str("\n<br>\n");
+        }
+        snapshot!(full_str);
     }
 }
