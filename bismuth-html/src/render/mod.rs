@@ -8,7 +8,7 @@ use std::path::PathBuf;
 
 mod code;
 mod element;
-use crate::render::element::HtmlElement;
+use crate::render::element::{ElementKind, HtmlElement};
 
 pub trait Render {
     fn render<T: Render + Clone>(&mut self, content: &[T]) -> String;
@@ -43,7 +43,47 @@ impl Renderer {
         }
     }
 
-    pub fn element_to_htmlelm(&mut self, element: Element) {}
+    pub fn element_to_htmlelm(&mut self, element: Element) -> HtmlElement {
+        let mut inside = element
+            .elements
+            .iter()
+            .map(|e| self.element_to_htmlelm(e.clone()))
+            .collect::<Vec<HtmlElement>>();
+        match element.kind {
+            Kind::Paragraph => HtmlElement::new(ElementKind::Paragraph, inside),
+            Kind::Text => HtmlElement::new(
+                ElementKind::Text {
+                    text: element.text.unwrap_or_default(),
+                },
+                inside,
+            ),
+            Kind::Link => HtmlElement::new(
+                ElementKind::Link {
+                    text: element.text.clone().unwrap_or_default(),
+                    link: element.get_attr("link").cloned().unwrap_or_default(),
+                },
+                inside,
+            ),
+            Kind::Bold => HtmlElement::new(ElementKind::Bold, inside),
+            Kind::Header => HtmlElement::new(
+                ElementKind::Header {
+                    level: element
+                        .get_attr("level")
+                        .cloned()
+                        .unwrap_or_default()
+                        .parse::<i8>()
+                        .unwrap_or(1),
+                },
+                inside,
+            ),
+            _ => HtmlElement::new(
+                ElementKind::Text {
+                    text: "".to_string(),
+                },
+                inside,
+            ),
+        }
+    }
 
     pub fn render_htmlelm(&mut self, element: HtmlElement) {}
 }

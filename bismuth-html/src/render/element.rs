@@ -2,19 +2,28 @@ use crate::render::code::highlight;
 use crate::render::Render;
 
 #[derive(Clone)]
-pub struct Element {
-    inside: Vec<Element>,
-    kind: HtmlElement,
+pub struct HtmlElement {
+    inside: Vec<HtmlElement>,
+    kind: ElementKind,
 }
 
-impl Render for Element {
+impl HtmlElement {
+    pub fn new(kind: ElementKind, inside: Vec<HtmlElement>) -> Self {
+        Self {
+            kind,
+            inside,
+        }
+    }
+}
+
+impl Render for HtmlElement {
     fn render<T: Render + Clone>(&mut self, content: &[T]) -> String {
         self.kind.render(&self.inside)
     }
 }
 
 #[derive(Clone)]
-pub enum HtmlElement {
+pub enum ElementKind {
     Paragraph,
     Text { text: String },
     Bold,
@@ -41,13 +50,14 @@ pub enum HtmlElement {
     // todo: Later impl this, after above
     CustomElm,
 }
+
 impl Render for String {
     fn render<T: Render + Clone>(&mut self, _: &[T]) -> String {
         self.to_string()
     }
 }
 
-impl Render for HtmlElement {
+impl Render for ElementKind {
     // have to re impl this in element and rewrite inside too
     fn render<T: Render + Clone>(&mut self, content: &[T]) -> String {
         let first = content.first();
@@ -118,12 +128,12 @@ mod test {
 
     #[test]
     fn test() {
-        let mut element = HtmlElement::Paragraph;
+        let mut element = ElementKind::Paragraph;
         let inside_elements = vec![
-            HtmlElement::Text {
+            ElementKind::Text {
                 text: "this is a test".to_string(),
             },
-            HtmlElement::Link {
+            ElementKind::Link {
                 text: "test".to_string(),
                 link: "example.com".to_string(),
             },
@@ -134,35 +144,35 @@ mod test {
 
     #[test]
     fn test_2() {
-        let inside_inside = vec![Element {
+        let inside_inside = vec![HtmlElement {
             inside: vec![],
-            kind: HtmlElement::Text {
+            kind: ElementKind::Text {
                 text: "test".to_string(),
             },
         }];
-        let inside = vec![Element {
+        let inside = vec![HtmlElement {
             inside: inside_inside,
-            kind: HtmlElement::Bold,
+            kind: ElementKind::Bold,
         }];
-        let inside_2 = vec![Element {
+        let inside_2 = vec![HtmlElement {
             inside: vec![],
-            kind: HtmlElement::Text {
+            kind: ElementKind::Text {
                 text: "Blockquote inside".to_string(),
             },
         }];
         let elements = vec![
-            Element {
+            HtmlElement {
                 inside,
-                kind: HtmlElement::Paragraph,
+                kind: ElementKind::Paragraph,
             },
-            Element {
+            HtmlElement {
                 inside: inside_2,
-                kind: HtmlElement::Blockquote,
+                kind: ElementKind::Blockquote,
             },
         ];
         let mut full_str = String::new();
         for mut element in elements {
-            full_str.push_str(&element.render::<Element>(&[]));
+            full_str.push_str(&element.render::<HtmlElement>(&[]));
             full_str.push_str("\n<br>\n");
         }
         snapshot!(full_str);
@@ -170,34 +180,34 @@ mod test {
 
     #[test]
     fn test_3() {
-        let inside_inside = vec![Element {
+        let inside_inside = vec![HtmlElement {
             inside: vec![],
-            kind: HtmlElement::Text {
+            kind: ElementKind::Text {
                 text: "test".to_string(),
             },
         }];
-        let inside = vec![Element {
+        let inside = vec![HtmlElement {
             inside: vec![],
-            kind: HtmlElement::Text {
+            kind: ElementKind::Text {
                 text: "Blockquote inside".to_string(),
             },
         }];
         let elements = vec![
-            Element {
+            HtmlElement {
                 inside: vec![],
-                kind: HtmlElement::Blockcode {
+                kind: ElementKind::Blockcode {
                     code: "fn test() {\n\tprintln!(\"Test\")\n}".to_string(),
                     lang: "rust".to_string(),
                 },
             },
-            Element {
+            HtmlElement {
                 inside,
-                kind: HtmlElement::Blockquote,
+                kind: ElementKind::Blockquote,
             },
         ];
         let mut full_str = String::new();
         for mut element in elements {
-            full_str.push_str(&element.render::<Element>(&[]));
+            full_str.push_str(&element.render::<HtmlElement>(&[]));
             full_str.push_str("\n<br>\n");
         }
         snapshot!(full_str);
