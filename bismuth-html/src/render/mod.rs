@@ -8,6 +8,7 @@ use std::path::PathBuf;
 
 mod code;
 mod element;
+use crate::render::element::HtmlElement;
 
 pub trait Render {
     fn render<T: Render + Clone>(&mut self, content: &[T]) -> String;
@@ -16,11 +17,12 @@ pub trait Render {
 #[derive(Clone)]
 pub struct Renderer {
     pub parser: Parser,
+    pos: usize,
 
     output: String,
     path: PathBuf,
 
-    current_elements: Vec<element::HtmlElement>,
+    current_line: Vec<HtmlElement>,
 }
 
 impl Renderer {
@@ -34,11 +36,16 @@ impl Renderer {
         );
         Self {
             parser,
+            pos: 0,
             output: String::new(),
             path,
-            current_elements: vec![],
+            current_line: vec![],
         }
     }
+
+    pub fn element_to_htmlelm(&mut self, element: Element) {}
+
+    pub fn render_htmlelm(&mut self, element: HtmlElement) {}
 }
 
 impl Render for Renderer {
@@ -48,6 +55,13 @@ impl Render for Renderer {
         // 1.1. Collapse 2 EOL to a <br>
         // 2. Render the line and append it to a string
         // 3. Return the string
+
+        while self.pos < self.parser.ast.elements.len() {
+            let current = self.parser.ast.elements.get(self.pos);
+
+            self.pos += 1;
+        }
+
         todo!();
     }
 }
