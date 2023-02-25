@@ -1,3 +1,4 @@
+use crate::render::code::highlight;
 use crate::render::Render;
 
 #[derive(Clone)]
@@ -83,8 +84,16 @@ impl Render for HtmlElement {
                 "</li>".to_string(),
             ),
 
-            // TODO: InlineCode + BLockcode + InlineLaTeX + BlockLaTeX
-            // Self::InlineCode { text }
+            // TODO: --InlineCode + BLockcode-- + InlineLaTeX + BlockLaTeX
+            Self::InlineCode { code } => (
+                format!("<div class=\"inline-code\">{}", code),
+                "</div>".to_string(),
+            ),
+            Self::Blockcode { code, lang } => (
+                // TODO: remove unwrap
+                highlight(lang.to_string(), code.to_string()).unwrap(),
+                "".to_string(),
+            ),
 
             Self::HorizontalRule => ("<hr>".to_string(), "".to_string()),
             Self::LineBreak => ("<br>".to_string(), "".to_string()),
@@ -148,6 +157,38 @@ mod test {
             },
             Element {
                 inside: inside_2,
+                kind: HtmlElement::Blockquote,
+            },
+        ];
+        let mut full_str = String::new();
+        for mut element in elements {
+            full_str.push_str(&element.render::<Element>(&[]));
+            full_str.push_str("\n<br>\n");
+        }
+        snapshot!(full_str);
+    }
+
+    #[test]
+    fn test_3() {
+        let inside_inside = vec![Element {
+            inside: vec![],
+            kind: HtmlElement::Text {
+                text: "test".to_string(),
+            },
+        }];
+        let inside = vec![Element {
+            inside: vec![],
+            kind: HtmlElement::Text {
+                text: "Blockquote inside".to_string(),
+            },
+        }];
+        let elements = vec![
+            Element {
+                inside: vec![],
+                kind: HtmlElement::Blockcode { code: "fn test() {\n\tprintln!(\"Test\")\n}".to_string(), lang: "Rust".to_string() },
+            },
+            Element {
+                inside,
                 kind: HtmlElement::Blockquote,
             },
         ];
