@@ -1,0 +1,7 @@
+---
+source: bismuth-html/src/render/code.rs
+expression: html
+---
+<pre style="background-color:#ffffff;">
+<span style="font-weight:bold;color:#a71d5d;">let</span><span style="color:#323232;"> test </span><span style="font-weight:bold;color:#a71d5d;">= </span><span style="color:#0086b3;">10</span></pre>
+

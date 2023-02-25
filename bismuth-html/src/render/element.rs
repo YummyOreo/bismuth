@@ -98,7 +98,7 @@ mod test {
     macro_rules! snapshot {
         ($content:tt) => {
             let mut settings = insta::Settings::clone_current();
-            settings.set_snapshot_path("../testdata/output/");
+            settings.set_snapshot_path("../../testdata/output/render/");
             settings.bind(|| {
                 insta::assert_snapshot!($content);
             });

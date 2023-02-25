@@ -7,6 +7,7 @@ use bismuth_parser::{
 use std::path::PathBuf;
 
 mod element;
+mod code;
 
 pub trait Render {
     fn render<T: Render + Clone>(&mut self, content: &[T]) -> String;

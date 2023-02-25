@@ -1,0 +1,9 @@
+---
+source: bismuth-html/src/render/code.rs
+expression: html
+---
+<pre style="background-color:#ffffff;">
+<span style="font-weight:bold;color:#a71d5d;">fn </span><span style="font-weight:bold;color:#795da3;">test</span><span style="color:#323232;">() {
+</span><span style="color:#323232;">	</span><span style="font-weight:bold;color:#a71d5d;">let</span><span style="color:#323232;"> a </span><span style="font-weight:bold;color:#a71d5d;">= </span><span style="color:#0086b3;">10</span><span style="color:#323232;">;
+</span><span style="color:#323232;">}</span></pre>
+
