@@ -6,8 +6,8 @@ use bismuth_parser::{
 };
 use std::path::PathBuf;
 
-mod element;
 mod code;
+mod element;
 
 pub trait Render {
     fn render<T: Render + Clone>(&mut self, content: &[T]) -> String;
@@ -41,3 +41,13 @@ impl Renderer {
     }
 }
 
+impl Render for Renderer {
+    fn render<T: Render + Clone>(&mut self, _: &[T]) -> String {
+        // Steps
+        // 1. Construct a from each entry in self.parser.ast.elements
+        // 1.1. Collapse 2 EOL to a <br>
+        // 2. Render the line and append it to a string
+        // 3. Return the string
+        todo!();
+    }
+}
