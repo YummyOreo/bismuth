@@ -29,10 +29,12 @@ pub enum HighlightError {
 
 pub fn highlight(lang: String, code: String) -> Result<String, HighlightError> {
     let (ps, ts) = init();
-    let syntax = ps.find_syntax_by_extension(&lang).unwrap_or(
-        ps.find_syntax_by_name(&lang)
+    let syntax = match ps.find_syntax_by_extension(&lang) {
+        Some(syntax) => syntax,
+        None => ps
+            .find_syntax_by_name(&lang)
             .ok_or(HighlightError::FindLangError { lang })?,
-    );
+    };
 
     highlighted_html_for_string(&code, &ps, syntax, &ts.themes["InspiredGitHub"])
         .map_err(HighlightError::Internal)
