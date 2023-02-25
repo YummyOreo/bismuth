@@ -185,7 +185,7 @@ mod test {
         let elements = vec![
             Element {
                 inside: vec![],
-                kind: HtmlElement::Blockcode { code: "fn test() {\n\tprintln!(\"Test\")\n}".to_string(), lang: "Rust".to_string() },
+                kind: HtmlElement::Blockcode { code: "fn test() {\n\tprintln!(\"Test\")\n}".to_string(), lang: "rust".to_string() },
             },
             Element {
                 inside,

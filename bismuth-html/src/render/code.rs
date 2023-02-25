@@ -21,20 +21,13 @@ fn init() -> (SyntaxSet, ThemeSet) {
 
 #[derive(Debug, Error)]
 pub enum HighlightError {
-    #[error("Could not find lang: `{lang}`")]
-    FindLangError { lang: String },
     #[error("Internal error {0}")]
     Internal(#[from] Error),
 }
 
 pub fn highlight(lang: String, code: String) -> Result<String, HighlightError> {
     let (ps, ts) = init();
-    let syntax = match ps.find_syntax_by_extension(&lang) {
-        Some(syntax) => syntax,
-        None => ps
-            .find_syntax_by_name(&lang)
-            .ok_or(HighlightError::FindLangError { lang })?,
-    };
+    let syntax = ps.find_syntax_by_token(&lang).unwrap_or_else(|| ps.find_syntax_plain_text());
 
     highlighted_html_for_string(&code, &ps, syntax, &ts.themes["InspiredGitHub"])
         .map_err(HighlightError::Internal)
