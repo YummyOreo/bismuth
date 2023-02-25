@@ -26,8 +26,8 @@ pub enum HtmlElement {
     ListItem { level: i32 },
     NumList { level: i32, num: String },
 
-    InlineCode { text: String },
-    Blockcode { text: String, lang: String },
+    InlineCode { code: String },
+    Blockcode { code: String, lang: String },
 
     InlineLaTeX { tex: String },
     BlockLaTeX { tex: String },
@@ -84,6 +84,8 @@ impl Render for HtmlElement {
             ),
 
             // TODO: InlineCode + BLockcode + InlineLaTeX + BlockLaTeX
+            // Self::InlineCode { text }
+
             Self::HorizontalRule => ("<hr>".to_string(), "".to_string()),
             Self::LineBreak => ("<br>".to_string(), "".to_string()),
             _ => ("".to_owned(), "".to_owned()),

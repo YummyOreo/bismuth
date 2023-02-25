@@ -2,7 +2,9 @@ use syntect::easy::HighlightLines;
 use syntect::highlighting::{Color, ThemeSet};
 use syntect::html::highlighted_html_for_string;
 use syntect::parsing::SyntaxSet;
+
 use syntect::Error;
+use thiserror::Error;
 
 fn init() -> (SyntaxSet, ThemeSet) {
     let ps = SyntaxSet::load_defaults_newlines();
@@ -11,11 +13,29 @@ fn init() -> (SyntaxSet, ThemeSet) {
     (ps, ts)
 }
 
-pub fn highlight(lang: String, code: String) -> Result<String, Error> {
+// #[derive(Error, Debug)]
+// #[error("Could not find lang: `{lang}`")]
+// pub struct FindLangError {
+//     lang: String,
+// }
+
+#[derive(Debug, Error)]
+pub enum HighlightError {
+    #[error("Could not find lang: `{lang}`")]
+    FindLangError { lang: String },
+    #[error("Internal error {0}")]
+    Internal(#[from] Error),
+}
+
+pub fn highlight(lang: String, code: String) -> Result<String, HighlightError> {
     let (ps, ts) = init();
-    let syntax = ps.find_syntax_by_extension(&lang).unwrap();
+    let syntax = ps.find_syntax_by_extension(&lang).unwrap_or(
+        ps.find_syntax_by_name(&lang)
+            .ok_or(HighlightError::FindLangError { lang })?,
+    );
 
     highlighted_html_for_string(&code, &ps, syntax, &ts.themes["InspiredGitHub"])
+        .map_err(HighlightError::Internal)
 }
 
 #[cfg(test)]

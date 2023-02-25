@@ -77,10 +77,12 @@ dependencies = [
 name = "bismuth-html"
 version = "0.1.0"
 dependencies = [
+ "anyhow",
  "bismuth-parser",
  "insta",
  "regex",
  "syntect",
+ "thiserror",
 ]
 
 [[package]]
