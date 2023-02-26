@@ -11,6 +11,9 @@
     - The html file template is basted no the File struct `type` field (or in Metadat)
 - Make Rss based on the markdown files
 
+## Rendering:
+- Code highlighting will be based on current theme
+
 ## implementation details:
 For internal/default templates, use:
 `include_str!`

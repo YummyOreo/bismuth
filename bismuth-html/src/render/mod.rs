@@ -11,7 +11,7 @@ mod element;
 use crate::render::element::{ElementKind, HtmlElement};
 
 pub trait Render {
-    fn render<T: Render + Clone>(&mut self, content: &[T]) -> String;
+    fn render(&mut self) -> String;
 }
 
 #[derive(Clone)]
@@ -42,54 +42,13 @@ impl Renderer {
             current_line: vec![],
         }
     }
-
-    pub fn element_to_htmlelm(&mut self, element: Element) -> HtmlElement {
-        let mut inside = element
-            .elements
-            .iter()
-            .map(|e| self.element_to_htmlelm(e.clone()))
-            .collect::<Vec<HtmlElement>>();
-        match element.kind {
-            Kind::Paragraph => HtmlElement::new(ElementKind::Paragraph, inside),
-            Kind::Text => HtmlElement::new(
-                ElementKind::Text {
-                    text: element.text.unwrap_or_default(),
-                },
-                inside,
-            ),
-            Kind::Link => HtmlElement::new(
-                ElementKind::Link {
-                    text: element.text.clone().unwrap_or_default(),
-                    link: element.get_attr("link").cloned().unwrap_or_default(),
-                },
-                inside,
-            ),
-            Kind::Bold => HtmlElement::new(ElementKind::Bold, inside),
-            Kind::Header => HtmlElement::new(
-                ElementKind::Header {
-                    level: element
-                        .get_attr("level")
-                        .cloned()
-                        .unwrap_or_default()
-                        .parse::<i8>()
-                        .unwrap_or(1),
-                },
-                inside,
-            ),
-            _ => HtmlElement::new(
-                ElementKind::Text {
-                    text: "".to_string(),
-                },
-                inside,
-            ),
-        }
-    }
-
-    pub fn render_htmlelm(&mut self, element: HtmlElement) {}
 }
 
 impl Render for Renderer {
-    fn render<T: Render + Clone>(&mut self, _: &[T]) -> String {
+    fn render(&mut self) -> String {
+        // TODO: change this to not use HtmlElement, just use parser element, no need to use the
+        // other ones
+
         // Steps
         // 1. Construct a from each entry in self.parser.ast.elements
         // 1.1. Collapse 2 EOL to a <br>
@@ -103,5 +62,20 @@ impl Render for Renderer {
         }
 
         todo!();
+    }
+}
+
+impl Render for Element {
+    fn render(&mut self) -> String {
+        let inside = self
+            .elements
+            .iter()
+            .map(|e| e.clone().render())
+            .collect::<String>();
+
+        let (start, end) = match self.kind {
+            _ => ("".to_string(), "".to_string()),
+        };
+        format!("{start}{inside}{end}")
     }
 }
