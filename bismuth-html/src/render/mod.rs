@@ -7,25 +7,25 @@ use bismuth_parser::{
 use std::path::PathBuf;
 
 mod code;
-mod element;
-use crate::render::element::{ElementKind, HtmlElement};
+use crate::render::code::highlight;
 
 pub trait Render {
     fn render(&mut self) -> String;
 }
 
 #[derive(Clone)]
-pub struct Renderer {
+pub struct Renderer<'a> {
     pub parser: Parser,
     pos: usize,
 
     output: String,
     path: PathBuf,
 
-    current_line: Vec<HtmlElement>,
+    // the start of the current line line (ie. the kind might be: Paragraph)
+    head: Option<&'a Element>,
 }
 
-impl Renderer {
+impl Renderer<'_> {
     pub fn new(parser: Parser) -> Self {
         let path = PathBuf::from(
             parser
@@ -39,12 +39,12 @@ impl Renderer {
             pos: 0,
             output: String::new(),
             path,
-            current_line: vec![],
+            head: None,
         }
     }
 }
 
-impl Render for Renderer {
+impl Render for Renderer<'_> {
     fn render(&mut self) -> String {
         // TODO: change this to not use HtmlElement, just use parser element, no need to use the
         // other ones
@@ -76,7 +76,7 @@ fn parse_url(url: &str) -> (String, bool) {
 
 impl Render for Element {
     fn render(&mut self) -> String {
-        let inside = self
+        let mut inside = self
             .elements
             .iter()
             .map(|e| e.clone().render())
@@ -87,7 +87,7 @@ impl Render for Element {
             Kind::Bold => (String::from("<b>"), String::from("</b>")),
             Kind::Italic => (String::from("<i>"), String::from("</i>")),
             Kind::Blockquote => (String::from("<blockquote>"), String::from("</blockquote>")),
-            Kind::Text => (self.text.clone().unwrap_or_default(), String::default()),
+            Kind::Text => (self.text.clone().unwrap_or_default(), Default::default()),
 
             Kind::Link => {
                 let (url, blank) = parse_url(&self.get_attr("link").cloned().unwrap_or_default());
@@ -95,12 +95,12 @@ impl Render for Element {
                     if blank {
                         String::from(r#"target="blank""#)
                     } else {
-                        String::default()
+                        Default::default()
                     }
                 };
                 (
                     format!(r#"<a target="{}" {}>"#, url, blank),
-                    String::default(),
+                    Default::default(),
                 )
             }
             Kind::FilePrev => (
@@ -109,7 +109,7 @@ impl Render for Element {
                     self.get_attr("link").cloned().unwrap_or_default(),
                     self.text.clone().unwrap_or_default()
                 ),
-                String::default(),
+                Default::default(),
             ),
 
             Kind::ListItem => (
@@ -125,9 +125,66 @@ impl Render for Element {
                 ),
                 String::from("</li>"),
             ),
+            Kind::ListItem => (
+                format!(
+                    r#"<li class="num-list">{}{}."#,
+                    String::from("\t").repeat(
+                        self.get_attr("level")
+                            .cloned()
+                            .unwrap_or(String::from("1"))
+                            .parse()
+                            .unwrap()
+                    ),
+                    self.get_attr("num").cloned().unwrap_or(String::from("0"))
+                ),
+                String::from("</li>"),
+            ),
 
+            Kind::InlineCode => (
+                highlight(
+                    String::from("plaintext"),
+                    self.text.clone().unwrap_or_default(),
+                )
+                .unwrap(),
+                Default::default(),
+            ),
+            Kind::BlockCode => (
+                highlight(
+                    self.get_attr("lang")
+                        .cloned()
+                        .unwrap_or(String::from("plaintext")),
+                    self.text.clone().unwrap_or_default(),
+                )
+                .unwrap(),
+                Default::default(),
+            ),
+
+            Kind::HorizontalRule => (String::from("<hr>"), Default::default()),
+            Kind::EndOfLine => {
+                if inside.starts_with("<hr>") {
+                    inside.replacen("<hr>", "", 1);
+                }
+
+                (String::from("<hr>"), Default::default())
+            }
+
+            // TOOD: LATEX
             _ => Default::default(),
         };
         format!("{start}{inside}{end}")
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use super::*;
+    macro_rules! snapshot {
+        ($content:tt) => {
+            let mut settings = insta::Settings::clone_current();
+            settings.set_snapshot_path("../../testdata/output/render/");
+            settings.bind(|| {
+                insta::assert_snapshot!($content);
+            });
+        };
     }
 }
