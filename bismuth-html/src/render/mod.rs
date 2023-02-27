@@ -65,6 +65,15 @@ impl Render for Renderer {
     }
 }
 
+/// Will return (Url, Should be _blank)
+fn parse_url(url: &str) -> (String, bool) {
+    // TODO: Make it so these V (inside the website) will be moved to /assets/
+    if url.starts_with('/') || url.starts_with('\\') || url.starts_with('.') {
+        return (url.to_string(), false);
+    }
+    (url.to_string(), true)
+}
+
 impl Render for Element {
     fn render(&mut self) -> String {
         let inside = self
@@ -74,7 +83,50 @@ impl Render for Element {
             .collect::<String>();
 
         let (start, end) = match self.kind {
-            _ => ("".to_string(), "".to_string()),
+            Kind::Paragraph => (String::from("<p>"), String::from("</p>")),
+            Kind::Bold => (String::from("<b>"), String::from("</b>")),
+            Kind::Italic => (String::from("<i>"), String::from("</i>")),
+            Kind::Blockquote => (String::from("<blockquote>"), String::from("</blockquote>")),
+            Kind::Text => (self.text.clone().unwrap_or_default(), String::default()),
+
+            Kind::Link => {
+                let (url, blank) = parse_url(&self.get_attr("link").cloned().unwrap_or_default());
+                let blank = {
+                    if blank {
+                        String::from(r#"target="blank""#)
+                    } else {
+                        String::default()
+                    }
+                };
+                (
+                    format!(r#"<a target="{}" {}>"#, url, blank),
+                    String::default(),
+                )
+            }
+            Kind::FilePrev => (
+                format!(
+                    r#"<img src="{}" alt="{}">"#,
+                    self.get_attr("link").cloned().unwrap_or_default(),
+                    self.text.clone().unwrap_or_default()
+                ),
+                String::default(),
+            ),
+
+            Kind::ListItem => (
+                format!(
+                    r#"<li class="item">{}"#,
+                    String::from("\t").repeat(
+                        self.get_attr("level")
+                            .cloned()
+                            .unwrap_or(String::from("1"))
+                            .parse()
+                            .unwrap()
+                    )
+                ),
+                String::from("</li>"),
+            ),
+
+            _ => Default::default(),
         };
         format!("{start}{inside}{end}")
     }
