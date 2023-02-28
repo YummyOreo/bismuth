@@ -1,5 +1,0 @@
----
-source: bismuth-html/src/render/element.rs
-expression: rendered
----
-<p>this is a test<a href="example.com" target="_blank">test</a></p>

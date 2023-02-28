@@ -14,18 +14,15 @@ pub trait Render {
 }
 
 #[derive(Clone)]
-pub struct Renderer<'a> {
+pub struct Renderer {
     pub parser: Parser,
     pos: usize,
 
     output: String,
     path: PathBuf,
-
-    // the start of the current line line (ie. the kind might be: Paragraph)
-    head: Option<&'a Element>,
 }
 
-impl Renderer<'_> {
+impl Renderer {
     pub fn new(parser: Parser) -> Self {
         let path = PathBuf::from(
             parser
@@ -39,29 +36,23 @@ impl Renderer<'_> {
             pos: 0,
             output: String::new(),
             path,
-            head: None,
         }
     }
 }
 
-impl Render for Renderer<'_> {
+impl Render for Renderer {
     fn render(&mut self) -> String {
-        // TODO: change this to not use HtmlElement, just use parser element, no need to use the
-        // other ones
-
-        // Steps
-        // 1. Construct a from each entry in self.parser.ast.elements
-        // 1.1. Collapse 2 EOL to a <br>
-        // 2. Render the line and append it to a string
-        // 3. Return the string
-
         while self.pos < self.parser.ast.elements.len() {
             let current = self.parser.ast.elements.get(self.pos);
+            let mut s = String::new();
+            if let Some(e) = current {
+                s = e.clone().render();
+                self.output.push_str(&format!("{s}\n"));
+            }
 
             self.pos += 1;
         }
-
-        todo!();
+        self.output.clone()
     }
 }
 
@@ -160,13 +151,7 @@ impl Render for Element {
             ),
 
             Kind::HorizontalRule => (String::from("<hr>"), Default::default()),
-            Kind::EndOfLine => {
-                if inside.starts_with("<hr>") {
-                    inside.replacen("<hr>", "", 1);
-                }
-
-                (String::from("<hr>"), Default::default())
-            }
+            Kind::EndOfLine => (String::from("<br>"), Default::default()),
 
             // TOOD: LATEX
             _ => Default::default(),
@@ -178,13 +163,33 @@ impl Render for Element {
 #[cfg(test)]
 mod test {
     use super::*;
+    fn snapshot(content: &str) -> String {
+        let mut parser = Parser::new_test("/test/", content);
+        parser.parse();
+        // println!(r#""{content}""#);
+        // println!("{parser:#?}");
+        let mut render = Renderer::new(parser);
+        render.render()
+        // panic!("");
+    }
+
     macro_rules! snapshot {
-        ($content:tt) => {
-            let mut settings = insta::Settings::clone_current();
-            settings.set_snapshot_path("../../testdata/output/render/");
-            settings.bind(|| {
-                insta::assert_snapshot!($content);
-            });
+        ($name:tt, $content:tt) => {
+            #[test]
+            fn $name() {
+                let mut settings = insta::Settings::clone_current();
+                settings.set_snapshot_path("../../testdata/output/render/");
+                settings.bind(|| {
+                    insta::assert_snapshot!(snapshot($content));
+                });
+            }
         };
     }
+
+    snapshot!(
+        test,
+        "test *test* \n```rust\nfn test() {\n\tprintln!(\"test\")\n}\n```"
+    );
+
+    snapshot!(test_br, "test test \n\n\ntest test\ntest\n");
 }

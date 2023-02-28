@@ -1,0 +1,14 @@
+---
+source: bismuth-html/src/render/mod.rs
+expression: "snapshot(\"test test \\n\\n\\ntest test\\ntest\\n\")"
+---
+<p>test test </p>
+<br>
+<br>
+<br>
+<p>test test</p>
+<br>
+<p>test</p>
+<br>
+<br>
+

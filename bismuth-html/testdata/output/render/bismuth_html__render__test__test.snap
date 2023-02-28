@@ -1,0 +1,15 @@
+---
+source: bismuth-html/src/render/mod.rs
+expression: "snapshot(\"test *test* \\n```rust\\nfn test() {\\n\\tprintln!(\\\"test\\\")\\n}\\n```\")"
+---
+<p>test <i>test</i> </p>
+<br>
+<pre style="background-color:#ffffff;">
+<span style="color:#323232;">
+</span><span style="font-weight:bold;color:#a71d5d;">fn </span><span style="font-weight:bold;color:#795da3;">test</span><span style="color:#323232;">() {
+</span><span style="color:#323232;">	println!(</span><span style="color:#183691;">&quot;test&quot;</span><span style="color:#323232;">)
+</span><span style="color:#323232;">}
+</span></pre>
+
+<br>
+

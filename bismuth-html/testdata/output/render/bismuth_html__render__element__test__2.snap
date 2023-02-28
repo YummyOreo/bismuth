@@ -1,9 +1,0 @@
----
-source: bismuth-html/src/render/element.rs
-expression: full_str
----
-<p><b>test</b></p>
-<br>
-<blockquote>Blockquote inside</blockquote>
-<br>
-
