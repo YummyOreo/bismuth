@@ -36,9 +36,9 @@ _This is italic text_
 Unordered
 
 - Sub-lists are made by indenting 2 spaces:
-    - Marker character change forces new list start:
-        - Facilisis in pretium nisl aliquet
-        - Nulla volutpat aliquam velit
+  - Marker character change forces new list start:
+    - Facilisis in pretium nisl aliquet
+    - Nulla volutpat aliquam velit
 - Very easy!
 
 Ordered
@@ -69,7 +69,7 @@ Sample text here...
 
 Syntax highlighting
 
-``` js
+```js
 var foo = function (bar) {
   return bar++;
 };
@@ -79,18 +79,19 @@ console.log(foo(5));
 
 ## Links
 
-[link text](example.com)
+[link text](/test)
 
 [link with title](example.com)
 
 ## Images
 
-![Minion](example.com)
+![Minion](/test.png)
 ![Stormtroopocat](example.com)
 
 Like links, Images also have a footnote style syntax
 
 ## Custom stuff:
+> TODO:
 %{{
     templates here
     or lists

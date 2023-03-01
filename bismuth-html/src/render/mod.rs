@@ -78,6 +78,13 @@ impl Render for Element {
             Kind::Bold => (String::from("<b>"), String::from("</b>")),
             Kind::Italic => (String::from("<i>"), String::from("</i>")),
             Kind::Blockquote => (String::from("<blockquote>"), String::from("</blockquote>")),
+            Kind::Header => {
+                let mut num = self.get_attr("level").cloned().unwrap_or(String::from("6"));
+                if num.parse::<i8>().unwrap_or_default() > 6_i8 {
+                    num = String::from("6");
+                }
+                (format!("<h{num}>"), format!("</h{num}>"))
+            }
             Kind::Text => (self.text.clone().unwrap_or_default(), Default::default()),
 
             Kind::Link => {
@@ -110,21 +117,23 @@ impl Render for Element {
                         self.get_attr("level")
                             .cloned()
                             .unwrap_or(String::from("1"))
-                            .parse()
+                            .parse::<usize>()
                             .unwrap()
+                            + 1_usize
                     )
                 ),
                 String::from("</li>"),
             ),
-            Kind::ListItem => (
+            Kind::OrderedListElement => (
                 format!(
                     r#"<li class="num-list">{}{}."#,
                     String::from("\t").repeat(
                         self.get_attr("level")
                             .cloned()
                             .unwrap_or(String::from("1"))
-                            .parse()
+                            .parse::<usize>()
                             .unwrap()
+                            + 1_usize
                     ),
                     self.get_attr("num").cloned().unwrap_or(String::from("0"))
                 ),
@@ -132,12 +141,11 @@ impl Render for Element {
             ),
 
             Kind::InlineCode => (
-                highlight(
-                    String::from("plaintext"),
-                    self.text.clone().unwrap_or_default(),
-                )
-                .unwrap(),
-                Default::default(),
+                format!(
+                    r#"<div class="inline-code">{}"#,
+                    self.text.clone().unwrap_or_default()
+                ),
+                String::from("</div>"),
             ),
             Kind::BlockCode => (
                 highlight(
@@ -163,14 +171,12 @@ impl Render for Element {
 #[cfg(test)]
 mod test {
     use super::*;
+    use std::fs;
     fn snapshot(content: &str) -> String {
         let mut parser = Parser::new_test("/test/", content);
         parser.parse();
-        // println!(r#""{content}""#);
-        // println!("{parser:#?}");
         let mut render = Renderer::new(parser);
         render.render()
-        // panic!("");
     }
 
     macro_rules! snapshot {
@@ -186,10 +192,33 @@ mod test {
         };
     }
 
+    macro_rules! snapshot_path {
+        ($name:tt, $path:tt) => {
+            #[test]
+            fn $name() {
+                let path = PathBuf::from($path);
+                println!("{path:?}");
+                let content = fs::read_to_string(&path).unwrap();
+                let mut settings = insta::Settings::clone_current();
+                settings.set_snapshot_path("../../testdata/output/render/");
+                settings.bind(|| {
+                    insta::assert_snapshot!(snapshot(&content));
+                });
+            }
+        };
+    }
+
     snapshot!(
         test,
         "test *test* \n```rust\nfn test() {\n\tprintln!(\"test\")\n}\n```"
     );
 
+    snapshot!(
+        test_2,
+        "# hearder\n- 1\n    - 2\n1. list item\nthis is a *__good test__*!! \n `inline?`\n---\n> blockquote"
+    );
+
     snapshot!(test_br, "test test \n\n\ntest test\ntest\n");
+
+    snapshot_path!(test_path, "./testdata/test/render/test.md");
 }

@@ -375,6 +375,7 @@ impl Parser {
     }
 
     fn handle_backtick(&mut self) -> ParseReturn {
+        // se handle text container
         let len = self.current_token_len()?;
         if len == 1 {
             return self.handle_container_text(TokenType::Backtick);
@@ -415,6 +416,7 @@ impl Parser {
     }
 
     fn handle_container_text(&mut self, kind: TokenType) -> ParseReturn {
+        // Same as Exclamation but 3 should accepct new lines
         let len = self.current_token_len()?;
         let elm_kind = match (kind, len) {
             (TokenType::DollarSign, 1) => Kind::InlineLaTeX,
@@ -449,6 +451,7 @@ impl Parser {
     }
 
     fn handle_container(&mut self, kind: TokenType) -> ParseReturn {
+        // Same as Exclamation
         let elm_kind = match (kind, self.current_token_len()?) {
             (TokenType::Asterisk, 1) | (TokenType::Underscore, 1) => Kind::Italic,
             (TokenType::Asterisk, 2) | (TokenType::Underscore, 2) => Kind::Bold,
@@ -506,6 +509,7 @@ impl Parser {
 
     // Somewhat same as *
     fn handle_bracket(&mut self) -> ParseReturn {
+        // Same as Exclamation
         match self.get_url() {
             Ok((text, url)) => {
                 let mut elm = Element::new(Kind::Link);
@@ -525,6 +529,7 @@ impl Parser {
 
     // just bracket with diff type and checks
     fn handle_exclamation(&mut self) -> ParseReturn {
+        // TODO: problem: will accepct [ on new lines
         self.advance_token()?;
         match self.get_url() {
             Ok((text, url)) => {

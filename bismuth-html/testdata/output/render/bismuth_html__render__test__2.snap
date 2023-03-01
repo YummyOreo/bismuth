@@ -1,0 +1,21 @@
+---
+source: bismuth-html/src/render/mod.rs
+expression: "snapshot(\"# hearder\\n- 1\\n    - 2\\n1. list item\\nthis is a *__good test__*!! \\n `inline?`\\n---\\n> blockquote\")"
+---
+<h1> hearder</h1>
+<br>
+<li class="item">	 1</li>
+<br>
+<li class="item">		 2</li>
+<br>
+<li class="num-list">	1. list item</li>
+<br>
+<p>this is a <i><b>good test</b></i>!! </p>
+<br>
+<p> <div class="inline-code">inline?</div></p>
+<br>
+<hr>
+<br>
+<blockquote> blockquote</blockquote>
+<br>
+
