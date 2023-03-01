@@ -198,6 +198,29 @@ impl Parser {
     }
 
     /// This is relitive
+    /// Ends with error if \n occurs before the kind
+    fn peek_till_kind_eol(&self, kind: &TokenType) -> Result<Vec<Token>, ParseError> {
+        let tokens_after = self.lexer.tokens.split_at(self.index).1;
+        let mut eol = false;
+        let end = tokens_after
+            .iter()
+            .position(|t| {
+                if t.kind == TokenType::EndOfLine {
+                    eol = true;
+                    true
+                } else {
+                    &t.kind == kind
+                }
+            })
+            .ok_or(ParseError::Peek(0))?;
+        if eol {
+            return Err(ParseError::Peek(0));
+        }
+
+        Ok(tokens_after.split_at(end).0.to_vec())
+    }
+
+    /// This is relitive
     fn peek_till_pattern(&self, kinds: &[TokenType]) -> Result<usize, ParseError> {
         let tokens_after = self.lexer.tokens.split_at(self.index).1;
 
@@ -530,6 +553,20 @@ impl Parser {
     // just bracket with diff type and checks
     fn handle_exclamation(&mut self) -> ParseReturn {
         // TODO: problem: will accepct [ on new lines
+        let peek = self.peek(1);
+        match peek {
+            Ok(t) => {
+                if t.kind != TokenType::BracketLeft {
+                    self.append_element(self.make_text()?);
+                    return Ok(());
+                }
+            }
+            Err(_) => {
+                self.append_element(self.make_text()?);
+                return Ok(());
+            }
+        }
+
         self.advance_token()?;
         match self.get_url() {
             Ok((text, url)) => {
@@ -550,8 +587,8 @@ impl Parser {
 
     fn get_url(&mut self) -> Result<(String, String), ParseError> {
         self.advance_token()?;
-        // this assumes that you are on [
-        let text = self.peek_till_kind(&TokenType::BracketRight)?;
+
+        let text = self.peek_till_kind_eol(&TokenType::BracketRight)?;
         let text_s = text
             .iter()
             .map(|t| t.text.iter().collect::<String>())
@@ -855,6 +892,8 @@ mod test {
         let lexer = init_lexer(content);
         let mut parser = Parser::new(lexer);
         parser.parse().unwrap();
+        // println!("{content}");
+        // panic!("");
         format!("{parser:#?}")
     }
 
@@ -875,6 +914,8 @@ mod test {
         let lexer = init_lexer_path(path);
         let mut parser = Parser::new(lexer);
         parser.parse().unwrap();
+        // println!("{path}");
+        // panic!("");
         format!("{parser:#?}")
     }
 
