@@ -158,11 +158,24 @@ impl Parser {
         self.advance_n_token(1)
     }
 
+    fn back_token(&mut self) -> Result<&Token, ParseError> {
+        self.back_n_token(1)
+    }
+
     fn advance_n_token(&mut self, n: usize) -> Result<&Token, ParseError> {
         if self.index + n >= self.lexer.tokens.len() {
             return Err(ParseError::Move(self.index + n));
         }
         self.index += n;
+
+        self.current_token()
+    }
+
+    fn back_n_token(&mut self, n: usize) -> Result<&Token, ParseError> {
+        if self.index.checked_sub(n).is_none() {
+            return Err(ParseError::Move(self.index + n));
+        }
+        self.index = self.index.checked_sub(n).expect("Should work");
 
         self.current_token()
     }
@@ -201,19 +214,22 @@ impl Parser {
     /// Ends with error if \n occurs before the kind
     fn peek_till_kind_eol(&self, kind: &TokenType) -> Result<Vec<Token>, ParseError> {
         let tokens_after = self.lexer.tokens.split_at(self.index).1;
+        println!("{tokens_after:?}");
         let mut eol = false;
         let end = tokens_after
             .iter()
             .position(|t| {
+                println!("{:?} | {:?}", kind, t.kind);
                 if t.kind == TokenType::EndOfLine {
+                    println!("eol");
                     eol = true;
-                    true
-                } else {
-                    &t.kind == kind
+                    return true;
                 }
+                &t.kind == kind
             })
             .ok_or(ParseError::Peek(0))?;
         if eol {
+            println!("eol");
             return Err(ParseError::Peek(0));
         }
 
@@ -439,7 +455,6 @@ impl Parser {
     }
 
     fn handle_container_text(&mut self, kind: TokenType) -> ParseReturn {
-        // Same as Exclamation but 3 should accepct new lines
         let len = self.current_token_len()?;
         let elm_kind = match (kind, len) {
             (TokenType::DollarSign, 1) => Kind::InlineLaTeX,
@@ -453,28 +468,48 @@ impl Parser {
             return Ok(());
         }
 
-        self.advance_token()?;
-        let pattern = vec![kind].repeat(len);
-        let pat_start = self.peek_till_pattern(&pattern)?;
-        let inside = self.peek_till(pat_start - self.index)?;
+        let inside = if len != 3 {
+            self.advance_token()?;
+            let inside = match self.peek_till_kind_eol(&kind) {
+                Ok(t) => t,
+                Err(_) => {
+                    self.append_element(self.make_text()?);
+                    return Ok(());
+                }
+            };
+            println!("{inside:?}");
+            println!("---");
+            self.back_token()?;
+            inside
+        } else {
+            self.advance_token()?;
+            let pattern = vec![kind].repeat(len);
+            let pat_start = self.peek_till_pattern(&pattern)?;
+            self.peek_till(pat_start - self.index)?
+        };
+
+        // self.advance_token()?;
+        // let pattern = vec![kind].repeat(len);
+        // let pat_start = self.peek_till_pattern(&pattern)?;
+        // let inside = self.peek_till(pat_start - self.index)?;
 
         let text = inside
             .iter()
             .map(|t| t.text.iter().collect::<String>())
             .collect::<String>();
+        println!("{text}");
 
         let mut elm = Element::new(elm_kind);
 
         elm.text = Some(text);
 
-        self.advance_n_token(inside.len())?;
+        self.advance_n_token(inside.len() + 1)?;
         self.append_element(elm);
 
         Ok(())
     }
 
     fn handle_container(&mut self, kind: TokenType) -> ParseReturn {
-        // Same as Exclamation
         let elm_kind = match (kind, self.current_token_len()?) {
             (TokenType::Asterisk, 1) | (TokenType::Underscore, 1) => Kind::Italic,
             (TokenType::Asterisk, 2) | (TokenType::Underscore, 2) => Kind::Bold,
@@ -485,6 +520,22 @@ impl Parser {
             self.append_element(self.make_text()?);
             return Ok(());
         }
+        self.advance_token()?;
+        let inside = self.peek_till_kind_eol(&kind);
+        self.back_token()?;
+
+        let mut inside = match inside {
+            Ok(t) => t,
+            Err(_) => {
+                self.append_element(self.make_text()?);
+                return Ok(());
+            }
+        };
+        println!("{inside:?}");
+        println!("---");
+        // if !inside.is_empty() {
+        //     inside.remove(0);
+        // }
 
         let elm = Element::new(elm_kind);
         let elm_id = elm.get_id();
@@ -492,7 +543,6 @@ impl Parser {
         self.state.inside.push(elm_id);
 
         self.advance_n_token(1)?;
-        let inside = self.peek_till_kind(&kind).unwrap();
 
         let mut last_index = self.index;
         let mut last_diff = 0;
@@ -532,7 +582,6 @@ impl Parser {
 
     // Somewhat same as *
     fn handle_bracket(&mut self) -> ParseReturn {
-        // Same as Exclamation
         match self.get_url() {
             Ok((text, url)) => {
                 let mut elm = Element::new(Kind::Link);
@@ -552,7 +601,6 @@ impl Parser {
 
     // just bracket with diff type and checks
     fn handle_exclamation(&mut self) -> ParseReturn {
-        // TODO: problem: will accepct [ on new lines
         let peek = self.peek(1);
         match peek {
             Ok(t) => {
@@ -892,7 +940,7 @@ mod test {
         let lexer = init_lexer(content);
         let mut parser = Parser::new(lexer);
         parser.parse().unwrap();
-        // println!("{content}");
+        println!("{content}");
         // panic!("");
         format!("{parser:#?}")
     }
@@ -955,6 +1003,7 @@ mod test {
         "---\ntitle: test title\npath: /test/path/\nvalues:\n    - key: value\n---"
     );
     snapshot_str!(test_linebreak, "test\n\n---\n");
+    snapshot_str!(test_inline, "\ntest `test`\n");
 
     snapshot_path!(test_load, "./testdata/tests/test.md");
     snapshot_path!(test_load_1, "./testdata/tests/test1.md");
