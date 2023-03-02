@@ -214,22 +214,20 @@ impl Parser {
     /// Ends with error if \n occurs before the kind
     fn peek_till_kind_eol(&self, kind: &TokenType) -> Result<Vec<Token>, ParseError> {
         let tokens_after = self.lexer.tokens.split_at(self.index).1;
-        let mut eol = false;
-        let end = tokens_after
-            .iter()
-            .position(|t| {
-                if t.kind == TokenType::EndOfLine {
-                    eol = true;
-                    return true;
-                }
-                &t.kind == kind
-            })
-            .ok_or(ParseError::Peek(0))?;
-        if eol {
-            return Err(ParseError::Peek(0));
-        }
 
-        Ok(tokens_after.split_at(end).0.to_vec())
+        let mut end = None;
+        for (index, token) in tokens_after.iter().enumerate() {
+            if token.kind == TokenType::EndOfLine {
+                return Err(ParseError::Peek(0));
+            } else if &token.kind == kind {
+                end = Some(index);
+                break;
+            }
+        }
+        match end {
+            Some(end) => Ok(tokens_after.split_at(end).0.to_vec()),
+            None => Err(ParseError::Peek(0)),
+        }
     }
 
     /// This is relitive
