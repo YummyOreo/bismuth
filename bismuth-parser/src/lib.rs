@@ -214,14 +214,11 @@ impl Parser {
     /// Ends with error if \n occurs before the kind
     fn peek_till_kind_eol(&self, kind: &TokenType) -> Result<Vec<Token>, ParseError> {
         let tokens_after = self.lexer.tokens.split_at(self.index).1;
-        println!("{tokens_after:?}");
         let mut eol = false;
         let end = tokens_after
             .iter()
             .position(|t| {
-                println!("{:?} | {:?}", kind, t.kind);
                 if t.kind == TokenType::EndOfLine {
-                    println!("eol");
                     eol = true;
                     return true;
                 }
@@ -229,7 +226,6 @@ impl Parser {
             })
             .ok_or(ParseError::Peek(0))?;
         if eol {
-            println!("eol");
             return Err(ParseError::Peek(0));
         }
 
@@ -380,7 +376,6 @@ impl Parser {
         };
 
         let inside_tokens = self.peek_till(end - self.index)?;
-        // need to -3 because it includes \n}}\n
         let inside_str = inside_tokens[0..inside_tokens.len()]
             .iter()
             .map(|t| t.text.iter().collect::<String>())
@@ -477,8 +472,6 @@ impl Parser {
                     return Ok(());
                 }
             };
-            println!("{inside:?}");
-            println!("---");
             self.back_token()?;
             inside
         } else {
@@ -488,16 +481,10 @@ impl Parser {
             self.peek_till(pat_start - self.index)?
         };
 
-        // self.advance_token()?;
-        // let pattern = vec![kind].repeat(len);
-        // let pat_start = self.peek_till_pattern(&pattern)?;
-        // let inside = self.peek_till(pat_start - self.index)?;
-
         let text = inside
             .iter()
             .map(|t| t.text.iter().collect::<String>())
             .collect::<String>();
-        println!("{text}");
 
         let mut elm = Element::new(elm_kind);
 
@@ -510,6 +497,8 @@ impl Parser {
     }
 
     fn handle_container(&mut self, kind: TokenType) -> ParseReturn {
+        // to handle *** or **test*test*** use patterns
+        // oooo, this may be hard bc how would you test for `*` against `***`?
         let elm_kind = match (kind, self.current_token_len()?) {
             (TokenType::Asterisk, 1) | (TokenType::Underscore, 1) => Kind::Italic,
             (TokenType::Asterisk, 2) | (TokenType::Underscore, 2) => Kind::Bold,
@@ -531,11 +520,6 @@ impl Parser {
                 return Ok(());
             }
         };
-        println!("{inside:?}");
-        println!("---");
-        // if !inside.is_empty() {
-        //     inside.remove(0);
-        // }
 
         let elm = Element::new(elm_kind);
         let elm_id = elm.get_id();
@@ -940,8 +924,6 @@ mod test {
         let lexer = init_lexer(content);
         let mut parser = Parser::new(lexer);
         parser.parse().unwrap();
-        println!("{content}");
-        // panic!("");
         format!("{parser:#?}")
     }
 
@@ -962,8 +944,6 @@ mod test {
         let lexer = init_lexer_path(path);
         let mut parser = Parser::new(lexer);
         parser.parse().unwrap();
-        // println!("{path}");
-        // panic!("");
         format!("{parser:#?}")
     }
 
