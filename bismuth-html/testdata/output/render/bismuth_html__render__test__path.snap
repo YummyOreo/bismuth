@@ -60,11 +60,11 @@ expression: snapshot(&content)
 <br>
 <li class="item">	 Sub-lists are made by indenting 2 spaces:</li>
 <br>
-<p>  - Marker character change forces new list start:</p>
+<li class="item">		 Marker character change forces new list start:</li>
 <br>
-<li class="item">		 Facilisis in pretium nisl aliquet</li>
+<li class="item">			 Facilisis in pretium nisl aliquet</li>
 <br>
-<li class="item">		 Nulla volutpat aliquam velit</li>
+<li class="item">			 Nulla volutpat aliquam velit</li>
 <br>
 <li class="item">	 Very easy!</li>
 <br>

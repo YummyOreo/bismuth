@@ -211,7 +211,9 @@ impl Parser {
     }
 
     /// This is relitive
-    /// Ends with error if \n occurs before the kind
+    /// Returs with error if \n occurs before the kind
+    /// Returns w/ error if it could not find the token
+    /// Returns w/ the tokens till it if it could find the token
     fn peek_till_kind_eol(&self, kind: &TokenType) -> Result<Vec<Token>, ParseError> {
         let tokens_after = self.lexer.tokens.split_at(self.index).1;
 
@@ -511,7 +513,7 @@ impl Parser {
         let inside = self.peek_till_kind_eol(&kind);
         self.back_token()?;
 
-        let mut inside = match inside {
+        let inside = match inside {
             Ok(t) => t,
             Err(_) => {
                 self.append_element(self.make_text()?);
@@ -524,7 +526,7 @@ impl Parser {
         self.append_element(elm);
         self.state.inside.push(elm_id);
 
-        self.advance_n_token(1)?;
+        self.advance_token()?;
 
         let mut last_index = self.index;
         let mut last_diff = 0;

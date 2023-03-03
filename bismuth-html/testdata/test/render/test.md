@@ -36,9 +36,9 @@ _This is italic text_
 Unordered
 
 - Sub-lists are made by indenting 2 spaces:
-  - Marker character change forces new list start:
-    - Facilisis in pretium nisl aliquet
-    - Nulla volutpat aliquam velit
+    - Marker character change forces new list start:
+        - Facilisis in pretium nisl aliquet
+        - Nulla volutpat aliquam velit
 - Very easy!
 
 Ordered
