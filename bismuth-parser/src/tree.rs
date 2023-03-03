@@ -64,6 +64,7 @@ pub enum Kind {
 
     Italic,
     Bold,
+    BoldItalic,
 
     Blockquote,
 

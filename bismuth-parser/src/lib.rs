@@ -502,6 +502,7 @@ impl Parser {
         let elm_kind = match (kind, self.current_token_len()?) {
             (TokenType::Asterisk, 1) | (TokenType::Underscore, 1) => Kind::Italic,
             (TokenType::Asterisk, 2) | (TokenType::Underscore, 2) => Kind::Bold,
+            (TokenType::Asterisk, 3) | (TokenType::Underscore, 3) => Kind::BoldItalic,
             _ => Kind::Text,
         };
 

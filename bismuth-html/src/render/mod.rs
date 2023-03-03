@@ -77,6 +77,7 @@ impl Render for Element {
             Kind::Paragraph => (String::from("<p>"), String::from("</p>")),
             Kind::Bold => (String::from("<b>"), String::from("</b>")),
             Kind::Italic => (String::from("<i>"), String::from("</i>")),
+            Kind::BoldItalic => (String::from("<b><i>"), String::from("</i></b>")),
             Kind::Blockquote => (String::from("<blockquote>"), String::from("</blockquote>")),
             Kind::Header => {
                 let mut num = self.get_attr("level").cloned().unwrap_or(String::from("6"));
