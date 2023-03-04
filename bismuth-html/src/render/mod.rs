@@ -4,6 +4,7 @@ use bismuth_parser::{
     tree::{Ast, Element, Kind},
     Parser,
 };
+use katex;
 use std::path::PathBuf;
 
 mod code;
@@ -163,6 +164,32 @@ impl Render for Element {
             Kind::EndOfLine => (String::from("<br>"), Default::default()),
 
             // TOOD: LATEX
+            Kind::InlineLaTeX => (
+                katex::render_with_opts(
+                    &self.get_text().cloned().unwrap_or_default(),
+                    katex::Opts::builder()
+                        .output_type(katex::OutputType::Mathml)
+                        .build()
+                        .unwrap(),
+                )
+                .unwrap(),
+                Default::default(),
+            ),
+            Kind::BlockLaTeX => (
+                format!(
+                    "<br>\n<div class=\"latex\">{}",
+                    katex::render_with_opts(
+                        &self.get_text().cloned().unwrap_or_default(),
+                        katex::Opts::builder()
+                            .output_type(katex::OutputType::Mathml)
+                            .display_mode(true)
+                            .build()
+                            .unwrap(),
+                    )
+                    .unwrap()
+                ),
+                String::from("\n</div>\n<br>"),
+            ),
             _ => Default::default(),
         };
         format!("{start}{inside}{end}")
@@ -219,7 +246,18 @@ mod test {
         "# hearder\n- 1\n    - 2\n1. list item\nthis is a *__good test__*!! \n `inline?`\n---\n> blockquote"
     );
 
+    snapshot!(test_3, "***test?***");
+
     snapshot!(test_br, "test test \n\n\ntest test\ntest\n");
+    snapshot!(
+        test_latex,
+        "this is a test for inline latex using katex: $E = mc^2$"
+    );
+
+    snapshot!(
+        test_latex_1,
+        "this is a test for block latex using katex:\n$$$E = mc^2$$$"
+    );
 
     snapshot_path!(test_path, "./testdata/test/render/test.md");
 }
