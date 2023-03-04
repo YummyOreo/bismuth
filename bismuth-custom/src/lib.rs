@@ -16,23 +16,25 @@ pub struct Custom {
     name: String,
     id: u32,
     data: HashMap<String, String>,
+    body: Option<String>,
     template: Option<template::Template>,
     plugin: Option<Box<dyn plugin::Plugin>>,
 }
 
 impl Custom {
-    pub fn new(name: String, data: HashMap<String, String>, id: u32) -> Self {
+    pub fn new(name: String, data: HashMap<String, String>, body: Option<String>, id: u32) -> Self {
         Custom {
             name,
             id,
             data,
+            body,
             template: None,
             plugin: None,
         }
     }
 
     pub fn from_elm(elm: &CustomElm, id: u32) -> Self {
-        Self::new(elm.name.clone(), elm.values.clone(), id)
+        Self::new(elm.name.clone(), elm.values.clone(), elm.body.clone(), id)
     }
 
     fn find_plugin(&mut self) -> Option<Box<dyn plugin::Plugin>> {
@@ -103,7 +105,6 @@ fn run_customs(target: &mut Parser, others: &[&Parser], custom_elms: &[u32]) {
             }
         })
         .collect();
-    println!("{customs:#?}");
 
     for custom in &mut customs {
         custom.run(target, others);

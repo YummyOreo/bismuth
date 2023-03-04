@@ -163,7 +163,6 @@ impl Render for Element {
             Kind::HorizontalRule => (String::from("<hr>"), Default::default()),
             Kind::EndOfLine => (String::from("<br>"), Default::default()),
 
-            // TOOD: LATEX
             Kind::InlineLaTeX => (
                 katex::render_with_opts(
                     &self.get_text().cloned().unwrap_or_default(),
