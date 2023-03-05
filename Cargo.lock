@@ -78,6 +78,7 @@ name = "bismuth-html"
 version = "0.1.0"
 dependencies = [
  "anyhow",
+ "bismuth-custom",
  "bismuth-parser",
  "insta",
  "katex",

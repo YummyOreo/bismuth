@@ -7,6 +7,7 @@ edition = "2021"
 
 [dependencies]
 bismuth-parser = { version = "0.1.0", path = "../bismuth-parser" }
+bismuth-custom = { version = "0.1.0", path = "../bismuth-custom" }
 regex = "1.7.1"
 
 thiserror = "1.0"
