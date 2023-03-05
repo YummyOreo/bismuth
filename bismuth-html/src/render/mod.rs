@@ -24,6 +24,8 @@ pub struct Renderer {
 }
 
 impl Renderer {
+    /// You should pass parser through bismuth_custom::parse_custom() first
+    /// Then put the output into this
     pub fn new(parser: Parser) -> Self {
         let path = PathBuf::from(
             parser
@@ -77,6 +79,7 @@ impl Render for Element {
             .map(|e| e.clone().render())
             .collect::<String>();
 
+        // Gets the html of the kind. Some kinds (like Text) may not have a end
         let (start, end) = match self.kind {
             Kind::Paragraph => (String::from("<p>"), String::from("</p>")),
             Kind::Bold => (String::from("<b>"), String::from("</b>")),
