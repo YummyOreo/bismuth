@@ -18,7 +18,7 @@ pub struct Template<'a> {
     template: &'a String,
     values: &'a HashMap<String, String>,
     body: &'a Option<String>,
-    elements: &'a Vec<Element>,
+    pub elements: &'a Vec<Element>,
 }
 // ^ should all be references to stuff
 
@@ -38,6 +38,22 @@ impl<'a> TryFrom<&'a Element> for Template<'a> {
             }
         }
         Err(())
+    }
+}
+
+impl<'a> Template<'a> {
+    pub fn new(
+        template_str: &'a String,
+        values: &'a HashMap<String, String>,
+        body: &'a Option<String>,
+        elements: &'a Vec<Element>,
+    ) -> Self {
+        Self {
+            template: template_str,
+            values,
+            body,
+            elements,
+        }
     }
 }
 

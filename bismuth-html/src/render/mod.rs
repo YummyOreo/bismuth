@@ -4,7 +4,7 @@ use bismuth_parser::{
     tree::{Ast, Element, Kind},
     Parser,
 };
-use katex;
+use std::convert::TryFrom;
 use std::path::PathBuf;
 
 mod code;
@@ -41,6 +41,9 @@ impl Renderer {
     }
 }
 
+
+// TODO: replace this with calling render on Template, do this by constructing a Template with the
+// template said in the metadata (or default one) then call render
 impl Render for Renderer {
     fn render(&mut self) -> String {
         while self.pos < self.parser.ast.elements.len() {
