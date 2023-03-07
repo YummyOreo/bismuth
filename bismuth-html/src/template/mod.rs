@@ -2,6 +2,7 @@
 use bismuth_parser::{
     custom::CustomElm,
     tree::{Element, Kind},
+    Parser,
 };
 use regex::Regex;
 use std::collections::HashMap;
@@ -87,5 +88,49 @@ impl Render for Template<'_> {
             output = rg.replace(&output, value).to_string();
         }
         output
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use super::*;
+
+    use bismuth_parser::Parser;
+
+    macro_rules! snapshot {
+        ($content:tt) => {
+            let mut settings = insta::Settings::clone_current();
+            settings.set_snapshot_path("../../testdata/output/template/");
+            settings.bind(|| {
+                insta::assert_snapshot!($content);
+            });
+        };
+    }
+
+    #[test]
+    fn test() {
+        let mut parser = Parser::new_test("/test/", "{value} {another_value}");
+        parser
+            .metadata
+            .frontmatter
+            .update_from_str(
+                "
+                values:
+                    - value: test
+                    - another_value: test another value
+            ",
+            )
+            .unwrap();
+
+        parser.parse();
+        let mut template = Template {
+            template: &String::from("test:\n {elements}"),
+            body: &None,
+            elements: &parser.ast.elements,
+            values: &parser.metadata.frontmatter.get_values().unwrap(),
+        };
+
+        let s = template.render();
+        snapshot!(s);
     }
 }

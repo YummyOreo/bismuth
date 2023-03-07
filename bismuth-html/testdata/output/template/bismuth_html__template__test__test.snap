@@ -1,0 +1,6 @@
+---
+source: bismuth-html/src/template/mod.rs
+expression: s
+---
+test:
+ <p>test test another value</p><br>

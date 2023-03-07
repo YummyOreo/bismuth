@@ -20,6 +20,9 @@ pub struct Renderer {
     pos: usize,
 
     output: String,
+
+    /// This is the path that the file will be placed to
+    /// Ie `.../output/test/index.html`
     path: PathBuf,
 }
 

@@ -1,6 +1,6 @@
 use serde::Deserialize;
 use serde_yaml::{from_str, Error};
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, HashMap};
 use std::path::Path;
 
 #[derive(Default, Deserialize, Debug, Clone)]
@@ -35,6 +35,20 @@ impl FrontMatter {
             .iter()
             .find(|t| t.contains_key(key))?
             .get(key)
+    }
+
+    pub fn get_values(&self) -> Option<HashMap<String, String>> {
+        let mut hm: HashMap<String, String> = HashMap::new();
+        for btm in &self.values.clone()? {
+            let btm_vec = btm
+                .iter()
+                .map(|(s, b)| (s.to_owned(), b.to_owned()))
+                .collect::<Vec<(String, String)>>();
+            for (k, v) in btm_vec {
+                hm.insert(k, v);
+            }
+        }
+        Some(hm)
     }
 
     pub fn get_kind(&self) -> Option<&String> {
