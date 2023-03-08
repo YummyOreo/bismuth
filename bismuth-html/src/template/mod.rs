@@ -94,9 +94,30 @@ impl Render for Template<'_> {
 #[cfg(test)]
 mod test {
     use super::*;
-
     use bismuth_parser::Parser;
 
+    fn init_parser<'a>(content: &'a str, frontmatter: &'a str) -> Parser {
+        let mut parser = Parser::new_test("/test/", content);
+        parser
+            .metadata
+            .frontmatter
+            .update_from_str(frontmatter)
+            .unwrap();
+
+        parser.parse();
+        parser
+    }
+
+    macro_rules! init_template {
+        ($parser:tt, $template:expr, $body:expr) => {
+            Template {
+                template: $template,
+                body: $body,
+                elements: &$parser.ast.elements,
+                values: &$parser.metadata.frontmatter.get_values().unwrap(),
+            }
+        };
+    }
     macro_rules! snapshot {
         ($content:tt) => {
             let mut settings = insta::Settings::clone_current();
@@ -109,26 +130,15 @@ mod test {
 
     #[test]
     fn test() {
-        let mut parser = Parser::new_test("/test/", "{value} {another_value}");
-        parser
-            .metadata
-            .frontmatter
-            .update_from_str(
-                "
-                values:
-                    - value: test
-                    - another_value: test another value
+        let parser = init_parser(
+            "{value} {another_value}",
+            "
+            values:
+                - value: test
+                - another_value: test another value
             ",
-            )
-            .unwrap();
-
-        parser.parse();
-        let mut template = Template {
-            template: &String::from("test:\n {elements}"),
-            body: &None,
-            elements: &parser.ast.elements,
-            values: &parser.metadata.frontmatter.get_values().unwrap(),
-        };
+        );
+        let mut template = init_template!(parser, &String::from("test:\n {elements}"), &None);
 
         let s = template.render();
         snapshot!(s);
