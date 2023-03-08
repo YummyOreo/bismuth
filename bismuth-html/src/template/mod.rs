@@ -11,6 +11,7 @@ use std::convert::TryFrom;
 use crate::render::Render;
 
 pub mod builtin;
+mod external;
 
 /// Data/Values: Will be replaced (as a string) at {key}
 /// Reserved keys: `body` and `elements`
@@ -24,7 +25,6 @@ pub struct Template<'a> {
     body: &'a Option<String>,
     pub elements: &'a Vec<Element>,
 }
-// ^ should all be references to stuff
 
 impl<'a> TryFrom<&'a Element> for Template<'a> {
     type Error = ();
@@ -60,6 +60,15 @@ impl<'a> Template<'a> {
             body,
             elements,
         }
+    }
+
+    pub fn new_from_name(
+        name: &str,
+        values: &'a HashMap<String, String>,
+        body: &'a Option<String>,
+        elements: &'a [Element],
+    ) -> Self {
+        todo!()
     }
 }
 
@@ -118,6 +127,7 @@ mod test {
             }
         };
     }
+
     macro_rules! snapshot {
         ($content:tt) => {
             let mut settings = insta::Settings::clone_current();
@@ -135,6 +145,22 @@ mod test {
             "
             values:
                 - value: test
+                - another_value: test another value
+            ",
+        );
+        let mut template = init_template!(parser, &String::from("test:\n {elements}"), &None);
+
+        let s = template.render();
+        snapshot!(s);
+    }
+
+    #[test]
+    fn test_1() {
+        let parser = init_parser(
+            "{value}} {hmm}",
+            "
+            values:
+                - value}: test
                 - another_value: test another value
             ",
         );

@@ -9,6 +9,7 @@ use std::path::PathBuf;
 
 mod code;
 use crate::render::code::highlight;
+use crate::template::Template;
 
 pub trait Render {
     fn render(&mut self) -> String;
@@ -46,7 +47,6 @@ impl Renderer {
     }
 }
 
-
 // TODO: replace this with calling render on Template, do this by constructing a Template with the
 // template said in the metadata (or default one) then call render
 impl Render for Renderer {
@@ -83,7 +83,7 @@ impl Render for Element {
             .collect::<String>();
 
         // Gets the html of the kind. Some kinds (like Text) may not have a end
-        let (start, end) = match self.kind {
+        let (start, end) = match &self.kind {
             Kind::Paragraph => (String::from("<p>"), String::from("</p>")),
             Kind::Bold => (String::from("<b>"), String::from("</b>")),
             Kind::Italic => (String::from("<i>"), String::from("</i>")),
@@ -198,6 +198,13 @@ impl Render for Element {
                 ),
                 String::from("\n</div>\n<br>"),
             ),
+            Kind::CustomElement(c) => {
+                if let Ok(mut t) = Template::try_from(&self.to_owned()) {
+                    (t.render(), Default::default())
+                } else {
+                    Default::default()
+                }
+            }
             _ => Default::default(),
         };
         format!("{start}{inside}{end}")
