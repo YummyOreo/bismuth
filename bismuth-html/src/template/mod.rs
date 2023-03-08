@@ -11,7 +11,6 @@ use std::convert::TryFrom;
 use crate::render::Render;
 
 pub mod builtin;
-mod external;
 
 /// Data/Values: Will be replaced (as a string) at {key}
 /// Reserved keys: `body` and `elements`
@@ -20,7 +19,7 @@ mod external;
 /// Elements: Will be replaced at {elements}
 #[derive(Debug, PartialEq)]
 pub struct Template<'a> {
-    template: &'a String,
+    template: &'a str,
     values: &'a HashMap<String, String>,
     body: &'a Option<String>,
     pub elements: &'a Vec<Element>,
@@ -49,7 +48,7 @@ impl<'a> TryFrom<&'a Element> for Template<'a> {
 
 impl<'a> Template<'a> {
     pub fn new(
-        template_str: &'a String,
+        template_str: &'a str,
         values: &'a HashMap<String, String>,
         body: &'a Option<String>,
         elements: &'a Vec<Element>,
@@ -66,15 +65,20 @@ impl<'a> Template<'a> {
         name: &str,
         values: &'a HashMap<String, String>,
         body: &'a Option<String>,
-        elements: &'a [Element],
-    ) -> Self {
-        todo!()
+        elements: &'a Vec<Element>,
+    ) -> Option<Self> {
+        let template_str = match name {
+            "test" => Some(&builtin::TEST),
+            _ => None,
+        }?;
+
+        Some(Self::new(template_str, values, body, elements))
     }
 }
 
 impl Render for Template<'_> {
     fn render(&mut self) -> String {
-        let mut output = self.template.clone();
+        let mut output = self.template.to_string();
         // First replace {elements} w/ rendered elements
         let mut elements_str = self
             .elements
