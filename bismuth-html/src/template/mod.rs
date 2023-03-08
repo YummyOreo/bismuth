@@ -61,16 +61,20 @@ impl<'a> Template<'a> {
         }
     }
 
+    pub fn get_template(name: &str) -> Option<&str> {
+        match name.to_lowercase().as_str() {
+            "test" => Some(builtin::TEST),
+            _ => None,
+        }
+    }
+
     pub fn new_from_name(
-        name: &str,
+        name: &'a str,
         values: &'a HashMap<String, String>,
         body: &'a Option<String>,
         elements: &'a Vec<Element>,
     ) -> Option<Self> {
-        let template_str = match name {
-            "test" => Some(&builtin::TEST),
-            _ => None,
-        }?;
+        let template_str = Self::get_template(name)?;
 
         Some(Self::new(template_str, values, body, elements))
     }
@@ -132,6 +136,17 @@ mod test {
         };
     }
 
+    macro_rules! init_template_name {
+        ($parser:tt, $name:expr, $body:expr) => {
+            Template {
+                template: Template::get_template(&$name).unwrap(),
+                body: $body,
+                elements: &$parser.ast.elements,
+                values: &$parser.metadata.frontmatter.get_values().unwrap(),
+            }
+        };
+    }
+
     macro_rules! snapshot {
         ($content:tt) => {
             let mut settings = insta::Settings::clone_current();
@@ -169,6 +184,24 @@ mod test {
             ",
         );
         let mut template = init_template!(parser, &String::from("test:\n {elements}"), &None);
+
+        let s = template.render();
+        snapshot!(s);
+    }
+
+    #[test]
+    fn test_2() {
+        let parser = init_parser(
+            "*test*",
+            "
+            kind: test
+            values:
+                - value_1: test
+                - value_2: test another value
+            ",
+        );
+        let name = parser.metadata.frontmatter.get_kind().unwrap();
+        let mut template = init_template_name!(parser, name, &None);
 
         let s = template.render();
         snapshot!(s);
