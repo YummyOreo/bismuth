@@ -27,7 +27,9 @@ pub enum HighlightError {
 
 pub fn highlight(lang: String, code: String) -> Result<String, HighlightError> {
     let (ps, ts) = init();
-    let syntax = ps.find_syntax_by_token(&lang).unwrap_or_else(|| ps.find_syntax_plain_text());
+    let syntax = ps
+        .find_syntax_by_token(&lang)
+        .unwrap_or_else(|| ps.find_syntax_plain_text());
 
     highlighted_html_for_string(&code, &ps, syntax, &ts.themes["InspiredGitHub"])
         .map_err(HighlightError::Internal)
