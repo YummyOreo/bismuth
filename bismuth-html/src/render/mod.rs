@@ -12,7 +12,7 @@ use crate::render::code::highlight;
 use crate::template::Template;
 
 pub trait Render {
-    fn render(&mut self) -> String;
+    fn render(&mut self) -> Option<String>;
 }
 
 #[derive(Clone)]
@@ -50,18 +50,12 @@ impl Renderer {
 // TODO: replace this with calling render on Template, do this by constructing a Template with the
 // template said in the metadata (or default one) then call render
 impl Render for Renderer {
-    fn render(&mut self) -> String {
-        while self.pos < self.parser.ast.elements.len() {
-            let current = self.parser.ast.elements.get(self.pos);
-            let mut s = String::new();
-            if let Some(e) = current {
-                s = e.clone().render();
-                self.output.push_str(&format!("{s}\n"));
-            }
-
-            self.pos += 1;
-        }
-        self.output.clone()
+    fn render(&mut self) -> Option<String> {
+        let kind = self.parser.metadata.frontmatter.get_kind()?;
+        let values = self.parser.metadata.frontmatter.get_values()?;
+        let elements = &self.parser.ast.elements;
+        let mut template = Template::new_from_name(kind, &values, None, elements)?;
+        template.render()
     }
 }
 
@@ -75,11 +69,11 @@ fn parse_url(url: &str) -> (String, bool) {
 }
 
 impl Render for Element {
-    fn render(&mut self) -> String {
+    fn render(&mut self) -> Option<String> {
         let mut inside = self
             .elements
             .iter()
-            .map(|e| e.clone().render())
+            .map(|e| e.clone().render().expect("This should not fail"))
             .collect::<String>();
 
         // Gets the html of the kind. Some kinds (like Text) may not have a end
@@ -200,14 +194,14 @@ impl Render for Element {
             ),
             Kind::CustomElement(c) => {
                 if let Ok(mut t) = Template::try_from(&self.to_owned()) {
-                    (t.render(), Default::default())
+                    (t.render()?, Default::default())
                 } else {
                     Default::default()
                 }
             }
             _ => Default::default(),
         };
-        format!("{start}{inside}{end}")
+        Some(format!("{start}{inside}{end}"))
     }
 }
 
@@ -219,7 +213,7 @@ mod test {
         let mut parser = Parser::new_test("/test/", content);
         parser.parse();
         let mut render = Renderer::new(parser);
-        render.render()
+        render.render().unwrap()
     }
 
     macro_rules! snapshot {

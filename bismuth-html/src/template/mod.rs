@@ -8,7 +8,7 @@ use regex::Regex;
 use std::collections::HashMap;
 use std::convert::TryFrom;
 
-use crate::render::Render;
+use crate::render::{Render, Renderer};
 
 pub mod builtin;
 
@@ -21,7 +21,7 @@ pub mod builtin;
 pub struct Template<'a> {
     template: &'a str,
     values: &'a HashMap<String, String>,
-    body: &'a Option<String>,
+    body: Option<&'a String>,
     pub elements: &'a Vec<Element>,
 }
 
@@ -37,7 +37,7 @@ impl<'a> TryFrom<&'a Element> for Template<'a> {
                 return Ok(Self {
                     template: t,
                     values: &c.values,
-                    body: &c.body,
+                    body: c.body.as_ref(),
                     elements: &elm.elements,
                 });
             }
@@ -50,7 +50,7 @@ impl<'a> Template<'a> {
     pub fn new(
         template_str: &'a str,
         values: &'a HashMap<String, String>,
-        body: &'a Option<String>,
+        body: Option<&'a String>,
         elements: &'a Vec<Element>,
     ) -> Self {
         Self {
@@ -64,6 +64,7 @@ impl<'a> Template<'a> {
     pub fn get_template(name: &str) -> Option<&str> {
         match name.to_lowercase().as_str() {
             "test" => Some(builtin::TEST),
+            "default" => Some(builtin::DEFAULT),
             _ => None,
         }
     }
@@ -71,7 +72,7 @@ impl<'a> Template<'a> {
     pub fn new_from_name(
         name: &'a str,
         values: &'a HashMap<String, String>,
-        body: &'a Option<String>,
+        body: Option<&'a String>,
         elements: &'a Vec<Element>,
     ) -> Option<Self> {
         let template_str = Self::get_template(name)?;
@@ -81,13 +82,13 @@ impl<'a> Template<'a> {
 }
 
 impl Render for Template<'_> {
-    fn render(&mut self) -> String {
+    fn render(&mut self) -> Option<String> {
         let mut output = self.template.to_string();
         // First replace {elements} w/ rendered elements
         let mut elements_str = self
             .elements
             .iter()
-            .map(|e| e.clone().render())
+            .map(|e| e.clone().render().expect("Should not fail"))
             .collect::<String>();
         let e_rg = Regex::new(r"\{(?i)elements\}").expect("Should be valid regex");
         output = e_rg.replace(&output, elements_str).to_string();
@@ -96,7 +97,7 @@ impl Render for Template<'_> {
         let b_rg = Regex::new(r"\{(?i)body\}").expect("Should be valid regex");
         let body_default = String::new();
         output = b_rg
-            .replace(&output, self.body.clone().unwrap_or_default())
+            .replace(&output, self.body.cloned().unwrap_or_default())
             .to_string();
 
         // next do each value
@@ -104,7 +105,7 @@ impl Render for Template<'_> {
             let rg = Regex::new(&format!(r"\{{(?i){}\}}", key)).expect("Should be valid");
             output = rg.replace(&output, value).to_string();
         }
-        output
+        Some(output)
     }
 }
 
@@ -167,9 +168,9 @@ mod test {
                 - another_value: test another value
             ",
         );
-        let mut template = init_template!(parser, &String::from("test:\n {elements}"), &None);
+        let mut template = init_template!(parser, &String::from("test:\n {elements}"), None);
 
-        let s = template.render();
+        let s = template.render().unwrap();
         snapshot!(s);
     }
 
@@ -183,9 +184,9 @@ mod test {
                 - another_value: test another value
             ",
         );
-        let mut template = init_template!(parser, &String::from("test:\n {elements}"), &None);
+        let mut template = init_template!(parser, &String::from("test:\n {elements}"), None);
 
-        let s = template.render();
+        let s = template.render().unwrap();
         snapshot!(s);
     }
 
@@ -201,9 +202,9 @@ mod test {
             ",
         );
         let name = parser.metadata.frontmatter.get_kind().unwrap();
-        let mut template = init_template_name!(parser, name, &None);
+        let mut template = init_template_name!(parser, name, None);
 
-        let s = template.render();
+        let s = template.render().unwrap();
         snapshot!(s);
     }
 }
