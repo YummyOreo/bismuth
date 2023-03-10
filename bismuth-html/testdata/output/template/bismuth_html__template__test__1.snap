@@ -3,4 +3,6 @@ source: bismuth-html/src/template/mod.rs
 expression: s
 ---
 test:
- <p>test {hmm}</p><br>
+ <p>test {hmm}</p>
+<br>
+

@@ -1,0 +1,8 @@
+---
+source: bismuth-html/tests/strs.rs
+assertion_line: 4
+expression: "run_snapshot_str(\"Does default work?\")"
+---
+<p>Does default work?</p>
+<br>
+

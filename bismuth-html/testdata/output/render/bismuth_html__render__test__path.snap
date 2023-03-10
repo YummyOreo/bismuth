@@ -14,49 +14,67 @@ expression: snapshot(&content)
 <br>
 <h6> h6 Heading</h6>
 <br>
+
 <br>
+
 <br>
 <h2> Horizontal Rules</h2>
 <br>
+
 <br>
 <hr>
 <br>
+
 <br>
 <p>!!!!!! ???? ,,  -- ---</p>
 <br>
+
 <br>
 <p>"Smartypants, double quotes" and 'single quotes'</p>
 <br>
+
 <br>
+
 <br>
 <h2> Emphasis</h2>
 <br>
+
 <br>
 <b>This is bold text</b>
 <br>
+
 <br>
 <b>This is bold text</b>
 <br>
+
 <br>
 <i>This is italic text</i>
 <br>
+
 <br>
 <i>This is italic text</i>
 <br>
+
 <br>
 <h2> Blockquotes</h2>
 <br>
+
 <br>
+
 <br>
 <blockquote> Blockquote...</blockquote>
 <br>
+
 <br>
+
 <br>
 <h2> Lists</h2>
 <br>
+
 <br>
 <p>Unordered</p>
 <br>
+
 <br>
 <li class="item">	 Sub-lists are made by indenting 2 spaces:</li>
 <br>
@@ -68,9 +86,11 @@ expression: snapshot(&content)
 <br>
 <li class="item">	 Very easy!</li>
 <br>
+
 <br>
 <p>Ordered</p>
 <br>
+
 <br>
 <li class="num-list">	1. Lorem ipsum dolor sit amet</li>
 <br>
@@ -78,30 +98,39 @@ expression: snapshot(&content)
 <br>
 <li class="num-list">	3. Integer molestie lorem at massa</li>
 <br>
+
 <br>
+
 <br>
 <li class="num-list">	1. You can use sequential numbers...</li>
 <br>
 <li class="num-list">	1. ...or keep all the numbers as <div class="inline-code">1.</div></li>
 <br>
+
 <br>
 <p>Start numbering with offset:</p>
 <br>
+
 <br>
 <li class="num-list">	57. foo</li>
 <br>
 <li class="num-list">	1. bar</li>
 <br>
+
 <br>
+
 <br>
 <h2> Code</h2>
 <br>
+
 <br>
 <p>Inline <div class="inline-code">code</div></p>
 <br>
+
 <br>
 <p>Block code "fences"</p>
 <br>
+
 <br>
 <pre style="background-color:#ffffff;">
 <span style="color:#323232;">
@@ -109,9 +138,11 @@ expression: snapshot(&content)
 </span></pre>
 
 <br>
+
 <br>
 <p>Syntax highlighting</p>
 <br>
+
 <br>
 <pre style="background-color:#ffffff;">
 <span style="color:#323232;">
@@ -123,26 +154,33 @@ expression: snapshot(&content)
 </span></pre>
 
 <br>
+
 <br>
 <h2> Links</h2>
 <br>
+
 <br>
 <a target="/test" >
 <br>
+
 <br>
 <a target="example.com" target="blank">
 <br>
+
 <br>
 <h2> Images</h2>
 <br>
+
 <br>
 <img src="/test.png" alt="Minion">
 <br>
 <img src="example.com" alt="Stormtroopocat">
 <br>
+
 <br>
 <p>Like links, Images also have a footnote style syntax</p>
 <br>
+
 <br>
 <h2> Custom stuff:</h2>
 <br>

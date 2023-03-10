@@ -52,7 +52,7 @@ impl Renderer {
 impl Render for Renderer {
     fn render(&mut self) -> Option<String> {
         let kind = self.parser.metadata.frontmatter.get_kind()?;
-        let values = self.parser.metadata.frontmatter.get_values()?;
+        let values = self.parser.metadata.frontmatter.get_values().unwrap_or_default();
         let elements = &self.parser.ast.elements;
         let mut template = Template::new_from_name(kind, &values, None, elements)?;
         template.render()
@@ -164,7 +164,7 @@ impl Render for Element {
             ),
 
             Kind::HorizontalRule => (String::from("<hr>"), Default::default()),
-            Kind::EndOfLine => (String::from("<br>"), Default::default()),
+            Kind::EndOfLine => (String::from("\n<br>\n"), Default::default()),
 
             Kind::InlineLaTeX => (
                 katex::render_with_opts(

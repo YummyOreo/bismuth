@@ -88,7 +88,7 @@ impl Render for Template<'_> {
         let mut elements_str = self
             .elements
             .iter()
-            .map(|e| e.clone().render().expect("Should not fail"))
+            .map(|e| format!{"{}", e.clone().render().expect("Should not fail")})
             .collect::<String>();
         let e_rg = Regex::new(r"\{(?i)elements\}").expect("Should be valid regex");
         output = e_rg.replace(&output, elements_str).to_string();

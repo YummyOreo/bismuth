@@ -4,11 +4,14 @@ expression: "snapshot(\"test test \\n\\n\\ntest test\\ntest\\n\")"
 ---
 <p>test test </p>
 <br>
+
 <br>
+
 <br>
 <p>test test</p>
 <br>
 <p>test</p>
 <br>
+
 <br>
 
