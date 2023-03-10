@@ -52,7 +52,17 @@ impl Renderer {
 impl Render for Renderer {
     fn render(&mut self) -> Option<String> {
         let kind = self.parser.metadata.frontmatter.get_kind()?;
-        let values = self.parser.metadata.frontmatter.get_values().unwrap_or_default();
+
+        let mut values = self
+            .parser
+            .metadata
+            .frontmatter
+            .get_values()
+            .unwrap_or_default();
+        if let Some(title) = self.parser.metadata.frontmatter.get_title().cloned() {
+            values.insert(String::from("title"), title);
+        }
+
         let elements = &self.parser.ast.elements;
         let mut template = Template::new_from_name(kind, &values, None, elements)?;
         template.render()

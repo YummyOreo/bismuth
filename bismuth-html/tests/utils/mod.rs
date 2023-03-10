@@ -14,6 +14,7 @@ pub fn run_snapshot_str(content: &str, frontmatter: Option<String>) -> String {
     let mut parser = Parser::new_test("/test/", &content);
     parser.parse().unwrap();
     let res = render_one(parser).unwrap();
+    println!("result: \n'{res}\n'");
 
     // skips annoying eol spaces
     let rg = Regex::new(r"\s\n").expect("Is valid regex");
@@ -44,11 +45,11 @@ macro_rules! snapshot_str {
         fn $name() {
             let result = run_snapshot_str($content, Some($frontmatter.to_string()));
             let expect = format_expected($expected);
-            println!("result: '\n{result}\n'");
             println!("");
             println!("---");
             println!("");
             println!("expected: '\n{expect}\n'");
+            // panic!("");
             assert_eq!(result, expect)
         }
     };
