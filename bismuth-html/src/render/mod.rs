@@ -109,13 +109,13 @@ impl Render for Element {
                 let (url, blank) = parse_url(&self.get_attr("link").cloned().unwrap_or_default());
                 let blank = {
                     if blank {
-                        String::from(r#"target="blank""#)
+                        String::from(r#" target="blank""#)
                     } else {
                         Default::default()
                     }
                 };
                 (
-                    format!(r#"<a target="{}" {}>"#, url, blank),
+                    format!(r#"<a target="{}"{}>"#, url, blank),
                     Default::default(),
                 )
             }
@@ -222,9 +222,13 @@ impl Render for Element {
 mod test {
     use super::*;
     use std::fs;
+
+    use bismuth_custom::parse_custom;
+
     fn snapshot(content: &str) -> String {
         let mut parser = Parser::new_test("/test/", content);
         parser.parse();
+        let parser = parse_custom(parser, &[]);
         let mut render = Renderer::new(parser);
         render.render().unwrap()
     }

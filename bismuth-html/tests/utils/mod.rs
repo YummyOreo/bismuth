@@ -17,7 +17,7 @@ pub fn run_snapshot_str(content: &str, frontmatter: Option<String>, path: &str) 
 
     let mut parser = Parser::new_test(path, &content);
     parser.parse().unwrap();
-    let parser = parse_custom(parser, &vec![]);
+    let parser = parse_custom(parser, &[]);
     let res = render_one(parser).unwrap();
     println!("result: \n'{res}\n'");
 
