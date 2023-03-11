@@ -4,7 +4,7 @@ use crate::utils::*;
 snapshot_str!(
     test_template_str,
     "Does default work?",
-r#"
+    r#"
 <!DOCTYPE html>
 <html lang="">
 
@@ -37,7 +37,7 @@ values:
     - value_2: test value 2
 ---
 ",
-"
+    "
 Test template: test value 1 test value 2
 <br>
 <p>Does default work?</p>

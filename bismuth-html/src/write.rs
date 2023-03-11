@@ -1,10 +1,4 @@
 #![allow(dead_code)]
-use std::{
-    fs,
-    io::Error,
-    path::{Path, PathBuf},
-};
-
 // use crate::render::Renderer;
 
 const BUILD: &str = "./build/";
@@ -13,6 +7,11 @@ const ASSETS: &str = "./assets";
 
 pub mod utils {
     use super::*;
+    use std::{
+        fs,
+        io::Error,
+        path::{Path, PathBuf},
+    };
 
     /// Makes the `./build/` folder along with the `./bulid/assets/` folder
     pub fn make_build() -> Result<(), Error> {
@@ -66,7 +65,6 @@ pub mod utils {
         let new_path = Path::new(BUILD).join(&path);
         let old_full = Path::new("./").canonicalize()?.join(&path);
 
-        fs::copy(old_full, new_path)?;
-        Ok(())
+        fs::copy(old_full, new_path).map(|_| ())
     }
 }

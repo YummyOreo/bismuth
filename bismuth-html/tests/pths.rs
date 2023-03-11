@@ -1,7 +1,10 @@
 mod utils;
 use crate::utils::*;
 
-snapshot_path!(test_path, "./testdata/test/test.md", r#"<!DOCTYPE html>
+snapshot_path!(
+    test_path,
+    "./testdata/test/test.md",
+    r#"<!DOCTYPE html>
 <html lang="">
 
 <head>
@@ -225,4 +228,5 @@ key: value
 </body>
 
 </html>
-"#);
+"#
+);
