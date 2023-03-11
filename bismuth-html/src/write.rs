@@ -25,6 +25,8 @@ pub mod utils {
     }
 
     /// Makes the `./bulid/assets/` folder
+    /// Will make the `./build/` folder if it does not exitst
+    /// But if it does not, you *should* call `make_build()`
     pub fn make_build_assets() -> Result<(), Error> {
         let assets = Path::new(BUILD_ASSETS);
         if !assets.exists() {
@@ -43,6 +45,7 @@ pub mod utils {
     }
 
     /// Writes a html file to the `./build/` folder
+    /// The path should not have a . in the begining
     pub fn write_html_file(content: &str, path: &PathBuf) -> Result<(), Error> {
         // Makes build dir if it does not exitst
         make_build()?;
@@ -51,5 +54,19 @@ pub mod utils {
         let full_path = path_build.join(path);
 
         fs::write(full_path, content)
+    }
+
+    /// Moves a asset from the `./assets/` folder to the `./bulid/assets/` folder
+    /// The path should not have a . in the begining
+    pub fn move_asset(path: &PathBuf) -> Result<(), Error> {
+        // Makes both the `./assets/` folder and the `./build/assets/` folder if the do not exitst
+        make_assets()?;
+        make_build_assets()?;
+
+        let new_path = Path::new(BUILD).join(&path);
+        let old_full = Path::new("./").canonicalize()?.join(&path);
+
+        fs::copy(old_full, new_path)?;
+        Ok(())
     }
 }

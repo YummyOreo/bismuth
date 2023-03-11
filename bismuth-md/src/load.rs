@@ -16,7 +16,7 @@ pub fn load_from_dir(path: &PathBuf) -> Result<Vec<MarkdownFile>, MarkdownFileEr
         let file_path = file.unwrap().path();
         let rel = file_path
             .to_string_lossy()
-            .replace(&path.to_string_lossy().to_string(), ".");
+            .replace(&path.to_string_lossy().to_string(), "");
         let file_rel = PathBuf::from(rel);
         if file_path.is_dir() {
             if let Ok(mut m) = load_from_dir(&file_path) {
