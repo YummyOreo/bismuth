@@ -20,6 +20,16 @@ For internal/default templates, use:
 
 Lazyload all images
 
+# Folders + files
+```
+- dist <Where the files will be rendered>
+    - assets <All the assents such as images>
+    - index.html
+- assets <All the source assests>
+- src <Where the .md files are located>
+- bismuth.toml <Config file>
+```
+
 # Built In Customs:
 ## Header/Navbar:
 Like the footer:
