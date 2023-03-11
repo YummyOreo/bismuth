@@ -2,6 +2,7 @@ use bismuth_parser::Parser;
 
 mod render;
 mod template;
+pub mod write;
 
 use crate::render::Render;
 

@@ -18,7 +18,6 @@ pub trait Render {
 #[derive(Clone)]
 pub struct Renderer {
     pub parser: Parser,
-    pos: usize,
 
     output: String,
 
@@ -40,7 +39,6 @@ impl Renderer {
         );
         Self {
             parser,
-            pos: 0,
             output: String::new(),
             path,
         }
@@ -49,6 +47,7 @@ impl Renderer {
 
 // TODO: replace this with calling render on Template, do this by constructing a Template with the
 // template said in the metadata (or default one) then call render
+/// This will set self.output for you
 impl Render for Renderer {
     fn render(&mut self) -> Option<String> {
         let kind = self.parser.metadata.frontmatter.get_kind()?;
@@ -65,13 +64,17 @@ impl Render for Renderer {
 
         let elements = &self.parser.ast.elements;
         let mut template = Template::new_from_name(kind, &values, None, elements)?;
-        template.render()
+        self.output = template.render()?;
+        Some(self.output.clone())
     }
 }
 
 /// Will return (Url, Should be _blank)
 fn parse_url(url: &str) -> (String, bool) {
     // TODO: Make it so these V (inside the website) will be moved to /assets/
+    // If it does not end in anything or does not end ing .html, assume it is in /assests/
+    // If it is in assets then move it,
+    // For both make the correct .. based on the path
     if url.starts_with('/') || url.starts_with('\\') || url.starts_with('.') {
         return (url.to_string(), false);
     }
