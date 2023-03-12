@@ -18,6 +18,7 @@ pub trait Render {
 #[derive(Clone)]
 pub struct Renderer {
     pub parser: Parser,
+    pub asset_list: Vec<PathBuf>,
 
     output: String,
 
@@ -39,9 +40,22 @@ impl Renderer {
         );
         Self {
             parser,
+            asset_list: vec![],
             output: String::new(),
             path,
         }
+    }
+
+    /// Will return (Url, Should be _blank)
+    fn parse_url(&self, url: &str) -> (String, bool) {
+        // TODO: Make it so these V (inside the website) will be moved to /assets/
+        // If it does not end in anything or does not end ing .html, assume it is in /assests/
+        // If it is in assets then move it,
+        // For both make the correct .. based on the path
+        if url.starts_with('/') || url.starts_with('\\') || url.starts_with('.') {
+            return (url.to_string(), false);
+        }
+        (url.to_string(), true)
     }
 }
 
@@ -69,18 +83,6 @@ impl Render for Renderer {
     }
 }
 
-/// Will return (Url, Should be _blank)
-fn parse_url(url: &str) -> (String, bool) {
-    // TODO: Make it so these V (inside the website) will be moved to /assets/
-    // If it does not end in anything or does not end ing .html, assume it is in /assests/
-    // If it is in assets then move it,
-    // For both make the correct .. based on the path
-    if url.starts_with('/') || url.starts_with('\\') || url.starts_with('.') {
-        return (url.to_string(), false);
-    }
-    (url.to_string(), true)
-}
-
 impl Render for Element {
     fn render(&mut self) -> Option<String> {
         let mut inside = self
@@ -106,7 +108,8 @@ impl Render for Element {
             Kind::Text => (self.text.clone().unwrap_or_default(), Default::default()),
 
             Kind::Link => {
-                let (url, blank) = parse_url(&self.get_attr("link").cloned().unwrap_or_default());
+                let (url, blank) =
+                    self.parse_url(&self.get_attr("link").cloned().unwrap_or_default());
                 let blank = {
                     if blank {
                         String::from(r#" target="blank""#)
