@@ -4,6 +4,7 @@ use bismuth_parser::{
     tree::{Ast, Element, Kind},
     Parser,
 };
+use regex::Regex;
 use std::convert::TryFrom;
 use std::path::PathBuf;
 
@@ -11,14 +12,18 @@ mod code;
 use crate::render::code::highlight;
 use crate::template::Template;
 
+#[derive(Clone)]
+pub struct Context<'a> {
+    pub path: &'a PathBuf,
+}
+
 pub trait Render {
-    fn render(&mut self) -> Option<String>;
+    fn render(&mut self, context: Option<Context>) -> Option<String>;
 }
 
 #[derive(Clone)]
 pub struct Renderer {
     pub parser: Parser,
-    pub asset_list: Vec<PathBuf>,
 
     output: String,
 
@@ -40,30 +45,75 @@ impl Renderer {
         );
         Self {
             parser,
-            asset_list: vec![],
             output: String::new(),
             path,
         }
     }
+}
 
-    /// Will return (Url, Should be _blank)
-    fn parse_url(&self, url: &str) -> (String, bool) {
-        // TODO: Make it so these V (inside the website) will be moved to /assets/
-        // If it does not end in anything or does not end ing .html, assume it is in /assests/
-        // If it is in assets then move it,
-        // For both make the correct .. based on the path
-        if url.starts_with('/') || url.starts_with('\\') || url.starts_with('.') {
-            return (url.to_string(), false);
+fn handle_file_url(url: &str, text: &str, context: Context) -> String {
+    // check if it is a valid utl
+    // If so, check ends with | image | unknown -> return image thing | video -> return video thing
+    // If not, check if it exists in the /assets/ folder, do ../ thing, then move it and do valid url thing
+    let valid_url = Regex::new(
+        r"^(http(s):\\/\\/.)?[-a-zA-Z0-9@:%._\\+~#=]{2,256}\\.[a-z]{2,6}\\b([-a-zA-Z0-9@:%_\\+.~#?&//=]*)$",
+    ).expect("Should be valid regex");
+
+    if valid_url.is_match(url) {
+    } else {
+        // TODO: Move the asset
+        let mut dot_number: usize = 0;
+        let mut path_cloned = context.path.clone();
+        while path_cloned.pop() == true {
+            dot_number += 1_usize;
         }
-        (url.to_string(), true)
+        let pre = "..".repeat(dot_number);
+        let picture_rg = Regex::new(r"^.+\.(png|jpeg|apng|avif|gif|jpg|jfif|pjpeg|pjp|svg|webp)$")
+            .expect("Should be valid regex");
+        let video_rg = Regex::new(r"^.+\.(webm|mp4)$").expect("Should be valid regex");
+
+        if picture_rg.is_match(url) {
+            return format!(r#"<img src="{pre}{url}" alt="{text}">"#);
+        } else if video_rg.is_match(url) {
+            let format = video_rg
+                .captures_iter(url)
+                .next()
+                .expect("Should have 2 capture groups")
+                .get(1)
+                .expect("Should have 1 capture")
+                .as_str();
+            return format!(r#"<source src="{pre}{url}" type="video/{format}">"#);
+        }
     }
+    todo!()
+}
+fn handle_link(url: &str) {
+    // check if it is a valid utl
+    // if so return _blank
+    // else do the valid ../ thing and return non _blank
+    todo!()
+}
+
+/// Will return (Url, Should be _blank)
+fn parse_url(url: &str) -> (String, bool) {
+    // This should probably be changed to detecting the type (ie png or video) then returning
+    // the correct html, make a seporate function for links
+
+    // TODO: Make it so these V (inside the website) will be moved to /assets/
+    // If it does not end in anything or does not end ing .html, assume it is in /assests/
+    // If it is in assets then move it,
+    // For both make the correct .. based on the path
+    if url.starts_with('/') || url.starts_with('\\') || url.starts_with('.') {
+        return (url.to_string(), false);
+    }
+    (url.to_string(), true)
 }
 
 // TODO: replace this with calling render on Template, do this by constructing a Template with the
 // template said in the metadata (or default one) then call render
 /// This will set self.output for you
 impl Render for Renderer {
-    fn render(&mut self) -> Option<String> {
+    fn render(&mut self, context: Option<Context>) -> Option<String> {
         let kind = self.parser.metadata.frontmatter.get_kind()?;
 
         let mut values = self
@@ -78,17 +128,24 @@ impl Render for Renderer {
 
         let elements = &self.parser.ast.elements;
         let mut template = Template::new_from_name(kind, &values, None, elements)?;
-        self.output = template.render()?;
+
+        let context = Context { path: &self.path };
+
+        self.output = template.render(Some(context))?;
         Some(self.output.clone())
     }
 }
 
 impl Render for Element {
-    fn render(&mut self) -> Option<String> {
+    fn render(&mut self, context: Option<Context>) -> Option<String> {
         let mut inside = self
             .elements
             .iter()
-            .map(|e| e.clone().render().expect("This should not fail"))
+            .map(|e| {
+                e.clone()
+                    .render(context.clone())
+                    .expect("This should not fail")
+            })
             .collect::<String>();
 
         // Gets the html of the kind. Some kinds (like Text) may not have a end
@@ -108,8 +165,7 @@ impl Render for Element {
             Kind::Text => (self.text.clone().unwrap_or_default(), Default::default()),
 
             Kind::Link => {
-                let (url, blank) =
-                    self.parse_url(&self.get_attr("link").cloned().unwrap_or_default());
+                let (url, blank) = parse_url(&self.get_attr("link").cloned().unwrap_or_default());
                 let blank = {
                     if blank {
                         String::from(r#" target="blank""#)
@@ -210,7 +266,7 @@ impl Render for Element {
             ),
             Kind::CustomElement(c) => {
                 if let Ok(mut t) = Template::try_from(&self.to_owned()) {
-                    (t.render()?, Default::default())
+                    (t.render(context)?, Default::default())
                 } else {
                     Default::default()
                 }
@@ -233,7 +289,7 @@ mod test {
         parser.parse();
         let parser = parse_custom(parser, &[]);
         let mut render = Renderer::new(parser);
-        render.render().unwrap()
+        render.render(None).unwrap()
     }
 
     macro_rules! snapshot {

@@ -8,7 +8,7 @@ use regex::Regex;
 use std::collections::HashMap;
 use std::convert::TryFrom;
 
-use crate::render::{Render, Renderer};
+use crate::render::{Render, Renderer, Context};
 
 pub mod builtin;
 
@@ -82,13 +82,13 @@ impl<'a> Template<'a> {
 }
 
 impl Render for Template<'_> {
-    fn render(&mut self) -> Option<String> {
+    fn render(&mut self, context: Option<Context>) -> Option<String> {
         let mut output = self.template.to_string();
         // First replace {elements} w/ rendered elements
         let mut elements_str = self
             .elements
             .iter()
-            .map(|e| format! {"{}", e.clone().render().expect("Should not fail")})
+            .map(|e| format! {"{}", e.clone().render(context.clone()).expect("Should not fail")})
             .collect::<String>();
         let e_rg = Regex::new(r"\{(?i)elements\}").expect("Should be valid regex");
         output = e_rg.replace(&output, elements_str).to_string();
@@ -170,7 +170,7 @@ mod test {
         );
         let mut template = init_template!(parser, &String::from("test:\n {elements}"), None);
 
-        let s = template.render().unwrap();
+        let s = template.render(None).unwrap();
         snapshot!(s);
     }
 
@@ -186,7 +186,7 @@ mod test {
         );
         let mut template = init_template!(parser, &String::from("test:\n {elements}"), None);
 
-        let s = template.render().unwrap();
+        let s = template.render(None).unwrap();
         snapshot!(s);
     }
 
@@ -204,7 +204,7 @@ mod test {
         let name = parser.metadata.frontmatter.get_kind().unwrap();
         let mut template = init_template_name!(parser, name, None);
 
-        let s = template.render().unwrap();
+        let s = template.render(None).unwrap();
         snapshot!(s);
     }
 }

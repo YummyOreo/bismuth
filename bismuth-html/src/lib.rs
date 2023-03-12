@@ -11,7 +11,7 @@ use crate::render::Render;
 
 pub fn render_one(parser: Parser) -> Option<String> {
     let mut renderer = render::Renderer::new(parser);
-    renderer.render()
+    renderer.render(None)
 }
 pub fn render_list() {
     todo!()
