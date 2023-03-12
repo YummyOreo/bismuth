@@ -94,6 +94,7 @@ pub struct Element {
     pub elements: Vec<Element>,
     pub text: Option<String>,
     pub attrs: HashMap<String, String>,
+    pub asset_list: Vec<std::path::PathBuf>,
 
     id: u32,
 }
@@ -107,6 +108,7 @@ impl Element {
             elements: vec![],
             text: Default::default(),
             attrs: Default::default(),
+            asset_list: Default::default(),
 
             id: rng.gen::<u32>(),
         }

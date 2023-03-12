@@ -1,0 +1,24 @@
+---
+source: bismuth-custom/src/lib.rs
+assertion_line: 171
+expression: customs
+---
+[
+    Element {
+        kind: CustomElement(
+            CustomElm {
+                name: "test",
+                values: {
+                    "other": "key",
+                },
+                body: None,
+                template: None,
+            },
+        ),
+        elements: [],
+        text: None,
+        attrs: {},
+        asset_list: [],
+        id: [redacted],
+    },
+]

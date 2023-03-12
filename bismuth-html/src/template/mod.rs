@@ -14,7 +14,7 @@ use crate::render::{Render, Renderer};
 pub mod builtin;
 
 /// Data/Values: Will be replaced (as a string) at {key}
-/// Reserved keys: `body` and `elements`
+/// Reserved keys: `body` and `elements` (Sometimes title if a full page template)
 ///
 /// Body: Will be replaced at {body}
 /// Elements: Will be replaced at {elements}
@@ -24,6 +24,7 @@ pub struct Template<'a> {
     values: &'a HashMap<String, String>,
     body: Option<&'a String>,
     pub elements: &'a Vec<Element>,
+    pub asset_list: Vec<PathBuf>,
 }
 
 impl<'a> TryFrom<&'a Element> for Template<'a> {
@@ -40,6 +41,7 @@ impl<'a> TryFrom<&'a Element> for Template<'a> {
                     values: &c.values,
                     body: c.body.as_ref(),
                     elements: &elm.elements,
+                    asset_list: vec![],
                 });
             }
         }
@@ -59,6 +61,7 @@ impl<'a> Template<'a> {
             values,
             body,
             elements,
+            asset_list: vec![],
         }
     }
 
@@ -89,9 +92,12 @@ impl Render for Template<'_> {
         let mut elements_str = self
             .elements
             .iter()
-            // TODO: when rending the element, when it is done, add the asset list to template's asset
-            // list
-            .map(|e| format! {"{}", e.clone().render(path).expect("Should not fail")})
+            .map(|e| {
+                let mut element = e.clone();
+                let html = element.render(path).expect("Should not fail");
+                self.asset_list.append(&mut element.asset_list);
+                html
+            })
             .collect::<String>();
         let e_rg = Regex::new(r"\{(?i)elements\}").expect("Should be valid regex");
         output = e_rg.replace(&output, elements_str).to_string();
@@ -136,6 +142,7 @@ mod test {
                 body: $body,
                 elements: &$parser.ast.elements,
                 values: &$parser.metadata.frontmatter.get_values().unwrap(),
+                asset_list: vec![],
             }
         };
     }
@@ -147,6 +154,7 @@ mod test {
                 body: $body,
                 elements: &$parser.ast.elements,
                 values: &$parser.metadata.frontmatter.get_values().unwrap(),
+                asset_list: vec![],
             }
         };
     }

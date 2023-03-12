@@ -11,6 +11,7 @@ use std::path::PathBuf;
 mod code;
 use crate::render::code::highlight;
 use crate::template::Template;
+const URL_CHECK: &str = r"^(http(s):\\/\\/.)?[-a-zA-Z0-9@:%._\\+~#=]{2,256}\\.[a-z]{2,6}\\b([-a-zA-Z0-9@:%_\\+.~#?&//=]*)$";
 
 pub trait Render {
     fn render(&mut self, path: &PathBuf) -> Option<String>;
@@ -19,6 +20,7 @@ pub trait Render {
 #[derive(Clone)]
 pub struct Renderer {
     pub parser: Parser,
+    pub asset_list: Vec<PathBuf>,
 
     output: String,
 
@@ -40,24 +42,23 @@ impl Renderer {
         );
         Self {
             parser,
+            asset_list: vec![],
             output: String::new(),
             path,
         }
     }
 }
 
-// Should return the asset to move if it exitst, then the caller can add it to a list
-fn handle_file_url(url: &str, text: &str, path: &PathBuf) -> String {
+/// Returns (Html, File to move)
+fn handle_file_url(url: &str, text: &str, path: &PathBuf) -> (String, Option<PathBuf>) {
     // check if it is a valid utl
     // If so, check ends with | image | unknown -> return image thing | video -> return video thing
     // If not, check if it exists in the /assets/ folder, do ../ thing, then move it and do valid url thing
-    let valid_url = Regex::new(
-        r"^(http(s):\\/\\/.)?[-a-zA-Z0-9@:%._\\+~#=]{2,256}\\.[a-z]{2,6}\\b([-a-zA-Z0-9@:%_\\+.~#?&//=]*)$",
-    ).expect("Should be valid regex");
+    let valid_url = Regex::new(URL_CHECK).expect("Should be valid regex");
 
     if valid_url.is_match(url) {
+        return (format!(r#"<img src="{url}" alt="{text}">"#), None);
     } else {
-        // TODO: Move the asset
         let mut dot_number: usize = 0;
         let mut path_cloned = path.clone();
         while path_cloned.pop() == true {
@@ -69,7 +70,10 @@ fn handle_file_url(url: &str, text: &str, path: &PathBuf) -> String {
         let video_rg = Regex::new(r"^.+\.(webm|mp4)$").expect("Should be valid regex");
 
         if picture_rg.is_match(url) {
-            return format!(r#"<img src="{pre}{url}" alt="{text}">"#);
+            return (
+                format!(r#"<img src="{pre}{url}" alt="{text}">"#),
+                Some(PathBuf::from(url)),
+            );
         } else if video_rg.is_match(url) {
             let format = video_rg
                 .captures_iter(url)
@@ -78,10 +82,13 @@ fn handle_file_url(url: &str, text: &str, path: &PathBuf) -> String {
                 .get(1)
                 .expect("Should have 1 capture")
                 .as_str();
-            return format!(r#"<source src="{pre}{url}" type="video/{format}">"#);
+            return (
+                format!(r#"<source src="{pre}{url}" type="video/{format}">"#),
+                Some(PathBuf::from(url)),
+            );
         }
     }
-    todo!()
+    Default::default()
 }
 fn handle_link(url: &str) {
     // check if it is a valid utl
@@ -105,9 +112,8 @@ fn parse_url(url: &str) -> (String, bool) {
     (url.to_string(), true)
 }
 
-// TODO: replace this with calling render on Template, do this by constructing a Template with the
-// template said in the metadata (or default one) then call render
 /// This will set self.output for you
+/// asset_list will be populated with the assets that are needed to be moved
 impl Render for Renderer {
     fn render(&mut self, path: &PathBuf) -> Option<String> {
         let kind = self.parser.metadata.frontmatter.get_kind()?;
@@ -126,7 +132,7 @@ impl Render for Renderer {
         let mut template = Template::new_from_name(kind, &values, None, elements)?;
 
         self.output = template.render(path)?;
-        // TODO: add templates asset list to your own
+        self.asset_list.append(&mut template.asset_list);
         Some(self.output.clone())
     }
 }
@@ -156,7 +162,6 @@ impl Render for Element {
             Kind::Text => (self.text.clone().unwrap_or_default(), Default::default()),
 
             Kind::Link => {
-                // TODO: when calling this, add the asset to the asset list
                 let (url, blank) = parse_url(&self.get_attr("link").cloned().unwrap_or_default());
                 let blank = {
                     if blank {
@@ -170,14 +175,17 @@ impl Render for Element {
                     Default::default(),
                 )
             }
-            Kind::FilePrev => (
-                format!(
-                    r#"<img src="{}" alt="{}">"#,
-                    self.get_attr("link").cloned().unwrap_or_default(),
-                    self.text.clone().unwrap_or_default()
-                ),
-                Default::default(),
-            ),
+            Kind::FilePrev => {
+                let (html, asset) = handle_file_url(
+                    &self.get_attr("link").cloned().unwrap_or_default(),
+                    &self.text.clone().unwrap_or_default(),
+                    path,
+                );
+                if let Some(asset) = asset {
+                    self.asset_list.push(asset);
+                }
+                (html, Default::default())
+            }
 
             Kind::ListItem => (
                 format!(
@@ -258,8 +266,9 @@ impl Render for Element {
             ),
             Kind::CustomElement(c) => {
                 if let Ok(mut t) = Template::try_from(&self.to_owned()) {
-                    // TODO: after rending, add templates asset list to your own
-                    (t.render(path)?, Default::default())
+                    let html = t.render(path)?;
+                    self.asset_list.append(&mut t.asset_list);
+                    (html, Default::default())
                 } else {
                     Default::default()
                 }

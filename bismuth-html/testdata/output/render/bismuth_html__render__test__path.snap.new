@@ -1,3 +1,8 @@
+---
+source: bismuth-html/src/render/mod.rs
+assertion_line: 351
+expression: snapshot(&content)
+---
 <!DOCTYPE html>
 <html lang="">
 
@@ -6,15 +11,11 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
     <meta name="head:count" content="4">
-    <title>This is a test</title>
+    <title>test</title>
 </head>
 
 <body>
-
-<br>
-
-<br>
-<h1> h1 Heading 8-</h1>
+    <h1> h1 Heading 8-</h1>
 <br>
 <h2> h2 Heading</h2>
 <br>
@@ -172,7 +173,7 @@
 <br>
 
 <br>
-<a target="/test" >
+<a target="/test">
 <br>
 
 <br>
@@ -186,7 +187,7 @@
 <br>
 <img src="/test.png" alt="Minion">
 <br>
-<img src="example.com" alt="Stormtroopocat">
+
 <br>
 
 <br>
@@ -198,27 +199,8 @@
 <br>
 <blockquote> TODO:</blockquote>
 <br>
-key: value
-<br>
-
-<br>
-<h3> Tex:</h3>
-<br>
-
-<br>
-<p>inline <span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>e</mi><mo>=</mo><mi>m</mi><msup><mi>c</mi><mn>2</mn></msup></mrow><annotation encoding="application/x-tex">e = mc^2</annotation></semantics></math></span></p>
-<br>
-
-<br>
-<p>$</p>
-<br>
-<p>e = mc^2</p>
-<br>
-<p>$</p>
-<br>
-
-<br>
 
 </body>
 
 </html>
+
