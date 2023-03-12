@@ -136,11 +136,7 @@ impl Render for Element {
         let mut inside = self
             .elements
             .iter()
-            .map(|e| {
-                e.clone()
-                    .render(path)
-                    .expect("This should not fail")
-            })
+            .map(|e| e.clone().render(path).expect("This should not fail"))
             .collect::<String>();
 
         // Gets the html of the kind. Some kinds (like Text) may not have a end
