@@ -1,4 +1,5 @@
 use bismuth_parser::Parser;
+use std::path::PathBuf;
 
 mod render;
 mod template;
@@ -11,7 +12,7 @@ use crate::render::Render;
 
 pub fn render_one(parser: Parser) -> Option<String> {
     let mut renderer = render::Renderer::new(parser);
-    renderer.render(None)
+    renderer.render(&PathBuf::new())
 }
 pub fn render_list() {
     todo!()

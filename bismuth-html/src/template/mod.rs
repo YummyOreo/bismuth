@@ -7,8 +7,9 @@ use bismuth_parser::{
 use regex::Regex;
 use std::collections::HashMap;
 use std::convert::TryFrom;
+use std::path::PathBuf;
 
-use crate::render::{Render, Renderer, Context};
+use crate::render::{Render, Renderer};
 
 pub mod builtin;
 
@@ -82,13 +83,15 @@ impl<'a> Template<'a> {
 }
 
 impl Render for Template<'_> {
-    fn render(&mut self, context: Option<Context>) -> Option<String> {
+    fn render(&mut self, path: &PathBuf) -> Option<String> {
         let mut output = self.template.to_string();
         // First replace {elements} w/ rendered elements
         let mut elements_str = self
             .elements
             .iter()
-            .map(|e| format! {"{}", e.clone().render(context.clone()).expect("Should not fail")})
+            // TODO: when rending the element, when it is done, add the asset list to template's asset
+            // list
+            .map(|e| format! {"{}", e.clone().render(path).expect("Should not fail")})
             .collect::<String>();
         let e_rg = Regex::new(r"\{(?i)elements\}").expect("Should be valid regex");
         output = e_rg.replace(&output, elements_str).to_string();
@@ -170,7 +173,7 @@ mod test {
         );
         let mut template = init_template!(parser, &String::from("test:\n {elements}"), None);
 
-        let s = template.render(None).unwrap();
+        let s = template.render(&PathBuf::new()).unwrap();
         snapshot!(s);
     }
 
@@ -186,7 +189,7 @@ mod test {
         );
         let mut template = init_template!(parser, &String::from("test:\n {elements}"), None);
 
-        let s = template.render(None).unwrap();
+        let s = template.render(&PathBuf::new()).unwrap();
         snapshot!(s);
     }
 
@@ -204,7 +207,7 @@ mod test {
         let name = parser.metadata.frontmatter.get_kind().unwrap();
         let mut template = init_template_name!(parser, name, None);
 
-        let s = template.render(None).unwrap();
+        let s = template.render(&PathBuf::new()).unwrap();
         snapshot!(s);
     }
 }

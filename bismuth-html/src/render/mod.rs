@@ -12,13 +12,8 @@ mod code;
 use crate::render::code::highlight;
 use crate::template::Template;
 
-#[derive(Clone)]
-pub struct Context<'a> {
-    pub path: &'a PathBuf,
-}
-
 pub trait Render {
-    fn render(&mut self, context: Option<Context>) -> Option<String>;
+    fn render(&mut self, path: &PathBuf) -> Option<String>;
 }
 
 #[derive(Clone)]
@@ -51,7 +46,8 @@ impl Renderer {
     }
 }
 
-fn handle_file_url(url: &str, text: &str, context: Context) -> String {
+// Should return the asset to move if it exitst, then the caller can add it to a list
+fn handle_file_url(url: &str, text: &str, path: &PathBuf) -> String {
     // check if it is a valid utl
     // If so, check ends with | image | unknown -> return image thing | video -> return video thing
     // If not, check if it exists in the /assets/ folder, do ../ thing, then move it and do valid url thing
@@ -63,7 +59,7 @@ fn handle_file_url(url: &str, text: &str, context: Context) -> String {
     } else {
         // TODO: Move the asset
         let mut dot_number: usize = 0;
-        let mut path_cloned = context.path.clone();
+        let mut path_cloned = path.clone();
         while path_cloned.pop() == true {
             dot_number += 1_usize;
         }
@@ -113,7 +109,7 @@ fn parse_url(url: &str) -> (String, bool) {
 // template said in the metadata (or default one) then call render
 /// This will set self.output for you
 impl Render for Renderer {
-    fn render(&mut self, context: Option<Context>) -> Option<String> {
+    fn render(&mut self, path: &PathBuf) -> Option<String> {
         let kind = self.parser.metadata.frontmatter.get_kind()?;
 
         let mut values = self
@@ -129,21 +125,20 @@ impl Render for Renderer {
         let elements = &self.parser.ast.elements;
         let mut template = Template::new_from_name(kind, &values, None, elements)?;
 
-        let context = Context { path: &self.path };
-
-        self.output = template.render(Some(context))?;
+        self.output = template.render(path)?;
+        // TODO: add templates asset list to your own
         Some(self.output.clone())
     }
 }
 
 impl Render for Element {
-    fn render(&mut self, context: Option<Context>) -> Option<String> {
+    fn render(&mut self, path: &PathBuf) -> Option<String> {
         let mut inside = self
             .elements
             .iter()
             .map(|e| {
                 e.clone()
-                    .render(context.clone())
+                    .render(path)
                     .expect("This should not fail")
             })
             .collect::<String>();
@@ -165,6 +160,7 @@ impl Render for Element {
             Kind::Text => (self.text.clone().unwrap_or_default(), Default::default()),
 
             Kind::Link => {
+                // TODO: when calling this, add the asset to the asset list
                 let (url, blank) = parse_url(&self.get_attr("link").cloned().unwrap_or_default());
                 let blank = {
                     if blank {
@@ -266,7 +262,8 @@ impl Render for Element {
             ),
             Kind::CustomElement(c) => {
                 if let Ok(mut t) = Template::try_from(&self.to_owned()) {
-                    (t.render(context)?, Default::default())
+                    // TODO: after rending, add templates asset list to your own
+                    (t.render(path)?, Default::default())
                 } else {
                     Default::default()
                 }
@@ -289,7 +286,7 @@ mod test {
         parser.parse();
         let parser = parse_custom(parser, &[]);
         let mut render = Renderer::new(parser);
-        render.render(None).unwrap()
+        render.render(&PathBuf::new()).unwrap()
     }
 
     macro_rules! snapshot {
