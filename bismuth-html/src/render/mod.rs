@@ -11,7 +11,7 @@ use std::path::PathBuf;
 mod code;
 use crate::render::code::highlight;
 use crate::template::Template;
-const URL_CHECK: &str = r"^(http(s):\\/\\/.)?[-a-zA-Z0-9@:%._\\+~#=]{2,256}\\.[a-z]{2,6}\\b([-a-zA-Z0-9@:%_\\+.~#?&//=]*)$";
+const URL_CHECK: &str = r"^(http(s)://.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)$";
 
 pub trait Render {
     fn render(&mut self, path: &PathBuf) -> Option<String>;
@@ -49,6 +49,32 @@ impl Renderer {
     }
 }
 
+/// This will set self.output for you
+/// asset_list will be populated with the assets that are needed to be moved
+impl Render for Renderer {
+    fn render(&mut self, path: &PathBuf) -> Option<String> {
+        let kind = self.parser.metadata.frontmatter.get_kind()?;
+
+        let mut values = self
+            .parser
+            .metadata
+            .frontmatter
+            .get_values()
+            .unwrap_or_default();
+        if let Some(title) = self.parser.metadata.frontmatter.get_title().cloned() {
+            values.insert(String::from("title"), title);
+        }
+
+        let elements = &self.parser.ast.elements;
+        let mut template = Template::new_from_name(kind, &values, None, elements)?;
+
+        self.output = template.render(&self.path)?;
+        self.asset_list.append(&mut template.asset_list);
+        Some(self.output.clone())
+    }
+}
+
+
 /// Returns (Html, File to move)
 fn handle_file_url(url: &str, text: &str, path: &PathBuf) -> (String, Option<PathBuf>) {
     // check if it is a valid utl
@@ -64,7 +90,11 @@ fn handle_file_url(url: &str, text: &str, path: &PathBuf) -> (String, Option<Pat
         while path_cloned.pop() == true {
             dot_number += 1_usize;
         }
-        let pre = "..".repeat(dot_number);
+        let dot_number = dot_number.checked_sub(1).unwrap_or(dot_number);
+
+        let mut pre = "../".repeat(dot_number);
+        pre.remove(pre.len() - 1);
+
         let picture_rg = Regex::new(r"^.+\.(png|jpeg|apng|avif|gif|jpg|jfif|pjpeg|pjp|svg|webp)$")
             .expect("Should be valid regex");
         let video_rg = Regex::new(r"^.+\.(webm|mp4)$").expect("Should be valid regex");
@@ -112,31 +142,6 @@ fn parse_url(url: &str) -> (String, bool) {
     (url.to_string(), true)
 }
 
-/// This will set self.output for you
-/// asset_list will be populated with the assets that are needed to be moved
-impl Render for Renderer {
-    fn render(&mut self, path: &PathBuf) -> Option<String> {
-        let kind = self.parser.metadata.frontmatter.get_kind()?;
-
-        let mut values = self
-            .parser
-            .metadata
-            .frontmatter
-            .get_values()
-            .unwrap_or_default();
-        if let Some(title) = self.parser.metadata.frontmatter.get_title().cloned() {
-            values.insert(String::from("title"), title);
-        }
-
-        let elements = &self.parser.ast.elements;
-        let mut template = Template::new_from_name(kind, &values, None, elements)?;
-
-        self.output = template.render(path)?;
-        self.asset_list.append(&mut template.asset_list);
-        Some(self.output.clone())
-    }
-}
-
 impl Render for Element {
     fn render(&mut self, path: &PathBuf) -> Option<String> {
         let mut inside = self
@@ -165,14 +170,15 @@ impl Render for Element {
                 let (url, blank) = parse_url(&self.get_attr("link").cloned().unwrap_or_default());
                 let blank = {
                     if blank {
-                        String::from(r#" target="blank""#)
+                        String::from(r#" target="_blank""#)
                     } else {
                         Default::default()
                     }
                 };
+                let text = self.get_text().cloned().unwrap_or_default();
                 (
-                    format!(r#"<a target="{}"{}>"#, url, blank),
-                    Default::default(),
+                    format!(r#"<a target="{}"{}>{}"#, url, blank, text),
+                    format!(r"</a>")
                 )
             }
             Kind::FilePrev => {
@@ -287,7 +293,7 @@ mod test {
     use bismuth_custom::parse_custom;
 
     fn snapshot(content: &str) -> String {
-        let mut parser = Parser::new_test("/test/", content);
+        let mut parser = Parser::new_test("/test/test.html", content);
         parser.parse();
         let parser = parse_custom(parser, &[]);
         let mut render = Renderer::new(parser);

@@ -172,11 +172,11 @@ expression: snapshot(&content)
 <br>
 
 <br>
-<a target="/test">
+<a target="/test">link text</a>
 <br>
 
 <br>
-<a target="example.com" target="blank">
+<a target="example.com" target="_blank">link with title</a>
 <br>
 
 <br>
@@ -184,7 +184,7 @@ expression: snapshot(&content)
 <br>
 
 <br>
-<img src="/test.png" alt="Minion">
+<img src="../assets/test.png" alt="Minion">
 <br>
 <img src="example.com" alt="Stormtroopocat">
 <br>
@@ -196,7 +196,25 @@ expression: snapshot(&content)
 <br>
 <h2> Custom stuff:</h2>
 <br>
-<blockquote> TODO:</blockquote>
+
+<br>
+
+<br>
+<h3> Tex:</h3>
+<br>
+
+<br>
+<p>inline <span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>T</mi><mi>e</mi><mi>x</mi></mrow><annotation encoding="application/x-tex">Tex</annotation></semantics></math></span></p>
+<br>
+
+<br>
+<p>$</p>
+<br>
+<p>None inline</p>
+<br>
+<p>$</p>
+<br>
+
 <br>
 
 </body>

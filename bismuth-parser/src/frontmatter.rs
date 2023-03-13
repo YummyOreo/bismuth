@@ -19,7 +19,8 @@ impl FrontMatter {
             .file_name()
             .expect("Should be a file")
             .to_string_lossy()
-            .to_string();
+            .to_string()
+            .replace(".html", "");
 
         FrontMatter {
             title: Some(title),

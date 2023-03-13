@@ -85,16 +85,15 @@ console.log(foo(5));
 
 ## Images
 
-![Minion](/test.png)
+![Minion](/assets/test.png)
 ![Stormtroopocat](example.com)
 
 Like links, Images also have a footnote style syntax
 
 ## Custom stuff:
-> TODO:
 %{{
-    templates here
-    or lists
+    name: blog post
+    key: value
 }}
 
 ### Tex:

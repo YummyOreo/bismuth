@@ -17,6 +17,7 @@ expression: customs
         elements: [],
         text: None,
         attrs: {},
+        asset_list: [],
         id: [redacted],
     },
 ]
