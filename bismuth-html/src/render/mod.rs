@@ -11,7 +11,9 @@ use std::path::PathBuf;
 mod code;
 use crate::render::code::highlight;
 use crate::template::Template;
-const URL_CHECK: &str = r"^(http(s)://.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)$";
+use crate::utils::get_dots;
+const URL_CHECK: &str =
+    r"^(http(s)://.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)$";
 
 pub trait Render {
     fn render(&mut self, path: &PathBuf) -> Option<String>;
@@ -74,7 +76,6 @@ impl Render for Renderer {
     }
 }
 
-
 /// Returns (Html, File to move)
 fn handle_file_url(url: &str, text: &str, path: &PathBuf) -> (String, Option<PathBuf>) {
     // check if it is a valid utl
@@ -85,15 +86,7 @@ fn handle_file_url(url: &str, text: &str, path: &PathBuf) -> (String, Option<Pat
     if valid_url.is_match(url) {
         return (format!(r#"<img src="{url}" alt="{text}">"#), None);
     } else {
-        let mut dot_number: usize = 0;
-        let mut path_cloned = path.clone();
-        while path_cloned.pop() == true {
-            dot_number += 1_usize;
-        }
-        let dot_number = dot_number.checked_sub(1).unwrap_or(dot_number);
-
-        let mut pre = "../".repeat(dot_number);
-        pre.remove(pre.len() - 1);
+        let pre = get_dots(path);
 
         let picture_rg = Regex::new(r"^.+\.(png|jpeg|apng|avif|gif|jpg|jfif|pjpeg|pjp|svg|webp)$")
             .expect("Should be valid regex");
@@ -120,7 +113,7 @@ fn handle_file_url(url: &str, text: &str, path: &PathBuf) -> (String, Option<Pat
     }
     Default::default()
 }
-fn handle_link(url: &str) {
+fn handle_link(url: &str, path: &PathBuf, text: &str) {
     // check if it is a valid utl
     // if so return _blank
     // else do the valid ../ thing and return non _blank
@@ -178,7 +171,7 @@ impl Render for Element {
                 let text = self.get_text().cloned().unwrap_or_default();
                 (
                     format!(r#"<a target="{}"{}>{}"#, url, blank, text),
-                    format!(r"</a>")
+                    format!(r"</a>"),
                 )
             }
             Kind::FilePrev => {
