@@ -13,6 +13,9 @@ pub fn get_dot_number(path: &PathBuf) -> usize {
 
 pub fn get_dots(path: &PathBuf) -> String {
     let mut pre = "../".repeat(get_dot_number(path));
-    pre.remove(pre.len() - 1);
+    match pre.len() {
+        0 => return String::from("."),
+        _ => pre.remove(pre.len() - 1),
+    };
     pre
 }
