@@ -12,6 +12,7 @@ mod code;
 use crate::render::code::highlight;
 use crate::template::Template;
 use crate::utils::get_dots;
+use crate::write::move_assets;
 const URL_CHECK: &str =
     r"^(http(s)://.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)$";
 
@@ -48,6 +49,19 @@ impl Renderer {
             output: String::new(),
             path,
         }
+    }
+
+    /// Will move the assets if self.output has stuff in it, and if the asset_list is not empty
+    /// Will return Ok(true) if it attempted to move it
+    /// Will return Ok(false) if self.output is empty
+    pub fn move_assets(&self) -> Result<bool, std::io::Error> {
+        if self.output.is_empty() {
+            return Ok(false);
+        } else if self.asset_list.is_empty() {
+            return Ok(true);
+        }
+        move_assets(&self.asset_list)?;
+        Ok(true)
     }
 }
 

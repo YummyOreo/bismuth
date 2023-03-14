@@ -1,4 +1,6 @@
 #![allow(dead_code)]
+use std::io::Error;
+use std::path::PathBuf;
 // use crate::render::Renderer;
 
 const BUILD: &str = "./build/";
@@ -68,3 +70,13 @@ pub mod utils {
         fs::copy(old_full, new_path).map(|_| ())
     }
 }
+
+pub fn move_assets(assets: &[PathBuf]) -> Result<(), Error> {
+    for asset in assets {
+        utils::move_asset(asset)?;
+    }
+    Ok(())
+}
+
+#[cfg(test)]
+mod tests {}
