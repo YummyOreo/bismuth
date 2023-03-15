@@ -11,7 +11,6 @@ use std::path::PathBuf;
 mod code;
 use crate::render::code::highlight;
 use crate::template::Template;
-use crate::utils::get_dots;
 use crate::write::move_assets;
 const URL_CHECK: &str =
     r"^(http(s)://.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)$";
@@ -92,23 +91,18 @@ impl Render for Renderer {
 
 /// Returns (Html, File to move)
 fn handle_file_url(url: &str, text: &str, path: &PathBuf) -> (String, Option<PathBuf>) {
-    // check if it is a valid utl
-    // If so, check ends with | image | unknown -> return image thing | video -> return video thing
-    // If not, check if it exists in the /assets/ folder, do ../ thing, then move it and do valid url thing
     let valid_url = Regex::new(URL_CHECK).expect("Should be valid regex");
 
     if valid_url.is_match(url) {
         return (format!(r#"<img src="{url}" alt="{text}">"#), None);
     } else {
-        let pre = get_dots(path);
-
         let picture_rg = Regex::new(r"^.+\.(png|jpeg|apng|avif|gif|jpg|jfif|pjpeg|pjp|svg|webp)$")
             .expect("Should be valid regex");
         let video_rg = Regex::new(r"^.+\.(webm|mp4)$").expect("Should be valid regex");
 
         if picture_rg.is_match(url) {
             return (
-                format!(r#"<img src="{pre}{url}" alt="{text}">"#),
+                format!(r#"<img src="{url}" alt="{text}">"#),
                 Some(PathBuf::from(url)),
             );
         } else if video_rg.is_match(url) {
@@ -120,13 +114,15 @@ fn handle_file_url(url: &str, text: &str, path: &PathBuf) -> (String, Option<Pat
                 .expect("Should have 1 capture")
                 .as_str();
             return (
-                format!(r#"<source src="{pre}{url}" type="video/{format}">"#),
+                format!(r#"<source src="{url}" type="video/{format}">"#),
                 Some(PathBuf::from(url)),
             );
         }
     }
     Default::default()
 }
+
+/// This will be relitive to the base dir
 fn handle_link(url: &str, text: &str) -> (String, String) {
     let valid_url = Regex::new(URL_CHECK).expect("Should be valid regex");
 
@@ -164,12 +160,10 @@ impl Render for Element {
             }
             Kind::Text => (self.text.clone().unwrap_or_default(), Default::default()),
 
-            Kind::Link => {
-                handle_link(
-                    &self.get_attr("link").cloned().unwrap_or_default(),
-                    &self.get_text().cloned().unwrap_or_default(),
-                )
-            }
+            Kind::Link => handle_link(
+                &self.get_attr("link").cloned().unwrap_or_default(),
+                &self.get_text().cloned().unwrap_or_default(),
+            ),
             Kind::FilePrev => {
                 let (html, asset) = handle_file_url(
                     &self.get_attr("link").cloned().unwrap_or_default(),

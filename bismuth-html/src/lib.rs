@@ -3,7 +3,6 @@ use std::path::PathBuf;
 
 mod render;
 mod template;
-mod utils;
 pub mod write;
 
 use crate::render::Render;
