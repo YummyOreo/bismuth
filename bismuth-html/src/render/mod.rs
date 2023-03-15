@@ -127,26 +127,17 @@ fn handle_file_url(url: &str, text: &str, path: &PathBuf) -> (String, Option<Pat
     }
     Default::default()
 }
-fn handle_link(url: &str, path: &PathBuf, text: &str) {
-    // check if it is a valid utl
-    // if so return _blank
-    // else do the valid ../ thing and return non _blank
-    todo!()
-}
+fn handle_link(url: &str, text: &str) -> (String, String) {
+    let valid_url = Regex::new(URL_CHECK).expect("Should be valid regex");
 
-/// Will return (Url, Should be _blank)
-fn parse_url(url: &str) -> (String, bool) {
-    // This should probably be changed to detecting the type (ie png or video) then returning
-    // the correct html, make a seporate function for links
-
-    // TODO: Make it so these V (inside the website) will be moved to /assets/
-    // If it does not end in anything or does not end ing .html, assume it is in /assests/
-    // If it is in assets then move it,
-    // For both make the correct .. based on the path
-    if url.starts_with('/') || url.starts_with('\\') || url.starts_with('.') {
-        return (url.to_string(), false);
+    if valid_url.is_match(url) {
+        (
+            format!(r#"<a target="{}" target="_blank">{}"#, url, text),
+            format!(r"</a>"),
+        )
+    } else {
+        (format!(r#"<a target="{}">{}"#, url, text), format!(r"</a>"))
     }
-    (url.to_string(), true)
 }
 
 impl Render for Element {
@@ -174,18 +165,9 @@ impl Render for Element {
             Kind::Text => (self.text.clone().unwrap_or_default(), Default::default()),
 
             Kind::Link => {
-                let (url, blank) = parse_url(&self.get_attr("link").cloned().unwrap_or_default());
-                let blank = {
-                    if blank {
-                        String::from(r#" target="_blank""#)
-                    } else {
-                        Default::default()
-                    }
-                };
-                let text = self.get_text().cloned().unwrap_or_default();
-                (
-                    format!(r#"<a target="{}"{}>{}"#, url, blank, text),
-                    format!(r"</a>"),
+                handle_link(
+                    &self.get_attr("link").cloned().unwrap_or_default(),
+                    &self.get_text().cloned().unwrap_or_default(),
                 )
             }
             Kind::FilePrev => {
