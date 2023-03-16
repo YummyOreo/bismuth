@@ -11,7 +11,8 @@ use std::path::PathBuf;
 mod code;
 use crate::render::code::highlight;
 use crate::template::Template;
-use crate::write::move_assets;
+use crate::write::{move_assets, utils::write_html_file};
+
 const URL_CHECK: &str =
     r"^(http(s)://.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)$";
 
@@ -61,6 +62,10 @@ impl Renderer {
         }
         move_assets(&self.asset_list)?;
         Ok(true)
+    }
+
+    pub fn write(&self) -> Result<(), std::io::Error> {
+        write_html_file(&self.output, &self.path)
     }
 }
 
