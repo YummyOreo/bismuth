@@ -1,3 +1,4 @@
+use bismuth_html::{render_list, Renderer};
 use bismuth_lexer::Lexer;
 use bismuth_md::MarkdownFile;
 use bismuth_parser::Parser;
@@ -5,8 +6,7 @@ use std::path::{Path, PathBuf};
 
 mod arguments;
 pub mod config;
-// TODO: change this to remove --dir and just take a dir. Also, make it so there has to be a
-// bismuth.toml file
+
 pub fn get_files(path: &PathBuf) -> Vec<MarkdownFile> {
     bismuth_md::load::load_from_dir(&path).unwrap()
 }
@@ -51,6 +51,10 @@ pub fn run_parser(files: Vec<Lexer>) -> Vec<Parser> {
         .collect::<Vec<Parser>>()
 }
 
+pub fn render(files: Vec<Parser>) -> Vec<(Renderer, String)> {
+    render_list(files)
+}
+
 pub fn run(dir: String) {
     let path = Path::new(&dir).canonicalize().unwrap();
 
@@ -58,7 +62,8 @@ pub fn run(dir: String) {
 
     let md_files = get_files(&path);
     let tokenized_file = run_lexer(md_files);
-    println!("{:#?}", run_parser(tokenized_file));
+    let parsers = run_parser(tokenized_file);
+    println!("{:#?}", render(parsers));
 }
 
 pub fn entry(dir: String) {

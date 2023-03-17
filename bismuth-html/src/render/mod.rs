@@ -20,7 +20,7 @@ pub trait Render {
     fn render(&mut self, path: &PathBuf) -> Option<String>;
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct Renderer {
     pub parser: Parser,
     pub asset_list: Vec<PathBuf>,

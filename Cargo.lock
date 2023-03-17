@@ -50,6 +50,7 @@ version = "0.1.0"
 dependencies = [
  "bismuth-custom",
  "bismuth-error",
+ "bismuth-html",
  "bismuth-lexer",
  "bismuth-md",
  "bismuth-parser",
