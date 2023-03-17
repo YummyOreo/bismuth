@@ -54,7 +54,7 @@ impl Custom {
         }
     }
 
-    fn run(&mut self, target: &mut Parser, others: &[&Parser]) {
+    fn run(&mut self, target: &mut Parser, others: &[Option<&Parser>]) {
         if let Some(mut p) = self.plugin.take() {
             p.run(target, others);
             self.plugin = Some(p);
@@ -90,7 +90,7 @@ fn get_customs(elements: Vec<Element>, mut current_list: Vec<u32>) -> Vec<u32> {
     current_list
 }
 
-fn run_customs(target: &mut Parser, others: &[&Parser], custom_elms: &[u32]) {
+fn run_customs(target: &mut Parser, others: &[Option<&Parser>], custom_elms: &[u32]) {
     let mut customs: Vec<Custom> = custom_elms
         .iter()
         .filter_map(|id| {
@@ -112,7 +112,7 @@ fn run_customs(target: &mut Parser, others: &[&Parser], custom_elms: &[u32]) {
     }
 }
 
-pub fn parse_custom(mut target: Parser, others: &[&Parser]) -> Parser {
+pub fn parse_custom(mut target: Parser, others: &Vec<Option<&Parser>>) -> Parser {
     if !target.has_custom {
         return target;
     }
@@ -184,7 +184,7 @@ mod test {
             Err(e) => panic!("{e}"),
         }
 
-        let customs = format!("{:#?}", parse_custom(parser, &[]));
+        let customs = format!("{:#?}", parse_custom(parser, &Default::default()));
         let re = Regex::new(r"id: \d+").unwrap();
         re.replace_all(&customs, "id: [redacted]").to_string()
     }

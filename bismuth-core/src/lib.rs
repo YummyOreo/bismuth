@@ -1,44 +1,54 @@
-use std::path::Path;
+use bismuth_lexer::Lexer;
+use bismuth_md::MarkdownFile;
+use bismuth_parser::Parser;
+use std::path::{Path, PathBuf};
 
 mod arguments;
 pub mod config;
 // TODO: change this to remove --dir and just take a dir. Also, make it so there has to be a
 // bismuth.toml file
-pub fn get_files(path: &Path) -> Vec<bismuth_md::MarkdownFile> {
-    match bismuth_md::load::load_from_dir(&path.to_path_buf()) {
-        Ok(files) => files,
-        Err(e) => panic!("{e:#?}"),
-    }
+pub fn get_files(path: &PathBuf) -> Vec<MarkdownFile> {
+    bismuth_md::load::load_from_dir(&path).unwrap()
 }
 
-pub fn run_lexer(files: Vec<bismuth_md::MarkdownFile>) -> Vec<bismuth_lexer::Lexer> {
-    let mut lexer_files: Vec<bismuth_lexer::Lexer> = vec![];
-    for file in files {
-        let mut lexer = bismuth_lexer::Lexer::new(file);
-        lexer.run_lexer().unwrap();
-        lexer_files.push(lexer);
-    }
-    lexer_files
+pub fn run_lexer(files: Vec<MarkdownFile>) -> Vec<Lexer> {
+    files
+        .iter()
+        .map(|file| {
+            let mut lexer = Lexer::new(file.clone());
+            lexer.run_lexer().unwrap();
+            lexer
+        })
+        .collect::<Vec<Lexer>>()
 }
 
-pub fn run_parser(files: Vec<bismuth_lexer::Lexer>) -> Vec<bismuth_parser::Parser> {
-    let mut parsed_files_pre: Vec<bismuth_parser::Parser> = vec![];
-    let mut parsed_files_post: Vec<bismuth_parser::Parser> = vec![];
-    for file in files {
-        let mut parser = bismuth_parser::Parser::new(file);
-        parser.parse().unwrap();
-        parsed_files_pre.push(parser)
-    }
-    for parser in parsed_files_pre.clone() {
-        let parser = bismuth_custom::parse_custom(
-            parser,
-            &parsed_files_pre
+pub fn run_parser(files: Vec<Lexer>) -> Vec<Parser> {
+    let mut parsed_files = files
+        .iter()
+        .map(|lexer| {
+            let mut parser = Parser::new(lexer.clone());
+            parser.parse().unwrap();
+            Some(parser)
+        })
+        .collect::<Vec<Option<Parser>>>();
+
+    let mut index = 0;
+    while index < parsed_files.len() {
+        let file = parsed_files[index].take().expect("Should be there");
+        let parsered = bismuth_custom::parse_custom(
+            file,
+            &parsed_files
                 .iter()
-                .collect::<Vec<&bismuth_parser::Parser>>(),
+                .map(|e| e.as_ref())
+                .collect::<Vec<Option<&Parser>>>(),
         );
-        parsed_files_post.push(parser)
+        parsed_files[index] = Some(parsered);
+        index += 1;
     }
-    parsed_files_post
+    parsed_files
+        .iter()
+        .map(|e| e.clone().expect("Should be there"))
+        .collect::<Vec<Parser>>()
 }
 
 pub fn run(dir: String) {

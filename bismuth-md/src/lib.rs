@@ -3,7 +3,7 @@ use std::path::{Path, PathBuf};
 
 pub mod load;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct MarkdownFile {
     pub content: String,
     pub path: PathBuf,
