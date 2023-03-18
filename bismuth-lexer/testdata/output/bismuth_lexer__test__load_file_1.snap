@@ -58,44 +58,45 @@ expression: "snapshot(\"./testdata/tests/test2.md\")"
 }}↲
 ^^ Token(CurlybraceRight, "}}", 131 -> 132)
   ^ Token(EndOfLine, "\n", 133 -> 133)
-[link]()↲
+[link](example.com)↲
 ^ Token(BracketLeft, "[", 134 -> 134)
  ^^^^ Token(Text, "link", 135 -> 138)
      ^ Token(BracketRight, "]", 139 -> 139)
       ^ Token(ParenthesisLeft, "(", 140 -> 140)
-       ^ Token(ParenthesisRight, ")", 141 -> 141)
-        ^ Token(EndOfLine, "\n", 142 -> 142)
-![file]()↲
-^ Token(Exclamation, "!", 143 -> 143)
- ^ Token(BracketLeft, "[", 144 -> 144)
-  ^^^^ Token(Text, "file", 145 -> 148)
-      ^ Token(BracketRight, "]", 149 -> 149)
-       ^ Token(ParenthesisLeft, "(", 150 -> 150)
-        ^ Token(ParenthesisRight, ")", 151 -> 151)
-         ^ Token(EndOfLine, "\n", 152 -> 152)
+       ^^^^^^^^^^^ Token(Text, "example.com", 141 -> 151)
+                  ^ Token(ParenthesisRight, ")", 152 -> 152)
+                   ^ Token(EndOfLine, "\n", 153 -> 153)
+![file]example.com)↲
+^ Token(Exclamation, "!", 154 -> 154)
+ ^ Token(BracketLeft, "[", 155 -> 155)
+  ^^^^ Token(Text, "file", 156 -> 159)
+      ^ Token(BracketRight, "]", 160 -> 160)
+       ^^^^^^^^^^^ Token(Text, "example.com", 161 -> 171)
+                  ^ Token(ParenthesisRight, ")", 172 -> 172)
+                   ^ Token(EndOfLine, "\n", 173 -> 173)
 ↲
-^ Token(EndOfLine, "\n", 153 -> 153)
+^ Token(EndOfLine, "\n", 174 -> 174)
 `inilen`↲
-^ Token(Backtick, "`", 154 -> 154)
- ^^^^^^ Token(Text, "inilen", 155 -> 160)
-       ^ Token(Backtick, "`", 161 -> 161)
-        ^ Token(EndOfLine, "\n", 162 -> 162)
+^ Token(Backtick, "`", 175 -> 175)
+ ^^^^^^ Token(Text, "inilen", 176 -> 181)
+       ^ Token(Backtick, "`", 182 -> 182)
+        ^ Token(EndOfLine, "\n", 183 -> 183)
 ```↲
-^^^ Token(Backtick, "```", 163 -> 165)
-   ^ Token(EndOfLine, "\n", 166 -> 166)
+^^^ Token(Backtick, "```", 184 -> 186)
+   ^ Token(EndOfLine, "\n", 187 -> 187)
 non inline↲
-^^^^^^^^^^ Token(Text, "non inline", 167 -> 176)
-          ^ Token(EndOfLine, "\n", 177 -> 177)
+^^^^^^^^^^ Token(Text, "non inline", 188 -> 197)
+          ^ Token(EndOfLine, "\n", 198 -> 198)
 ```↲
-^^^ Token(Backtick, "```", 178 -> 180)
-   ^ Token(EndOfLine, "\n", 181 -> 181)
+^^^ Token(Backtick, "```", 199 -> 201)
+   ^ Token(EndOfLine, "\n", 202 -> 202)
 ↲
-^ Token(EndOfLine, "\n", 182 -> 182)
+^ Token(EndOfLine, "\n", 203 -> 203)
 $Math?$↲
-^ Token(DollarSign, "$", 183 -> 183)
- ^^^^^ Token(Text, "Math?", 184 -> 188)
-      ^ Token(DollarSign, "$", 189 -> 189)
-       ^ Token(EndOfLine, "\n", 190 -> 190)
+^ Token(DollarSign, "$", 204 -> 204)
+ ^^^^^ Token(Text, "Math?", 205 -> 209)
+      ^ Token(DollarSign, "$", 210 -> 210)
+       ^ Token(EndOfLine, "\n", 211 -> 211)
 ↲
-^ Token(EndOfLine, "\n", 191 -> 191)
+^ Token(EndOfLine, "\n", 212 -> 212)
 

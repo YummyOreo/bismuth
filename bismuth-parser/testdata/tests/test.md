@@ -17,8 +17,8 @@ values:
 ---
 # List
 
-[link](stuff)
-![file](stuff)
+[link](example.com)
+![file](example.com)
 
 `inilen`
 ```rust

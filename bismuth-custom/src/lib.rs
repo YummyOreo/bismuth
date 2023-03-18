@@ -122,7 +122,6 @@ pub fn parse_custom(mut target: Parser, others: &Vec<Option<&Parser>>) -> Parser
     loop {
         i += 1;
         let mut new_elms = get_customs(target.ast.elements.clone(), vec![]);
-        // println!("{new_elms:#?} | {old_elms:#?}");
 
         if new_elms == old_elms {
             break;

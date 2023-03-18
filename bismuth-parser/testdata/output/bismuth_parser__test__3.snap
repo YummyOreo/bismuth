@@ -1,6 +1,6 @@
 ---
 source: bismuth-parser/src/lib.rs
-expression: "snapshot_str(\"[test](link)\\n![prev](of a file)\\ntest ![other txt](./*test*)\")"
+expression: "snapshot_str(\"[test](link.url)\\n![prev of a file](example.com)\\ntest ![other txt](./*test*)\")"
 ---
 FrontMatter {
     title: Some(
@@ -17,7 +17,7 @@ FrontMatter {
 Element{
     Kind: "Link",
     Text: Some("test"),
-    Attrs: [("link", "link")],
+    Attrs: [("link", "link.url")],
     Elements: [
     ])
 }
@@ -30,8 +30,8 @@ Element{
 }
 Element{
     Kind: "FilePrev",
-    Text: Some("prev"),
-    Attrs: [("link", "of a file")],
+    Text: Some("prev of a file"),
+    Attrs: [("link", "example.com")],
     Elements: [
     ])
 }

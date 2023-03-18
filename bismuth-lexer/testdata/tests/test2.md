@@ -13,8 +13,8 @@
 %{{
 
 }}
-[link]()
-![file]()
+[link](example.com)
+![file]example.com)
 
 `inilen`
 ```

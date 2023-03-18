@@ -268,7 +268,7 @@ Element{
 Element{
     Kind: "Link",
     Text: Some("link"),
-    Attrs: [("link", "stuff")],
+    Attrs: [("link", "example.com")],
     Elements: [
     ])
 }
@@ -282,7 +282,7 @@ Element{
 Element{
     Kind: "FilePrev",
     Text: Some("file"),
-    Attrs: [("link", "stuff")],
+    Attrs: [("link", "example.com")],
     Elements: [
     ])
 }

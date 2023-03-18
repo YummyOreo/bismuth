@@ -55,15 +55,26 @@ pub fn render(files: Vec<Parser>) -> Vec<(Renderer, String)> {
     render_list(files)
 }
 
+pub fn write(files: Vec<(Renderer, String)>) -> Result<(), std::io::Error> {
+    for file in files {
+        file.0.write()?;
+    }
+    Ok(())
+}
+
 pub fn run(dir: String) {
     let path = Path::new(&dir).canonicalize().unwrap();
 
     let _config = config::Config::new(&path);
 
-    let md_files = get_files(&path);
+    let mut src_path = path.clone();
+    src_path.push("src/");
+    let md_files = get_files(&src_path);
     let tokenized_file = run_lexer(md_files);
     let parsers = run_parser(tokenized_file);
-    println!("{:#?}", render(parsers));
+    let renderers = render(parsers);
+    write(renderers).unwrap();
+
 }
 
 pub fn entry(dir: String) {

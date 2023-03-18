@@ -28,7 +28,6 @@ impl CustomElm {
     }
 
     pub fn from_string(s: &str) -> Result<Self, CustomElmError> {
-        println!("{s}");
         let sections = s.splitn(2, "---\n").collect::<Vec<&str>>();
         let yaml = sections.first().ok_or(CustomElmError::NoKeys)?;
         let body = sections.get(1).map(|p| p.to_string());

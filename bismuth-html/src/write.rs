@@ -3,7 +3,7 @@ use std::io::Error;
 use std::path::PathBuf;
 // use crate::render::Renderer;
 
-const BUILD: &str = "./build/";
+const BUILD: &str = "./build";
 const BUILD_ASSETS: &str = "./build/assets";
 const ASSETS: &str = "./assets";
 
@@ -47,11 +47,16 @@ pub mod utils {
 
     /// Writes a html file to the `./build/` folder
     /// The path should not have a . in the begining
-    pub fn write_html_file(content: &str, path: &PathBuf) -> Result<(), Error> {
+    pub fn write_html_file(content: &str, path: &PathBuf, name: &String) -> Result<(), Error> {
         // Makes build dir if it does not exitst
         make_build()?;
+        let mut path_str = path.to_string_lossy().to_string();
+        path_str.remove(0);
+        let path = &mut PathBuf::from(path_str);
 
         let path_build = Path::new(BUILD);
+        path.pop();
+        let path = path.join(format!("{}.html", name));
         let full_path = path_build.join(path);
 
         fs::write(full_path, content)

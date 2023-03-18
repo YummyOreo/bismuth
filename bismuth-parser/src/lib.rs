@@ -629,15 +629,15 @@ impl Parser {
 
         self.advance_n_token(text.len() + 2)?;
 
-        let url = self.peek_till_kind(&TokenType::ParenthesisRight)?;
-        let url_s = url
+        let link = self.peek_till_kind(&TokenType::ParenthesisRight)?;
+        let link_s = link
             .iter()
             .map(|t| t.text.iter().collect::<String>())
             .collect::<String>();
 
-        self.advance_n_token(url.len())?;
+        self.advance_n_token(link.len())?;
 
-        Ok((text_s, url_s))
+        Ok((text_s, link_s))
     }
 
     fn handle_frontmatter(&mut self) -> ParseReturn {
@@ -969,7 +969,7 @@ mod test {
     snapshot_str!(test_2, "1. list item\n\t2. hmm");
     snapshot_str!(
         test_3,
-        "[test](link)\n![prev](of a file)\ntest ![other txt](./*test*)"
+        "[test](link.url)\n![prev of a file](example.com)\ntest ![other txt](./*test*)"
     );
     snapshot_str!(
         test_custom,

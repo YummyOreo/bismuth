@@ -20,7 +20,7 @@ impl FrontMatter {
             .expect("Should be a file")
             .to_string_lossy()
             .to_string()
-            .replace(".html", "");
+            .replace(".md", "");
 
         FrontMatter {
             title: Some(title),
