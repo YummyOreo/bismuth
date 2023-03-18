@@ -74,7 +74,6 @@ pub fn run(dir: String) {
     let parsers = run_parser(tokenized_file);
     let renderers = render(parsers);
     write(renderers).unwrap();
-
 }
 
 pub fn entry(dir: String) {

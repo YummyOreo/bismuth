@@ -66,7 +66,17 @@ impl Renderer {
 
     pub fn write(&self) -> Result<(), std::io::Error> {
         self.move_assets()?;
-        write_html_file(&self.output, &self.path, &self.parser.metadata.frontmatter.get_title().cloned().unwrap())
+        write_html_file(
+            &self.output,
+            &self.path,
+            &self
+                .parser
+                .metadata
+                .frontmatter
+                .get_title()
+                .cloned()
+                .unwrap(),
+        )
     }
 }
 
