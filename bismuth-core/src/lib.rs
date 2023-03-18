@@ -6,6 +6,7 @@ use std::path::{Path, PathBuf};
 
 mod arguments;
 pub mod config;
+mod init;
 
 pub fn get_files(path: &PathBuf) -> Vec<MarkdownFile> {
     bismuth_md::load::load_from_dir(&path).unwrap()
@@ -81,6 +82,8 @@ pub fn entry(dir: String) {
 
     match args.command {
         arguments::Commands::Run => run(dir),
-        _ => {}
+        arguments::Commands::Init { name } => {
+            init::init_folder(&name).unwrap();
+        }
     }
 }
