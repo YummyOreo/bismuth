@@ -5,6 +5,8 @@ const SRC_DIR: &str = "src/";
 const ASSETS_DIR: &str = "assets/";
 
 pub fn init_folder(name: &str) -> Result<(), std::io::Error> {
+    println!("Creating project...");
+
     let dir = format!("./{name}/");
     let src = PathBuf::from(format!("{dir}{SRC_DIR}"));
     let assets = PathBuf::from(format!("{dir}{ASSETS_DIR}"));
@@ -16,5 +18,7 @@ pub fn init_folder(name: &str) -> Result<(), std::io::Error> {
     create_dir_all(assets)?;
     write(index_file, "# This is the entry for your website!")?;
     write(config_file, include_str!("../config.toml"))?;
+
+    println!("Project created in `./{name}/`");
     Ok(())
 }

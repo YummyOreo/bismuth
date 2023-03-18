@@ -14,8 +14,8 @@ pub enum Commands {
     /// Inits a new project
     Init {
         /// Name of the project to create
-        name: String
-    }
+        name: String,
+    },
 }
 
 pub fn parse_args() -> CliArguments {

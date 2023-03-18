@@ -1,7 +1,7 @@
 mod arguments;
+mod build;
 pub mod config;
 mod init;
-mod build;
 
 pub fn entry(dir: String) {
     let args = arguments::parse_args();
