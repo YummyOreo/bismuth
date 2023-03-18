@@ -21,6 +21,8 @@ impl FrontMatter {
             .to_string_lossy()
             .to_string()
             .replace(".md", "");
+        let mut path = path.to_path_buf();
+        path.pop();
 
         FrontMatter {
             title: Some(title),

@@ -134,11 +134,11 @@ fn handle_link(url: &str, text: &str) -> (String, String) {
 
     if valid_url.is_match(url) {
         (
-            format!(r#"<a target="{}" target="_blank">{}"#, url, text),
+            format!(r#"<a href="{}" target="_blank">{}"#, url, text),
             format!(r"</a>"),
         )
     } else {
-        (format!(r#"<a target="{}">{}"#, url, text), format!(r"</a>"))
+        (format!(r#"<a href="{}">{}"#, url, text), format!(r"</a>"))
     }
 }
 

@@ -55,10 +55,13 @@ pub mod utils {
         let path = &mut PathBuf::from(path_str);
 
         let path_build = Path::new(BUILD);
-        path.pop();
         let path = path.join(format!("{}.html", name));
         let full_path = path_build.join(path);
 
+        let mut dir = full_path.clone();
+        dir.pop();
+
+        fs::create_dir_all(dir)?;
         fs::write(full_path, content)
     }
 
