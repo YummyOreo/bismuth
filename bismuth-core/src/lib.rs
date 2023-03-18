@@ -81,5 +81,6 @@ pub fn entry(dir: String) {
 
     match args.command {
         arguments::Commands::Run => run(dir),
+        _ => {}
     }
 }

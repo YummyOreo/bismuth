@@ -11,6 +11,11 @@ pub struct CliArguments {
 pub enum Commands {
     /// Run the app in the current directory
     Run,
+    /// Inits a new project
+    Init {
+        /// Name of the project to create
+        name: String
+    }
 }
 
 pub fn parse_args() -> CliArguments {
