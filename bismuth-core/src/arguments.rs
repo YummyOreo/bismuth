@@ -9,8 +9,8 @@ pub struct CliArguments {
 }
 #[derive(Debug, Subcommand)]
 pub enum Commands {
-    /// Run the app in the current directory
-    Run,
+    /// Builds the app in the current directory
+    Build,
     /// Inits a new project
     Init {
         /// Name of the project to create
