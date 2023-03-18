@@ -14,13 +14,13 @@ pub fn render_one(parser: Parser) -> Option<String> {
     let mut renderer = render::Renderer::new(parser);
     renderer.render(&PathBuf::new())
 }
-pub fn render_list(parsers: Vec<Parser>) -> Vec<(render::Renderer, String)> {
+pub fn render_list(parsers: Vec<Parser>) -> Vec<render::Renderer> {
     parsers
         .iter()
         .map(|p| {
             let mut renderer = render::Renderer::new(p.clone());
-            let s = renderer.render(&PathBuf::new());
-            (renderer, s.expect("Should not fail"))
+            let _ = renderer.render(&PathBuf::new());
+            renderer
         })
-        .collect::<Vec<(render::Renderer, String)>>()
+        .collect::<Vec<render::Renderer>>()
 }

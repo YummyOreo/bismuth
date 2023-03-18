@@ -2,13 +2,9 @@ use bismuth_html::{render_list, Renderer};
 use bismuth_lexer::Lexer;
 use bismuth_md::MarkdownFile;
 use bismuth_parser::Parser;
-use std::path::{Path, PathBuf};
+use std::path::Path;
 
 use crate::config::Config;
-
-pub fn get_files(path: &PathBuf) -> Vec<MarkdownFile> {
-    bismuth_md::load::load_from_dir(&path).unwrap()
-}
 
 pub fn run_lexer(files: Vec<MarkdownFile>) -> Vec<Lexer> {
     files
@@ -50,17 +46,6 @@ pub fn run_parser(files: Vec<Lexer>) -> Vec<Parser> {
         .collect::<Vec<Parser>>()
 }
 
-pub fn render(files: Vec<Parser>) -> Vec<(Renderer, String)> {
-    render_list(files)
-}
-
-pub fn write(files: Vec<(Renderer, String)>) -> Result<(), std::io::Error> {
-    for file in files {
-        file.0.write()?;
-    }
-    Ok(())
-}
-
 pub fn build(dir: String) {
     let path = Path::new(&dir).canonicalize().unwrap();
 
@@ -68,9 +53,13 @@ pub fn build(dir: String) {
 
     let mut src_path = path.clone();
     src_path.push("src/");
-    let md_files = get_files(&src_path);
+
+    let md_files = bismuth_md::load::load_from_dir(&path).unwrap();
     let tokenized_file = run_lexer(md_files);
     let parsers = run_parser(tokenized_file);
-    let renderers = render(parsers);
-    write(renderers).unwrap();
+
+    let renderers = render_list(parsers);
+    for r in renderers {
+        r.write().unwrap();
+    }
 }
