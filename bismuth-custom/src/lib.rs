@@ -156,7 +156,7 @@ mod test_utils {
     #[test]
     fn get_customs_test() {
         let mut parser =
-            bismuth_parser::Parser::new_test("/test/", "%{{\nname: test\nother: key\n}}");
+            bismuth_parser::Parser::new_test("/test/test.md", "%{{\nname: test\nother: key\n}}");
         parser.parse().unwrap();
 
         let custom_ids = get_customs(parser.ast.elements.clone(), vec![]);
@@ -177,7 +177,7 @@ mod test {
     use regex::Regex;
 
     fn snapshot(content: &str) -> String {
-        let mut parser = bismuth_parser::Parser::new_test("/test/", content);
+        let mut parser = bismuth_parser::Parser::new_test("/test/test.md", content);
         match parser.parse() {
             Ok(_) => {}
             Err(e) => panic!("{e}"),

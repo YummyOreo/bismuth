@@ -292,7 +292,7 @@ mod test {
     use bismuth_custom::parse_custom;
 
     fn snapshot(content: &str) -> String {
-        let mut parser = Parser::new_test("/test/test.html", content);
+        let mut parser = Parser::new_test("/test/test.md", content);
         parser.parse();
         let parser = parse_custom(parser, &vec![]);
         let mut render = Renderer::new(parser);

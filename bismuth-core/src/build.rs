@@ -1,4 +1,4 @@
-use bismuth_html::{render_list, Renderer};
+use bismuth_html::render_list;
 use bismuth_lexer::Lexer;
 use bismuth_md::MarkdownFile;
 use bismuth_parser::Parser;

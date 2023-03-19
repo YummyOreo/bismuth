@@ -7,7 +7,7 @@ FrontMatter {
         "test",
     ),
     path: Some(
-        "/test/",
+        "/test",
     ),
     kind: Some(
         "default",

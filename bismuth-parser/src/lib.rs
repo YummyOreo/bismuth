@@ -776,7 +776,7 @@ mod test_utils {
 
     fn init_lexer(content: &str) -> Lexer {
         let content = content.to_string();
-        let path = PathBuf::from("/test/");
+        let path = PathBuf::from("/test/test.md");
         let mut l = Lexer::new_test(path, content);
         l.run_lexer().unwrap();
         l
@@ -907,7 +907,7 @@ mod test {
 
     fn init_lexer(content: &str) -> Lexer {
         let content = content.to_string();
-        let path = PathBuf::from("/test/");
+        let path = PathBuf::from("/test/test.md");
         let mut l = Lexer::new_test(path, content);
         l.run_lexer().unwrap();
         l

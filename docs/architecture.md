@@ -6,6 +6,7 @@
 | bismuth-lexer | Tokenizing markdown files |
 | bismuth-parser | Parses tokenized files |
 | bismuth-custom | Handles running plugins and templates |
+| bismuth-html | Handles rendering, templating, and writing of files |
 
 # Bismuth-Core:
 The main entry point for the app. This handles cli argument and configuration details.

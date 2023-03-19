@@ -10,7 +10,7 @@ expression: snapshot(&content)
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
     <meta name="head:count" content="4">
-    <title>test.html</title>
+    <title>test</title>
 </head>
 
 <body>
@@ -172,11 +172,11 @@ expression: snapshot(&content)
 <br>
 
 <br>
-<a target="/test">link text</a>
+<a href="/test">link text</a>
 <br>
 
 <br>
-<a target="example.com" target="_blank">link with title</a>
+<a href="example.com" target="_blank">link with title</a>
 <br>
 
 <br>

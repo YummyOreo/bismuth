@@ -124,7 +124,7 @@ mod test {
     use bismuth_parser::Parser;
 
     fn init_parser<'a>(content: &'a str, frontmatter: &'a str) -> Parser {
-        let mut parser = Parser::new_test("/test/", content);
+        let mut parser = Parser::new_test("/test/test.md", content);
         parser
             .metadata
             .frontmatter
