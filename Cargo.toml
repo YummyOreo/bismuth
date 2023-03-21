@@ -8,5 +8,6 @@ members = [
     "bismuth-parser",
     "bismuth-custom",
     "bismuth-html",
+    "bismuth-tui",
     "bismuth-config"
 ]
