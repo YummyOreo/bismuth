@@ -3,8 +3,11 @@ use std::path::PathBuf;
 
 use crate::{MarkdownFile, MarkdownFileError};
 
-pub fn load_from_dir(path: &PathBuf) -> Result<Vec<MarkdownFile>, MarkdownFileError> {
-    let path = &PathBuf::from(path.to_string_lossy().to_string().replace("\\", "/"));
+pub fn load_from_dir(
+    path: &PathBuf,
+    dir: &PathBuf,
+) -> Result<Vec<MarkdownFile>, MarkdownFileError> {
+    let path_dir = &mut PathBuf::from(dir.to_string_lossy().to_string().replace("\\", "/"));
 
     let mut files = vec![];
     if !path.is_dir() {
@@ -13,20 +16,23 @@ pub fn load_from_dir(path: &PathBuf) -> Result<Vec<MarkdownFile>, MarkdownFileEr
         ));
     }
 
-    let paths = fs::read_dir(path).expect("Should be directory");
+    let paths = fs::read_dir(path.clone()).expect("Should be directory");
     for file in paths {
-        let file_path = file.unwrap().path();
-        let rel = file_path
-            .to_string_lossy()
-            .replace("\\", "/")
-            .replace(&path.to_string_lossy().to_string(), "");
+        let file_path = &mut file.unwrap().path();
 
-        let file_rel = PathBuf::from(rel);
         if file_path.is_dir() {
-            if let Ok(mut m) = load_from_dir(&file_path) {
+            let mut file_dir = file_path.clone();
+            file_dir.pop();
+            if let Ok(mut m) = load_from_dir(&file_path, &file_dir) {
                 files.append(&mut m)
             }
         } else if file_path.is_file() {
+            let rel = file_path
+                .to_string_lossy()
+                .replace("\\", "/")
+                .replace(&path_dir.to_string_lossy().to_string(), "");
+
+            let file_rel = PathBuf::from(rel);
             if let Ok(m) = MarkdownFile::load_file(&file_path, &file_rel) {
                 files.push(m)
             }
@@ -48,7 +54,8 @@ mod test {
 
     fn snapshot(path: &str) -> String {
         let path = PathBuf::from(path).canonicalize().unwrap();
-        let mut files = load_from_dir(&path).unwrap();
+        let mut files =
+            load_from_dir(&path, &PathBuf::from(&path).canonicalize().unwrap()).unwrap();
         for mut file in &mut files {
             let new_path = file
                 .path

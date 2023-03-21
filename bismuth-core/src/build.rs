@@ -54,7 +54,13 @@ pub fn build(dir: String) {
     let mut src_path = path.clone();
     src_path.push("src/");
 
-    let md_files = bismuth_md::load::load_from_dir(&path).unwrap();
+    let md_files = bismuth_md::load::load_from_dir(
+        &src_path,
+        &std::path::PathBuf::from(src_path.clone())
+            .canonicalize()
+            .unwrap(),
+    )
+    .unwrap();
     let tokenized_file = run_lexer(md_files);
     let parsers = run_parser(tokenized_file);
 
