@@ -4,8 +4,8 @@ mod select;
 
 #[derive(Debug)]
 pub struct Prompter {
-    title: String,
-    description: Option<String>,
+    pub title: String,
+    pub description: Option<String>,
 }
 
 /// For selecting from a list of options
@@ -18,9 +18,11 @@ pub trait Select {
     /// Selects the default option
     fn select_default(&mut self) -> Option<String>;
 
-    fn get_prompter(&self) -> Prompter;
+    fn get_prompter(&self) -> &Prompter;
 
-    fn run(&self) {}
+    fn run(&mut self) {
+        select::run(self).unwrap()
+    }
 }
 
 /// For accepting string inputs
@@ -36,16 +38,16 @@ pub trait Input {
     /// This indicates that the user quit
     fn set_default(&mut self) -> Option<String>;
 
-    fn get_prompter(&self) -> Prompter;
+    fn get_prompter(&self) -> &Prompter;
     fn get_result_type(&self) -> &ResultType;
 
     fn run(&self) {}
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct OptionElement {
-    promt_value: String,
-    promt_description: String,
+    pub promt_value: String,
+    pub promt_description: Option<String>,
 }
 
 pub enum ResultType {
