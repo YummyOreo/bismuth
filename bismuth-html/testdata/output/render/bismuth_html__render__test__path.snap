@@ -208,11 +208,10 @@ expression: snapshot(&content)
 <br>
 
 <br>
-<p>$</p>
 <br>
-<p>None inline</p>
+<div class="latex"><span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mi>N</mi><mi>o</mi><mi>n</mi><mi>e</mi><mi>i</mi><mi>n</mi><mi>l</mi><mi>i</mi><mi>n</mi><mi>e</mi></mrow><annotation encoding="application/x-tex">None inline</annotation></semantics></math></span>
+</div>
 <br>
-<p>$</p>
 <br>
 
 <br>

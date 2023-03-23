@@ -453,7 +453,7 @@ impl Parser {
         let len = self.current_token_len()?;
         let elm_kind = match (kind, len) {
             (TokenType::DollarSign, 1) => Kind::InlineLaTeX,
-            (TokenType::DollarSign, 3) => Kind::BlockLaTeX,
+            (TokenType::DollarSign, 2) => Kind::BlockLaTeX,
             (TokenType::Backtick, 1) => Kind::InlineCode,
             _ => Kind::Text,
         };
@@ -983,6 +983,7 @@ mod test {
         test_fm,
         "---\ntitle: test title\npath: /test/path/\nvalues:\n    - key: value\n---"
     );
+    snapshot_str!(test_latex, "test $e = mc^2$ \n $$e = mc^3$$");
     snapshot_str!(test_linebreak, "test\n\n---\n");
     snapshot_str!(test_inline, "\ntest `test`\n");
 

@@ -1,0 +1,80 @@
+---
+source: bismuth-parser/src/lib.rs
+expression: "snapshot_str(\"test $e = mc^2$ \\n $$e = mc^3$$\")"
+---
+FrontMatter {
+    title: Some(
+        "test",
+    ),
+    path: Some(
+        "/test",
+    ),
+    kind: Some(
+        "default",
+    ),
+    values: None,
+}
+Element{
+    Kind: "Paragraph",
+    Text: None,
+    Attrs: [],
+    Elements: [
+    Element{
+        Kind: "Text",
+        Text: Some("test "),
+        Attrs: [],
+        Elements: [
+        ])
+    },
+    Element{
+        Kind: "InlineLaTeX",
+        Text: Some("e = mc^2"),
+        Attrs: [],
+        Elements: [
+        ])
+    },
+    Element{
+        Kind: "Text",
+        Text: Some(" "),
+        Attrs: [],
+        Elements: [
+        ])
+    },
+    ])
+}
+Element{
+    Kind: "EndOfLine",
+    Text: None,
+    Attrs: [],
+    Elements: [
+    ])
+}
+Element{
+    Kind: "Paragraph",
+    Text: None,
+    Attrs: [],
+    Elements: [
+    Element{
+        Kind: "Text",
+        Text: Some(" "),
+        Attrs: [],
+        Elements: [
+        ])
+    },
+    Element{
+        Kind: "BlockLaTeX",
+        Text: Some("e = mc^3"),
+        Attrs: [],
+        Elements: [
+        ])
+    },
+    ])
+}
+Element{
+    Kind: "EndOfLine",
+    Text: None,
+    Attrs: [],
+    Elements: [
+    ])
+}
+

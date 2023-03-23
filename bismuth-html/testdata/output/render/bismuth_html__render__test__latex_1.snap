@@ -1,6 +1,6 @@
 ---
 source: bismuth-html/src/render/mod.rs
-expression: "snapshot(\"this is a test for block latex using katex:\\n$$$E = mc^2$$$\")"
+expression: "snapshot(\"this is a test for block latex using katex:\\n$$E = mc^2$$\")"
 ---
 <!DOCTYPE html>
 <html lang="">
@@ -20,6 +20,8 @@ expression: "snapshot(\"this is a test for block latex using katex:\\n$$$E = mc^
 <div class="latex"><span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mi>E</mi><mo>=</mo><mi>m</mi><msup><mi>c</mi><mn>2</mn></msup></mrow><annotation encoding="application/x-tex">E = mc^2</annotation></semantics></math></span>
 </div>
 <br>
+<br>
+
 </body>
 
 </html>

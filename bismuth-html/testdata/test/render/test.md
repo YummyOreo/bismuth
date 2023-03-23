@@ -100,6 +100,4 @@ Like links, Images also have a footnote style syntax
 
 inline $Tex$
 
-$$
-None inline
-$$
+$$None inline$$

@@ -348,7 +348,7 @@ mod test {
 
     snapshot!(
         test_latex_1,
-        "this is a test for block latex using katex:\n$$$E = mc^2$$$"
+        "this is a test for block latex using katex:\n$$E = mc^2$$"
     );
 
     snapshot_path!(test_path, "./testdata/test/render/test.md");
