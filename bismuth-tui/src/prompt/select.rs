@@ -1,4 +1,4 @@
-use crossterm::{cursor, event, execute, style};
+use crossterm::{cursor, event, execute, style, style::Stylize};
 use std::io::stdout;
 
 use crate::prompt::{utils::read_event, OptionElement, Select};
@@ -13,25 +13,44 @@ fn render_info(title: String, description: String) -> Result<(), std::io::Error>
     )
 }
 
+fn render_option(
+    element: &OptionElement,
+    return_to_pos: bool,
+    selected: bool,
+) -> Result<u16, std::io::Error> {
+    let mut moves = 1;
+
+    let mut title = format!("    {}", element.promt_value.clone()).white();
+    if selected {
+        title = title.italic().bold().blue();
+    }
+    execute!(stdout(), cursor::MoveToColumn(0), style::Print(title))?;
+    if let Some(description) = element.promt_description.clone() {
+        let mut description = format!("\n    {}", description).grey();
+        if selected {
+            description = description.italic().blue();
+        }
+        moves += 1;
+        execute!(stdout(), style::Print(description),)?;
+    }
+
+    execute!(stdout(), style::Print("\n"))?;
+
+    if return_to_pos {
+        execute!(stdout(), cursor::MoveUp(moves), cursor::MoveToColumn(4))?;
+    }
+    Ok(moves)
+}
+
 fn render_options(options: &[OptionElement]) -> Result<(), std::io::Error> {
     execute!(stdout(), cursor::MoveDown(1))?;
     let mut moves = 0;
     for element in options {
-        moves += 1;
-        execute!(
-            stdout(),
-            style::Print(format!("    {}", element.promt_value.clone()))
-        )?;
-        if let Some(description) = element.promt_description.clone() {
-            moves += 1;
-            execute!(
-                stdout(),
-                style::SetForegroundColor(style::Color::Grey),
-                style::Print(format!("\n    {description}")),
-                style::SetForegroundColor(style::Color::White),
-            )?;
+        let mut selected = false;
+        if moves == 0 {
+            selected = true;
         }
-        execute!(stdout(), style::Print("\n"))?;
+        moves += render_option(&element, false, selected)?;
     }
 
     execute!(stdout(), cursor::MoveUp(moves), cursor::MoveToColumn(4))
@@ -59,6 +78,7 @@ fn calc_move(from: usize, to: usize, options: &[OptionElement]) -> i32 {
 }
 
 fn handle_up(options: &[OptionElement], index: i32) -> Result<i32, std::io::Error> {
+    render_option(&options[index as usize], true, false)?;
     let next_index;
     if index - 1 >= 0 {
         next_index = index - 1;
@@ -73,10 +93,12 @@ fn handle_up(options: &[OptionElement], index: i32) -> Result<i32, std::io::Erro
         let moves = -moves;
         execute!(stdout(), cursor::MoveDown(moves.try_into().unwrap()))?;
     }
+    render_option(&options[next_index as usize], true, true)?;
     return Ok(next_index);
 }
 
 fn handle_down(options: &[OptionElement], index: i32) -> Result<i32, std::io::Error> {
+    render_option(&options[index as usize], true, false)?;
     let mut next_index = index + 1;
     if next_index >= options.len() as i32 {
         next_index = 0;
@@ -89,6 +111,7 @@ fn handle_down(options: &[OptionElement], index: i32) -> Result<i32, std::io::Er
         let moves = -moves;
         execute!(stdout(), cursor::MoveDown(moves.try_into().unwrap()))?;
     }
+    render_option(&options[next_index as usize], true, true)?;
     return Ok(next_index);
 }
 
@@ -107,6 +130,8 @@ fn handle_key(
 }
 
 pub fn run<T: Select + ?Sized>(selecter: &mut T) -> Result<(), std::io::Error> {
+    execute!(stdout(), cursor::Hide)?;
+
     let prompter = selecter.get_prompter();
     let (title, description) = (prompter.title.clone(), prompter.description.clone());
     render_info(title, description.unwrap_or_default())?;
@@ -140,5 +165,6 @@ pub fn run<T: Select + ?Sized>(selecter: &mut T) -> Result<(), std::io::Error> {
         selecter.select_option(current_index);
     }
 
+    execute!(stdout(), cursor::Show)?;
     Ok(())
 }
