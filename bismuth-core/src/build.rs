@@ -55,6 +55,7 @@ pub fn build(dir: String) {
     let mut src_path = path.clone();
     src_path.push("src/");
 
+    println!("Loading files...");
     let md_files = bismuth_md::load::load_from_dir(
         &src_path,
         &std::path::PathBuf::from(src_path.clone())
@@ -62,12 +63,14 @@ pub fn build(dir: String) {
             .unwrap(),
     )
     .unwrap();
+    println!("Parsing files...");
     let tokenized_file = run_lexer(md_files);
     let parsers = run_parser(tokenized_file);
+    println!("---");
 
     if PathBuf::from("./build/").exists() {
         let mut check_remove_dir = YesNo::new(
-            String::from("Would you like to proceed (Y/n):"),
+            String::from("Warning! ./build/ dir will be removed! Would you like to proceed (Y/n):"),
             String::from("Warning! All the contents in the ./build dir will be removed"),
             None,
         );
@@ -87,4 +90,5 @@ pub fn build(dir: String) {
     for r in renderers {
         r.write().unwrap();
     }
+    println!("Site built!");
 }

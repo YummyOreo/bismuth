@@ -1,7 +1,9 @@
+use serde::Deserialize;
 use std::{
     fs,
     path::{Path, PathBuf},
 };
+use toml;
 
 use bismuth_tui::prompt::{builtin::YesNo, Input};
 
@@ -28,7 +30,20 @@ pub fn make_config(dir: &PathBuf) -> Result<(), std::io::Error> {
     fs::write(config_file, config_file_contents)
 }
 
-fn read_config() {}
+#[derive(Deserialize)]
+pub struct WebsiteConfig {
+    name: String,
+}
+#[derive(Deserialize)]
+pub struct TomlConfig {
+    website: WebsiteConfig,
+}
+
+fn read_config(path: &PathBuf) -> Result<TomlConfig, std::io::Error> {
+    let content = fs::read_to_string(path)?;
+    let config: TomlConfig = toml::from_str(&content).unwrap();
+    Ok(config)
+}
 
 pub struct Config<'a> {
     pub name: String,
@@ -40,7 +55,7 @@ impl<'a> Config<'a> {
         let pb = dir.to_path_buf();
         if !check_for_config(&pb) {
             let mut should_make = YesNo::new(
-                String::from("Would you like to create one? (Y/n): "),
+                String::from("bismuth.toml does not exist. Would you like to create one? (Y/n): "),
                 String::from("There is no bismuth.toml."),
                 None,
             );
@@ -53,6 +68,12 @@ impl<'a> Config<'a> {
                 std::process::exit(1);
             }
         }
-        todo!()
+
+        let toml_config = read_config(&dir.join("bismuth.toml")).unwrap();
+
+        Config {
+            directory: dir,
+            name: toml_config.website.name,
+        }
     }
 }
