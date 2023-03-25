@@ -1,4 +1,4 @@
-use crossterm::{cursor, event, execute, style, style::Stylize};
+use crossterm::{cursor, event, execute, style, style::Stylize, terminal};
 use std::io::stdout;
 
 use crate::prompt::{utils::read_event, OptionElement, Select};
@@ -130,7 +130,7 @@ fn handle_key(
 }
 
 pub fn run<T: Select + ?Sized>(selecter: &mut T) -> Result<(), std::io::Error> {
-    execute!(stdout(), cursor::Hide)?;
+    execute!(stdout(), cursor::Hide, cursor::SavePosition)?;
 
     let prompter = selecter.get_prompter();
     let (title, description) = (prompter.title.clone(), prompter.description.clone());
@@ -159,11 +159,17 @@ pub fn run<T: Select + ?Sized>(selecter: &mut T) -> Result<(), std::io::Error> {
             }
         }
     }
-    if current_index.is_negative() {
-        selecter.select_default();
+    let text = if current_index.is_negative() {
+        selecter.select_default()
     } else {
-        selecter.select_option(current_index);
-    }
+        selecter.select_option(current_index)
+    };
+    execute!(
+        stdout(),
+        cursor::RestorePosition,
+        terminal::Clear(terminal::ClearType::FromCursorDown),
+        style::Print(text.unwrap_or_default())
+    )?;
 
     execute!(stdout(), cursor::Show)?;
     Ok(())

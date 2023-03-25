@@ -41,7 +41,7 @@ impl Select for YesNo {
 
     fn select_option(&mut self, index: i32) -> Option<String> {
         self.result = Some(index);
-        None
+        Some(String::from(format!("{self:?}")))
     }
     fn select_default(&mut self) -> Option<String> {
         self.select_option(0)
@@ -51,5 +51,6 @@ impl Select for YesNo {
 fn main() {
     let mut yn = YesNo::new();
     yn.run();
-    println!("{yn:?}");
+    std::thread::sleep(std::time::Duration::from_secs(3))
+    // println!("{yn:?}");
 }
