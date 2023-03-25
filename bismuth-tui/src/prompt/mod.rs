@@ -39,9 +39,11 @@ pub trait Input {
     fn set_default(&mut self) -> Option<String>;
 
     fn get_prompter(&self) -> &Prompter;
-    fn get_result_type(&self) -> &ResultType;
+    fn get_result_type(&self) -> ResultType;
 
-    fn run(&self) {}
+    fn run(&mut self) {
+        input::run(self).unwrap();
+    }
 }
 
 #[derive(Debug, Clone)]
