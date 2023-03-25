@@ -65,9 +65,17 @@ mod utils {
 
     /// Reads not blocking
     /// If returns `None`. That means that there was no event within 250ms
-    pub fn read_event() -> Option<event::Event> {
+    pub fn read_key() -> Option<event::KeyEvent> {
         if let Ok(true) = event::poll(Duration::from_millis(250)) {
-            return Some(event::read().expect("Event should not fail"));
+            return match event::read().expect("Should not fail") {
+                event::Event::Key(key) => {
+                    if key.kind == event::KeyEventKind::Release {
+                        return None;
+                    }
+                    Some(key)
+                }
+                _ => None,
+            };
         }
         None
     }

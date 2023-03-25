@@ -1,7 +1,7 @@
 use crossterm::{cursor, event, execute, style, style::Stylize, terminal};
 use std::io::stdout;
 
-use crate::prompt::{utils::read_event, OptionElement, Select};
+use crate::prompt::{utils::read_key, OptionElement, Select};
 
 fn render_info(title: String, description: String) -> Result<(), std::io::Error> {
     execute!(
@@ -143,19 +143,11 @@ pub fn run<T: Select + ?Sized>(selecter: &mut T) -> Result<(), std::io::Error> {
         if current_index.is_negative() {
             break;
         }
-        if let Some(event) = read_event() {
-            match event {
-                event::Event::Key(key) => {
-                    if key.kind == event::KeyEventKind::Release {
-                        continue;
-                    }
-                    if let Some(index) = handle_key(key, &options, current_index)? {
-                        current_index = index;
-                    } else {
-                        break;
-                    }
-                }
-                _ => (),
+        if let Some(key) = read_key() {
+            if let Some(index) = handle_key(key, &options, current_index)? {
+                current_index = index;
+            } else {
+                break;
             }
         }
     }
