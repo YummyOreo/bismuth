@@ -23,7 +23,6 @@ impl Lexer {
         let mut content = file.content.chars().collect::<Vec<char>>();
         content.retain(|c| c != &'\r');
         content.push('\n');
-        println!("{file:?}");
         Lexer {
             path: file.path,
             chars: content,

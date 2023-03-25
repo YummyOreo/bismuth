@@ -12,6 +12,7 @@ bismuth-lexer = {version = "0.1.0", path = "../bismuth-lexer"}
 bismuth-parser = {version = "0.1.0", path = "../bismuth-parser"}
 bismuth-custom = {version = "0.1.0", path = "../bismuth-custom"}
 bismuth-html = {version = "0.1.0", path = "../bismuth-html"}
+bismuth-tui = {version = "0.1.0", path = "../bismuth-tui"}
 clap = { version="4.1.1", features = ["derive", "cargo"] }
 
 [dev-dependencies]

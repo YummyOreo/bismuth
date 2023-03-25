@@ -35,7 +35,6 @@ fn handle_update(
     }
 
     let mut input = input.to_string();
-    // println!("{input:?}");
     if let Some(c) = c {
         input.push(*c);
     }

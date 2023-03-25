@@ -58,6 +58,7 @@ dependencies = [
  "bismuth-lexer",
  "bismuth-md",
  "bismuth-parser",
+ "bismuth-tui",
  "clap",
  "insta",
 ]

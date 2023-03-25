@@ -82,3 +82,48 @@ mod utils {
         None
     }
 }
+
+pub mod builtin {
+    use super::*;
+
+    #[derive(Debug)]
+    pub struct YesNo {
+        pub result: Option<bool>,
+        pub last_message: Option<String>,
+        prompter: Prompter,
+    }
+
+    impl YesNo {
+        pub fn new(question: String, description: String, last_message: Option<String>) -> Self {
+            let prompter = Prompter {
+                title: question,
+                description: Some(description),
+            };
+            Self {
+                result: None,
+                last_message,
+                prompter,
+            }
+        }
+    }
+
+    impl Input for YesNo {
+        fn set_result(&mut self, result: ResultType) -> Option<String> {
+            if let ResultType::Bool(b) = result {
+                self.result = b
+            }
+            self.last_message.clone()
+        }
+        fn set_default(&mut self) -> Option<String> {
+            self.set_result(ResultType::Bool(Some(false)))
+        }
+
+        fn get_prompter(&self) -> &Prompter {
+            &self.prompter
+        }
+
+        fn get_result_type(&self) -> ResultType {
+            ResultType::Bool(None)
+        }
+    }
+}

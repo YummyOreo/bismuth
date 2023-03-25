@@ -2,7 +2,8 @@ use bismuth_html::render_list;
 use bismuth_lexer::Lexer;
 use bismuth_md::MarkdownFile;
 use bismuth_parser::Parser;
-use std::path::Path;
+use bismuth_tui::prompt::{builtin::YesNo, Input};
+use std::path::{Path, PathBuf};
 
 use crate::config::Config;
 
@@ -64,7 +65,25 @@ pub fn build(dir: String) {
     let tokenized_file = run_lexer(md_files);
     let parsers = run_parser(tokenized_file);
 
+    if PathBuf::from("./build/").exists() {
+        let mut check_remove_dir = YesNo::new(
+            String::from("Would you like to proceed (y/n):"),
+            String::from("Warning! All the contents in the ./build dir will be removed"),
+            None,
+        );
+        check_remove_dir.run();
+        if let Some(true) = check_remove_dir.result {
+            println!("Removing dir...");
+            std::fs::remove_dir_all(PathBuf::from("./build/")).unwrap();
+        } else {
+            println!("Exiting...");
+            std::process::exit(1);
+        }
+    }
+
+    println!("Rendering...");
     let renderers = render_list(parsers);
+    println!("Writing files...");
     for r in renderers {
         r.write().unwrap();
     }
