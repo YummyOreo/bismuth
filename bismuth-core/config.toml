@@ -1,2 +1,2 @@
 [website]
-entry = "./src/index.md"
+name = "{name}"

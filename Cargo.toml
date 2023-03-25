@@ -9,5 +9,4 @@ members = [
     "bismuth-custom",
     "bismuth-html",
     "bismuth-tui",
-    "bismuth-config"
 ]

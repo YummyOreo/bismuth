@@ -1,6 +1,8 @@
 use std::fs::{create_dir_all, write};
 use std::path::PathBuf;
 
+use crate::config::CONFIG_FILE;
+
 const SRC_DIR: &str = "src/";
 const ASSETS_DIR: &str = "assets/";
 
@@ -17,7 +19,9 @@ pub fn init_folder(name: &str) -> Result<(), std::io::Error> {
     create_dir_all(src)?;
     create_dir_all(assets)?;
     write(index_file, "# This is the entry for your website!")?;
-    write(config_file, include_str!("../config.toml"))?;
+
+    let config_file_contents = CONFIG_FILE.replace("{name}", name);
+    write(config_file, config_file_contents)?;
 
     println!("Project created in `./{name}/`");
     Ok(())

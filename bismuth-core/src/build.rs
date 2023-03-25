@@ -67,7 +67,7 @@ pub fn build(dir: String) {
 
     if PathBuf::from("./build/").exists() {
         let mut check_remove_dir = YesNo::new(
-            String::from("Would you like to proceed (y/n):"),
+            String::from("Would you like to proceed (Y/n):"),
             String::from("Warning! All the contents in the ./build dir will be removed"),
             None,
         );
