@@ -34,9 +34,46 @@ pub fn make_config(dir: &PathBuf) -> Result<(), std::io::Error> {
 pub struct WebsiteConfig {
     name: String,
 }
+
+#[allow(dead_code)]
+#[derive(Deserialize)]
+pub struct Theme {
+    background_1: Option<String>,
+    background_2: Option<String>,
+    background_3: Option<String>,
+    text_1: Option<String>,
+    text_2: Option<String>,
+    link: Option<String>,
+    link_hover: Option<String>,
+}
+
+impl Theme {
+    pub fn fill_default(self) -> Self {
+        Self {
+            background_1: Some(self.background_1.unwrap_or(String::from("#282828"))),
+            background_2: Some(self.background_2.unwrap_or(String::from("#3c3836"))),
+            background_3: Some(self.background_3.unwrap_or(String::from("#1d2021"))),
+            text_1: Some(self.text_1.unwrap_or(String::from("#ebdbb2"))),
+            text_2: Some(self.text_2.unwrap_or(String::from("#d5c4a1"))),
+            link: Some(self.link.unwrap_or(String::from("#fe8018"))),
+            link_hover: Some(self.link_hover.unwrap_or(String::from("#d65d0e"))),
+        }
+    }
+}
+
+#[allow(dead_code)]
+#[derive(Deserialize)]
+pub struct Addons {
+    templates: Option<String>,
+    plugins: Option<String>,
+}
+
+#[allow(dead_code)]
 #[derive(Deserialize)]
 pub struct TomlConfig {
     website: WebsiteConfig,
+    theme: Option<Theme>,
+    addons: Option<Addons>,
 }
 
 fn read_config(path: &PathBuf) -> Result<TomlConfig, std::io::Error> {
