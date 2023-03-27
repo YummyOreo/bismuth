@@ -39,7 +39,9 @@ impl std::fmt::Display for Token {
 }
 
 #[derive(PartialEq, Eq, Clone, Copy, Debug)]
+#[derive(Default)]
 pub enum TokenType {
+    #[default]
     Text,
 
     EndOfFile,
@@ -81,8 +83,4 @@ pub enum TokenType {
     FrontmatterEnd,
 }
 
-impl Default for TokenType {
-    fn default() -> Self {
-        TokenType::Text
-    }
-}
+

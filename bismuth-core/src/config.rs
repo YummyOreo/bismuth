@@ -1,20 +1,17 @@
 use serde::Deserialize;
-use std::{
-    fs,
-    path::{Path, PathBuf},
-};
+use std::{fs, path::Path};
 use toml;
 
 use bismuth_tui::prompt::{builtin::YesNo, Input};
 
 pub const CONFIG_FILE: &str = include_str!("../config.toml");
 
-pub fn check_for_config(dir: &PathBuf) -> bool {
+pub fn check_for_config(dir: &Path) -> bool {
     let file_path = dir.join("bismuth.toml");
     file_path.exists()
 }
 
-pub fn make_config(dir: &PathBuf) -> Result<(), std::io::Error> {
+pub fn make_config(dir: &Path) -> Result<(), std::io::Error> {
     let full_dir = dir.canonicalize().unwrap();
     let name = full_dir
         .components()
@@ -122,7 +119,7 @@ impl<'a> Config<'a> {
     }
 
     fn new_toml_config(content: &str) -> TomlConfig {
-        let mut config: TomlConfig = toml::from_str(&content).unwrap();
+        let mut config: TomlConfig = toml::from_str(content).unwrap();
         if let Some(theme) = config.theme {
             config.theme = Some(theme.fill_default());
         }
@@ -145,18 +142,7 @@ impl<'a> Config<'a> {
         let base_css = replace_css!(base_css, self.theme, text_1);
         let base_css = replace_css!(base_css, self.theme, text_2);
         let base_css = replace_css!(base_css, self.theme, link);
-        let base_css = replace_css!(base_css, self.theme, link_hover);
-        // let base_css =
-        //     base_css.replace("{background_1}", &self.theme.background_1.clone().unwrap());
-        // let base_css =
-        //     base_css.replace("{background_2}", &self.theme.background_2.clone().unwrap());
-        // let base_css =
-        //     base_css.replace("{background_3}", &self.theme.background_3.clone().unwrap());
-        // let base_css = base_css.replace("{text_1}", &self.theme.text_1.clone().unwrap());
-        // let base_css = base_css.replace("{text_2}", &self.theme.text_2.clone().unwrap());
-        // let base_css = base_css.replace("{link}", &self.theme.link.clone().unwrap());
-        // let base_css = base_css.replace("{link_hover}", &self.theme.link_hover.clone().unwrap());
-        base_css
+        replace_css!(base_css, self.theme, link_hover)
     }
 }
 

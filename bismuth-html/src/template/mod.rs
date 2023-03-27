@@ -2,7 +2,7 @@ use bismuth_parser::tree::{Element, Kind};
 use regex::Regex;
 use std::collections::HashMap;
 use std::convert::TryFrom;
-use std::path::PathBuf;
+use std::path::{PathBuf, Path};
 
 use crate::render::Render;
 
@@ -81,7 +81,7 @@ impl<'a> Template<'a> {
 }
 
 impl Render for Template<'_> {
-    fn render(&mut self, path: &PathBuf) -> Option<String> {
+    fn render(&mut self, path: &Path) -> Option<String> {
         let mut output = self.template.to_string();
         // First replace {elements} w/ rendered elements
         let elements_str = self

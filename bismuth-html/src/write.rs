@@ -18,7 +18,7 @@ pub mod utils {
     pub fn make_build() -> Result<(), Error> {
         let build = Path::new(BUILD);
         if !build.exists() {
-            fs::create_dir_all(&build)?
+            fs::create_dir_all(build)?
         }
         make_build_assets()?;
         Ok(())
@@ -30,7 +30,7 @@ pub mod utils {
     pub fn make_build_assets() -> Result<(), Error> {
         let assets = Path::new(BUILD_ASSETS);
         if !assets.exists() {
-            fs::create_dir_all(&assets)?
+            fs::create_dir_all(assets)?
         }
         Ok(())
     }
@@ -39,14 +39,14 @@ pub mod utils {
     pub fn make_assets() -> Result<(), Error> {
         let assets = Path::new(ASSETS);
         if !assets.exists() {
-            fs::create_dir_all(&assets)?
+            fs::create_dir_all(assets)?
         }
         Ok(())
     }
 
     /// Writes a html file to the `./build/` folder
     /// The path should not have a . in the begining
-    pub fn write_html_file(content: &str, path: &PathBuf, name: &String) -> Result<(), Error> {
+    pub fn write_html_file(content: &str, path: &Path, name: &String) -> Result<(), Error> {
         // Makes build dir if it does not exitst
         make_build()?;
         let mut path_str = path.to_string_lossy().to_string();
@@ -66,13 +66,13 @@ pub mod utils {
 
     /// Moves a asset from the `./assets/` folder to the `./bulid/assets/` folder
     /// The path should not have a . in the begining
-    pub fn move_asset(path: &PathBuf) -> Result<(), Error> {
+    pub fn move_asset(path: &Path) -> Result<(), Error> {
         // Makes both the `./assets/` folder and the `./build/assets/` folder if the do not exitst
         make_assets()?;
         make_build_assets()?;
 
-        let new_path = Path::new(BUILD).join(&path);
-        let old_full = Path::new("./").canonicalize()?.join(&path);
+        let new_path = Path::new(BUILD).join(path);
+        let old_full = Path::new("./").canonicalize()?.join(path);
 
         fs::copy(old_full, new_path).map(|_| ())
     }

@@ -20,7 +20,7 @@ impl Plugin for BlogList {
     }
 
     fn run(&mut self, target: &mut bismuth_parser::Parser, _: &[Option<&bismuth_parser::Parser>]) {
-        let mut mod_element = target.ast.find_mut(self.id).unwrap();
+        let mod_element = target.ast.find_mut(self.id).unwrap();
         let mut values = self.values.iter().collect::<Vec<(&String, &String)>>();
         values.sort();
         for (key, value) in values {

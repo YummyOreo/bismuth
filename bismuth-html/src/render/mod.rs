@@ -4,7 +4,7 @@ use bismuth_parser::{
 };
 use regex::Regex;
 use std::convert::TryFrom;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
 mod code;
 use crate::render::code::highlight;
@@ -15,7 +15,7 @@ const URL_CHECK: &str =
     r"^(http(s)://.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)$";
 
 pub trait Render {
-    fn render(&mut self, path: &PathBuf) -> Option<String>;
+    fn render(&mut self, path: &Path) -> Option<String>;
 }
 
 #[derive(Clone, Debug)]
@@ -81,7 +81,7 @@ impl Renderer {
 /// This will set self.output for you
 /// asset_list will be populated with the assets that are needed to be moved
 impl Render for Renderer {
-    fn render(&mut self, _path: &PathBuf) -> Option<String> {
+    fn render(&mut self, _path: &Path) -> Option<String> {
         let kind = self.parser.metadata.frontmatter.get_kind()?;
 
         let mut values = self
@@ -104,7 +104,7 @@ impl Render for Renderer {
 }
 
 /// Returns (Html, File to move)
-fn handle_file_url(url: &str, text: &str, _path: &PathBuf) -> (String, Option<PathBuf>) {
+fn handle_file_url(url: &str, text: &str, _path: &Path) -> (String, Option<PathBuf>) {
     let valid_url = Regex::new(URL_CHECK).expect("Should be valid regex");
 
     if valid_url.is_match(url) {
@@ -143,15 +143,18 @@ fn handle_link(url: &str, text: &str) -> (String, String) {
     if valid_url.is_match(url) {
         (
             format!(r#"<a href="{}" target="_blank">{}"#, url, text),
-            format!(r"</a>"),
+            r"</a>".to_string(),
         )
     } else {
-        (format!(r#"<a href="{}">{}"#, url, text), format!(r"</a>"))
+        (
+            format!(r#"<a href="{}">{}"#, url, text),
+            r"</a>".to_string(),
+        )
     }
 }
 
 impl Render for Element {
-    fn render(&mut self, path: &PathBuf) -> Option<String> {
+    fn render(&mut self, path: &Path) -> Option<String> {
         let inside = self
             .elements
             .iter()

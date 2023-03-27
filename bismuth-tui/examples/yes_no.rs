@@ -41,7 +41,7 @@ impl Select for YesNo {
 
     fn select_option(&mut self, index: i32) -> Option<String> {
         self.result = Some(index);
-        Some(String::from(format!("{self:?}")))
+        Some(format!("{self:?}"))
     }
     fn select_default(&mut self) -> Option<String> {
         self.select_option(0)

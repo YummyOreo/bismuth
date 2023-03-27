@@ -112,7 +112,7 @@ fn run_customs(target: &mut Parser, others: &[Option<&Parser>], custom_elms: &[u
     }
 }
 
-pub fn parse_custom(mut target: Parser, others: &Vec<Option<&Parser>>) -> Parser {
+pub fn parse_custom(mut target: Parser, others: &[Option<&Parser>]) -> Parser {
     if !target.has_custom {
         return target;
     }
@@ -180,7 +180,7 @@ mod test {
             Err(e) => panic!("{e}"),
         }
 
-        let customs = format!("{:#?}", parse_custom(parser, &Default::default()));
+        let customs = format!("{:#?}", parse_custom(parser, &[]));
         let re = Regex::new(r"id: \d+").unwrap();
         re.replace_all(&customs, "id: [redacted]").to_string()
     }

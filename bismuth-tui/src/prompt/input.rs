@@ -8,7 +8,7 @@ fn render_info(title: String, description: String) -> Result<(), std::io::Error>
         stdout(),
         cursor::MoveDown(1),
         style::SetForegroundColor(style::Color::Grey),
-        style::Print(format!("{description}")),
+        style::Print(description.to_string()),
         cursor::MoveUp(1),
         cursor::MoveToColumn(0),
         style::SetForegroundColor(style::Color::White),
@@ -22,7 +22,7 @@ fn handle_update(
     kind: &ResultType,
     delete: bool,
 ) -> Result<String, std::io::Error> {
-    if input.len() != 0 || delete {
+    if !input.is_empty() || delete {
         let mut to_move = input.len() as u16;
         if delete {
             to_move += 1;
@@ -67,7 +67,7 @@ fn handle_key(
         event::KeyCode::Char(c) => (Some(handle_update(input, Some(&c), kind, false)?), false),
         event::KeyCode::Backspace => {
             let mut input = input.to_string();
-            if input.len() == 0 {
+            if input.is_empty() {
                 (Some(input), false)
             } else {
                 input.pop();
@@ -106,10 +106,9 @@ pub fn run<T: Input + ?Sized>(inputer: &mut T) -> Result<(), std::io::Error> {
         }
     }
     let res = match kind {
-        ResultType::Bool(_) => ResultType::Bool(Some(match input.to_lowercase().as_str() {
-            "yes" | "y" => true,
-            _ => false,
-        })),
+        ResultType::Bool(_) => {
+            ResultType::Bool(Some(matches!(input.to_lowercase().as_str(), "yes" | "y")))
+        }
         ResultType::Other(_) => ResultType::Other(Some(input)),
     };
 

@@ -50,19 +50,18 @@ fn render_options(options: &[OptionElement]) -> Result<(), std::io::Error> {
         if moves == 0 {
             selected = true;
         }
-        moves += render_option(&element, false, selected)?;
+        moves += render_option(element, false, selected)?;
     }
 
     execute!(stdout(), cursor::MoveUp(moves), cursor::MoveToColumn(4))
 }
 
 fn calc_move(from: usize, to: usize, options: &[OptionElement]) -> i32 {
-    let between;
-    if from > to {
-        between = &options[to..from];
+    let between = if from > to {
+        &options[to..from]
     } else {
-        between = &options[from..to];
-    }
+        &options[from..to]
+    };
 
     let mut lines = 0;
     for element in between {
@@ -79,12 +78,11 @@ fn calc_move(from: usize, to: usize, options: &[OptionElement]) -> i32 {
 
 fn handle_up(options: &[OptionElement], index: i32) -> Result<i32, std::io::Error> {
     render_option(&options[index as usize], true, false)?;
-    let next_index;
-    if index - 1 >= 0 {
-        next_index = index - 1;
+    let next_index = if index > 0 {
+        index - 1
     } else {
-        next_index = (options.len() as i32) - 1;
-    }
+        (options.len() as i32) - 1
+    };
 
     let moves = calc_move(index as usize, next_index as usize, options);
     if moves.is_positive() {
@@ -94,7 +92,7 @@ fn handle_up(options: &[OptionElement], index: i32) -> Result<i32, std::io::Erro
         execute!(stdout(), cursor::MoveDown(moves.try_into().unwrap()))?;
     }
     render_option(&options[next_index as usize], true, true)?;
-    return Ok(next_index);
+    Ok(next_index)
 }
 
 fn handle_down(options: &[OptionElement], index: i32) -> Result<i32, std::io::Error> {
@@ -112,7 +110,7 @@ fn handle_down(options: &[OptionElement], index: i32) -> Result<i32, std::io::Er
         execute!(stdout(), cursor::MoveDown(moves.try_into().unwrap()))?;
     }
     render_option(&options[next_index as usize], true, true)?;
-    return Ok(next_index);
+    Ok(next_index)
 }
 
 fn handle_key(

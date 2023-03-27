@@ -1,13 +1,10 @@
 use std::fs;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
 use crate::{MarkdownFile, MarkdownFileError};
 
-pub fn load_from_dir(
-    path: &PathBuf,
-    dir: &PathBuf,
-) -> Result<Vec<MarkdownFile>, MarkdownFileError> {
-    let path_dir = &mut PathBuf::from(dir.to_string_lossy().to_string().replace("\\", "/"));
+pub fn load_from_dir(path: &Path, dir: &Path) -> Result<Vec<MarkdownFile>, MarkdownFileError> {
+    let path_dir = &mut PathBuf::from(dir.to_string_lossy().to_string().replace('\\', "/"));
 
     let mut files = vec![];
     if !path.is_dir() {
@@ -16,24 +13,24 @@ pub fn load_from_dir(
         ));
     }
 
-    let paths = fs::read_dir(path.clone()).expect("Should be directory");
+    let paths = fs::read_dir(path).expect("Should be directory");
     for file in paths {
         let file_path = &mut file.unwrap().path();
 
         if file_path.is_dir() {
             let mut file_dir = file_path.clone();
             file_dir.pop();
-            if let Ok(mut m) = load_from_dir(&file_path, &file_dir) {
+            if let Ok(mut m) = load_from_dir(file_path, &file_dir) {
                 files.append(&mut m)
             }
         } else if file_path.is_file() {
             let rel = file_path
                 .to_string_lossy()
-                .replace("\\", "/")
+                .replace('\\', "/")
                 .replace(&path_dir.to_string_lossy().to_string(), "");
 
             let file_rel = PathBuf::from(rel);
-            if let Ok(m) = MarkdownFile::load_file(&file_path, &file_rel) {
+            if let Ok(m) = MarkdownFile::load_file(file_path, &file_rel) {
                 files.push(m)
             }
         }
