@@ -1,4 +1,3 @@
-#![allow(dead_code)]
 use std::io::Error;
 use std::path::PathBuf;
 // use crate::render::Renderer;

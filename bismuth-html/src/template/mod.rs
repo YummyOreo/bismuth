@@ -1,15 +1,10 @@
-#![allow(unused, dead_code)]
-use bismuth_parser::{
-    custom::CustomElm,
-    tree::{Element, Kind},
-    Parser,
-};
+use bismuth_parser::tree::{Element, Kind};
 use regex::Regex;
 use std::collections::HashMap;
 use std::convert::TryFrom;
 use std::path::PathBuf;
 
-use crate::render::{Render, Renderer};
+use crate::render::Render;
 
 pub mod builtin;
 
@@ -89,7 +84,7 @@ impl Render for Template<'_> {
     fn render(&mut self, path: &PathBuf) -> Option<String> {
         let mut output = self.template.to_string();
         // First replace {elements} w/ rendered elements
-        let mut elements_str = self
+        let elements_str = self
             .elements
             .iter()
             .map(|e| {
@@ -104,7 +99,6 @@ impl Render for Template<'_> {
 
         // Next do the body
         let b_rg = Regex::new(r"\{(?i)body\}").expect("Should be valid regex");
-        let body_default = String::new();
         output = b_rg
             .replace(&output, self.body.cloned().unwrap_or_default())
             .to_string();
@@ -131,7 +125,7 @@ mod test {
             .update_from_str(frontmatter)
             .unwrap();
 
-        parser.parse();
+        parser.parse().unwrap();
         parser
     }
 

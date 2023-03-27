@@ -1,7 +1,5 @@
-#![allow(dead_code, unused)]
 use bismuth_parser::{
-    error,
-    tree::{Ast, Element, Kind},
+    tree::{Element, Kind},
     Parser,
 };
 use regex::Regex;
@@ -83,7 +81,7 @@ impl Renderer {
 /// This will set self.output for you
 /// asset_list will be populated with the assets that are needed to be moved
 impl Render for Renderer {
-    fn render(&mut self, path: &PathBuf) -> Option<String> {
+    fn render(&mut self, _path: &PathBuf) -> Option<String> {
         let kind = self.parser.metadata.frontmatter.get_kind()?;
 
         let mut values = self
@@ -106,7 +104,7 @@ impl Render for Renderer {
 }
 
 /// Returns (Html, File to move)
-fn handle_file_url(url: &str, text: &str, path: &PathBuf) -> (String, Option<PathBuf>) {
+fn handle_file_url(url: &str, text: &str, _path: &PathBuf) -> (String, Option<PathBuf>) {
     let valid_url = Regex::new(URL_CHECK).expect("Should be valid regex");
 
     if valid_url.is_match(url) {
@@ -154,7 +152,7 @@ fn handle_link(url: &str, text: &str) -> (String, String) {
 
 impl Render for Element {
     fn render(&mut self, path: &PathBuf) -> Option<String> {
-        let mut inside = self
+        let inside = self
             .elements
             .iter()
             .map(|e| e.clone().render(path).expect("This should not fail"))
@@ -269,7 +267,7 @@ impl Render for Element {
                 ),
                 String::from("\n</div>\n<br>"),
             ),
-            Kind::CustomElement(c) => {
+            Kind::CustomElement(_c) => {
                 if let Ok(mut t) = Template::try_from(&self.to_owned()) {
                     let html = t.render(path)?;
                     self.asset_list.append(&mut t.asset_list);
@@ -293,7 +291,7 @@ mod test {
 
     fn snapshot(content: &str) -> String {
         let mut parser = Parser::new_test("/test/test.md", content);
-        parser.parse();
+        parser.parse().unwrap();
         let parser = parse_custom(parser, &vec![]);
         let mut render = Renderer::new(parser);
         render.render(&PathBuf::new()).unwrap()

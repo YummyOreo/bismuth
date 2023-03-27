@@ -1,5 +1,4 @@
-use syntect::easy::HighlightLines;
-use syntect::highlighting::{Color, ThemeSet};
+use syntect::highlighting::ThemeSet;
 use syntect::html::highlighted_html_for_string;
 use syntect::parsing::SyntaxSet;
 

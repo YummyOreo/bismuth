@@ -1,10 +1,9 @@
-#![allow(dead_code, unused)]
 use std::collections::HashMap;
 
 use bismuth_parser::{
     custom::CustomElm,
-    tree::{Ast, Element, Kind},
-    Metadata, Parser,
+    tree::{Element, Kind},
+    Parser,
 };
 
 mod builtin;
@@ -16,6 +15,7 @@ pub struct Custom {
     name: String,
     id: u32,
     data: HashMap<String, String>,
+    #[allow(unused)]
     body: Option<String>,
     template: Option<template::Template>,
     plugin: Option<Box<dyn plugin::Plugin>>,
@@ -64,7 +64,7 @@ impl Custom {
     pub fn insert_template(&self, target: &mut Parser) {
         if let Some(t) = &self.template {
             let id = self.id;
-            let mut elm = target.ast.find_mut(id).expect("Should be there");
+            let elm = target.ast.find_mut(id).expect("Should be there");
 
             if let Kind::CustomElement(c) = &mut elm.kind {
                 c.template = Some(t.content.clone())
@@ -117,11 +117,9 @@ pub fn parse_custom(mut target: Parser, others: &Vec<Option<&Parser>>) -> Parser
         return target;
     }
     let mut old_elms: Vec<u32> = vec![];
-    let mut i = 0;
 
     loop {
-        i += 1;
-        let mut new_elms = get_customs(target.ast.elements.clone(), vec![]);
+        let new_elms = get_customs(target.ast.elements.clone(), vec![]);
 
         if new_elms == old_elms {
             break;
@@ -134,7 +132,6 @@ pub fn parse_custom(mut target: Parser, others: &Vec<Option<&Parser>>) -> Parser
         old_elms = new_elms;
     }
 
-    // panic!("");
     target
 }
 
