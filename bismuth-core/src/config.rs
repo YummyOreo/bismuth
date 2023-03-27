@@ -83,6 +83,15 @@ pub struct Config<'a> {
     pub directory: &'a Path,
 }
 
+macro_rules! replace_css {
+    ($css:expr, $theme:expr, $replace:tt) => {
+        $css.replace(
+            &format!("{{{}}}", stringify!($replace)),
+            &$theme.$replace.clone().unwrap(),
+        )
+    };
+}
+
 impl<'a> Config<'a> {
     pub fn new(dir: &'a Path) -> Self {
         let pb = dir.to_path_buf();
@@ -104,7 +113,6 @@ impl<'a> Config<'a> {
         let content = fs::read_to_string(dir.join("bismuth.toml")).unwrap();
         let toml_config = Self::new_toml_config(&content);
 
-        // TODO: add the theme and addons
         Config {
             directory: dir,
             name: toml_config.website.name,
@@ -119,6 +127,36 @@ impl<'a> Config<'a> {
             config.theme = Some(theme.fill_default());
         }
         config
+    }
+
+    fn gen_colors(&self) -> String {
+        let base_css = r":root {
+    --background_1: {background_1};
+    --background_2: {background_2};
+    --background_3: {background_3};
+    --text_1: {text_1};
+    --text_2: {text_2};
+    --link: {link};
+    --link_hover: {link_hover};
+}";
+        let base_css = replace_css!(base_css, self.theme, background_1);
+        let base_css = replace_css!(base_css, self.theme, background_2);
+        let base_css = replace_css!(base_css, self.theme, background_3);
+        let base_css = replace_css!(base_css, self.theme, text_1);
+        let base_css = replace_css!(base_css, self.theme, text_2);
+        let base_css = replace_css!(base_css, self.theme, link);
+        let base_css = replace_css!(base_css, self.theme, link_hover);
+        // let base_css =
+        //     base_css.replace("{background_1}", &self.theme.background_1.clone().unwrap());
+        // let base_css =
+        //     base_css.replace("{background_2}", &self.theme.background_2.clone().unwrap());
+        // let base_css =
+        //     base_css.replace("{background_3}", &self.theme.background_3.clone().unwrap());
+        // let base_css = base_css.replace("{text_1}", &self.theme.text_1.clone().unwrap());
+        // let base_css = base_css.replace("{text_2}", &self.theme.text_2.clone().unwrap());
+        // let base_css = base_css.replace("{link}", &self.theme.link.clone().unwrap());
+        // let base_css = base_css.replace("{link_hover}", &self.theme.link_hover.clone().unwrap());
+        base_css
     }
 }
 
@@ -142,13 +180,6 @@ name = "test"
         assert_eq!(expected, result)
     }
 
-    // background_1: Option<String>,
-    // background_2: Option<String>,
-    // background_3: Option<String>,
-    // text_1: Option<String>,
-    // text_2: Option<String>,
-    // link: Option<String>,
-    // link_hover: Option<String>,
     #[test]
     fn simple_config_2() {
         let content = r####"
@@ -192,5 +223,37 @@ text_1 = "#fefefe"
 "#;
 
         let _ = Config::new_toml_config(&content);
+    }
+
+    #[test]
+    fn gen_css() {
+        let content = r#"
+[website]
+name = "test"
+"#;
+
+        let toml = Config::new_toml_config(&content);
+        let theme = toml.theme.unwrap_or_default().fill_default();
+        let path = Path::new("./");
+        let result = Config {
+            name: String::new(),
+            theme,
+            addons: Default::default(),
+            directory: &path,
+        }
+        .gen_colors();
+
+        let expected = String::from(
+            r":root {
+    --background_1: #282828;
+    --background_2: #3c3836;
+    --background_3: #1d2021;
+    --text_1: #ebdbb2;
+    --text_2: #d5c4a1;
+    --link: #fe8018;
+    --link_hover: #d65d0e;
+}",
+        );
+        assert_eq!(expected, result)
     }
 }
