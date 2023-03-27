@@ -30,13 +30,13 @@ pub fn make_config(dir: &PathBuf) -> Result<(), std::io::Error> {
     fs::write(config_file, config_file_contents)
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Default, Debug, PartialEq)]
 pub struct WebsiteConfig {
     name: String,
 }
 
 #[allow(dead_code)]
-#[derive(Deserialize)]
+#[derive(Deserialize, Debug, PartialEq)]
 pub struct Theme {
     background_1: Option<String>,
     background_2: Option<String>,
@@ -62,27 +62,18 @@ impl Theme {
 }
 
 #[allow(dead_code)]
-#[derive(Deserialize)]
+#[derive(Deserialize, Debug, PartialEq)]
 pub struct Addons {
     templates: Option<String>,
     plugins: Option<String>,
 }
 
 #[allow(dead_code)]
-#[derive(Deserialize)]
+#[derive(Deserialize, Default, Debug, PartialEq)]
 pub struct TomlConfig {
     website: WebsiteConfig,
     theme: Option<Theme>,
     addons: Option<Addons>,
-}
-
-fn read_config(path: &PathBuf) -> Result<TomlConfig, std::io::Error> {
-    let content = fs::read_to_string(path)?;
-    let mut config: TomlConfig = toml::from_str(&content).unwrap();
-    if let Some(theme) = config.theme {
-        config.theme = Some(theme.fill_default());
-    }
-    Ok(config)
 }
 
 pub struct Config<'a> {
@@ -108,12 +99,42 @@ impl<'a> Config<'a> {
                 std::process::exit(1);
             }
         }
+        let content = fs::read_to_string(dir.join("bismuth.toml")).unwrap();
+        let toml_config = Self::new_toml_config(&content);
 
-        let toml_config = read_config(&dir.join("bismuth.toml")).unwrap();
-
+        // TODO: add the theme and addons
         Config {
             directory: dir,
             name: toml_config.website.name,
         }
+    }
+
+    fn new_toml_config(content: &str) -> TomlConfig {
+        let mut config: TomlConfig = toml::from_str(&content).unwrap();
+        if let Some(theme) = config.theme {
+            config.theme = Some(theme.fill_default());
+        }
+        config
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    #[test]
+    fn simple_config() {
+        let content = r#"
+[website]
+name = "test"
+"#;
+
+        let expected = TomlConfig {
+            website: WebsiteConfig {
+                name: String::from("test"),
+            },
+            ..Default::default()
+        };
+        let result = Config::new_toml_config(&content);
+        assert_eq!(expected, result)
     }
 }
