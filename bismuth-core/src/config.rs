@@ -62,7 +62,7 @@ impl Theme {
 }
 
 #[allow(dead_code)]
-#[derive(Deserialize, Debug, PartialEq)]
+#[derive(Deserialize, Debug, PartialEq, Default)]
 pub struct Addons {
     templates: Option<String>,
     plugins: Option<String>,
@@ -78,6 +78,8 @@ pub struct TomlConfig {
 
 pub struct Config<'a> {
     pub name: String,
+    pub theme: Theme,
+    pub addons: Addons,
     pub directory: &'a Path,
 }
 
@@ -106,6 +108,8 @@ impl<'a> Config<'a> {
         Config {
             directory: dir,
             name: toml_config.website.name,
+            addons: toml_config.addons.unwrap_or_default(),
+            theme: toml_config.theme.unwrap_or_default(),
         }
     }
 
