@@ -56,11 +56,9 @@ pub fn build(dir: String) {
     src_path.push("src/");
 
     println!("Loading files...");
-    let md_files = bismuth_md::load::load_from_dir(
-        &src_path,
-        &src_path.clone().canonicalize().unwrap(),
-    )
-    .unwrap();
+    let md_files =
+        bismuth_md::load::load_from_dir(&src_path, &src_path.clone().canonicalize().unwrap())
+            .unwrap();
     println!("Parsing files...");
     let tokenized_file = run_lexer(md_files);
     let parsers = run_parser(tokenized_file);

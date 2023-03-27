@@ -2,7 +2,7 @@ use bismuth_parser::tree::{Element, Kind};
 use regex::Regex;
 use std::collections::HashMap;
 use std::convert::TryFrom;
-use std::path::{PathBuf, Path};
+use std::path::{Path, PathBuf};
 
 use crate::render::Render;
 

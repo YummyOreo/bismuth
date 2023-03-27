@@ -38,8 +38,7 @@ impl std::fmt::Display for Token {
     }
 }
 
-#[derive(PartialEq, Eq, Clone, Copy, Debug)]
-#[derive(Default)]
+#[derive(PartialEq, Eq, Clone, Copy, Debug, Default)]
 pub enum TokenType {
     #[default]
     Text,
@@ -82,5 +81,3 @@ pub enum TokenType {
     FrontmatterInside,
     FrontmatterEnd,
 }
-
-
