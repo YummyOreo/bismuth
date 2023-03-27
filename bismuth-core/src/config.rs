@@ -78,7 +78,10 @@ pub struct TomlConfig {
 
 fn read_config(path: &PathBuf) -> Result<TomlConfig, std::io::Error> {
     let content = fs::read_to_string(path)?;
-    let config: TomlConfig = toml::from_str(&content).unwrap();
+    let mut config: TomlConfig = toml::from_str(&content).unwrap();
+    if let Some(theme) = config.theme {
+        config.theme = Some(theme.fill_default());
+    }
     Ok(config)
 }
 
