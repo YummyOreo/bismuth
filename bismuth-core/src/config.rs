@@ -36,7 +36,7 @@ pub struct WebsiteConfig {
 }
 
 #[allow(dead_code)]
-#[derive(Deserialize, Debug, PartialEq)]
+#[derive(Deserialize, Debug, PartialEq, Default)]
 pub struct Theme {
     background_1: Option<String>,
     background_2: Option<String>,
@@ -136,5 +136,57 @@ name = "test"
         };
         let result = Config::new_toml_config(&content);
         assert_eq!(expected, result)
+    }
+
+    // background_1: Option<String>,
+    // background_2: Option<String>,
+    // background_3: Option<String>,
+    // text_1: Option<String>,
+    // text_2: Option<String>,
+    // link: Option<String>,
+    // link_hover: Option<String>,
+    #[test]
+    fn simple_config_2() {
+        let content = r####"
+[website]
+name = "test"
+
+[theme]
+background_1 = "#fefefe"
+link = "#fefefe"
+text_1 = "#fefefe"
+
+"####;
+
+        let color = String::from("#fefefe");
+
+        let theme = Theme {
+            background_1: Some(color.clone()),
+            link: Some(color.clone()),
+            text_1: Some(color.clone()),
+            ..Default::default()
+        }
+        .fill_default();
+
+        let expected = TomlConfig {
+            website: WebsiteConfig {
+                name: String::from("test"),
+            },
+            theme: Some(theme),
+            ..Default::default()
+        };
+        let result = Config::new_toml_config(&content);
+        assert_eq!(expected, result)
+    }
+
+    #[test]
+    #[should_panic]
+    fn simple_error() {
+        // should panic bc there has to be a name
+        let content = r#"
+[website]
+"#;
+
+        let _ = Config::new_toml_config(&content);
     }
 }
