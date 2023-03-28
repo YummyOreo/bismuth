@@ -9,11 +9,16 @@
 - Blog List
     - pass through a path, dirs = blog series
 - Blog series
-# Add \[link\](1) ... \[1\](link thing)
-see the markdown thing
+
+<!-- # Add \[link\](1) ... \[1\](link thing) ~ -->
+<!-- ~ see the markdown thing ~ -->
+<!-- NOT PLANNED -->
 
 # Add \\ support
 
 # Move premade assest (such as css)
 
 # Allow links to headers
+
+# Make header links things
+like the thing that shows a # next to the header, then click it and it takes you to a link
