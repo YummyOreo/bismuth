@@ -19,3 +19,7 @@ toml = "0.7.3"
 
 [dev-dependencies]
 insta = "1.26.0"
+
+[features]
+default = ["bstd"]
+bstd = ["bismuth-custom/bstd"]

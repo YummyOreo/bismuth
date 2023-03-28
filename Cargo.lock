@@ -66,6 +66,7 @@ name = "bismuth-custom"
 version = "0.1.0"
 dependencies = [
  "bismuth-parser",
+ "bismuth-std",
  "insta",
  "regex",
 ]
@@ -122,6 +123,10 @@ dependencies = [
  "serde_yaml",
  "thiserror",
 ]
+
+[[package]]
+name = "bismuth-std"
+version = "0.1.0"
 
 [[package]]
 name = "bismuth-tui"
