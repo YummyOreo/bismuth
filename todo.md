@@ -14,11 +14,10 @@
 <!-- ~ see the markdown thing ~ -->
 <!-- NOT PLANNED -->
 
-# Add \\ support
+<!-- # Add \\ support -->
 
 # Move premade assest (such as css)
 
-# Allow links to headers
-
 # Make header links things
 like the thing that shows a # next to the header, then click it and it takes you to a link
+## Allow links to headers
