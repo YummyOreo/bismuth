@@ -29,16 +29,17 @@ impl BlogList {
         let mut output_files = vec![];
         for file in files {
             if file.is_some() {
-                // TODO: make it so /x/ matches w/ /x
                 let file = file.unwrap();
-                let mut file_path = file
+                let file_path = file
                     .metadata
                     .frontmatter
                     .get_path()
                     .cloned()
                     .unwrap_or_default();
-                file_path.push('/');
-                if file_path == self.dir {
+                if file_path == self.dir
+                    || format!("{file_path}/") == self.dir
+                    || format!("/{file_path}") == self.dir
+                {
                     output_files.push(file);
                 }
             }
