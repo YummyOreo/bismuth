@@ -20,17 +20,10 @@ Element{
     Attrs: [],
     Elements: [
     Element{
-        Kind: "Custom{Name: navbar, Body: None, Values: [(\"other\", \"key\")], Template: None}",
-        Text: Some("other: key"),
+        Kind: "Custom{Name: builtin_blogwrapper, Body: None, Values: [], Template: Some(\"<style>\\r\\n    .blogitem {\\r\\n        width: 9rem;\\r\\n        background-color: var(--background-2);\\r\\n        padding: 0.5rem 0.5rem;\\r\\n        border-radius: 0.5rem;\\r\\n    }\\r\\n\\r\\n    .blogitem-title {\\r\\n        margin-bottom: 0rem;\\r\\n        margin-top: 0.5rem;\\r\\n    }\\r\\n\\r\\n    .blogitem-date {\\r\\n        font-size: 0.7rem;\\r\\n        color: var(--text-22);\\r\\n    }\\r\\n\\r\\n    .blogitem-button {\\r\\n        border: none;\\r\\n        border-radius: 0.5rem;\\r\\n        height: 2rem;\\r\\n        width: 4rem;\\r\\n        margin-left: 50%;\\r\\n\\r\\n        background-color: var(--link);\\r\\n    }\\r\\n\\r\\n    .blogitem-button::hover {\\r\\n        background-color: var(--link-hover);\\r\\n    }\\r\\n\\r\\n    .blog-wrapper {\\r\\n        width: 10rem;\\r\\n        padding: 1rem 1rem;\\r\\n        background-color: var(--background-3);\\r\\n        border-radius: 0.5rem;\\r\\n    }\\r\\n</style>\\r\\n<div class=\\\"blog-wrapper\\\">\\r\\n    {elements}\\r\\n</div>\\r\\n\")}",
+        Text: None,
         Attrs: [],
         Elements: [
-            Element{
-            Kind: "Text",
-            Text: Some("other: key"),
-            Attrs: [],
-            Elements: [
-            ])
-        },
         ])
     },
     ])
