@@ -1,7 +1,42 @@
-<div style="
-     width: 10rem;
-     padding: 1rem 1rem;
-     background-color: var(--background-3)
-">
+<style>
+    .blogitem {
+        width: 9rem;
+        background-color: var(--background-2);
+        padding: 0.5rem 0.5rem;
+        border-radius: 0.5rem;
+    }
+
+    .blogitem-title {
+        margin-bottom: 0rem;
+        margin-top: 0.5rem;
+    }
+
+    .blogitem-date {
+        font-size: 0.7rem;
+        color: var(--text-22);
+    }
+
+    .blogitem-button {
+        border: none;
+        border-radius: 0.5rem;
+        height: 2rem;
+        width: 4rem;
+        margin-left: 50%;
+
+        background-color: var(--link);
+    }
+
+    .blogitem-button::hover {
+        background-color: var(--link-hover);
+    }
+
+    .blog-wrapper {
+        width: 10rem;
+        padding: 1rem 1rem;
+        background-color: var(--background-3);
+        border-radius: 0.5rem;
+    }
+</style>
+<div class="blog-wrapper">
     {elements}
 </div>
