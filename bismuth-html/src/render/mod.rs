@@ -155,7 +155,7 @@ fn handle_link(url: &str, text: &str) -> (String, String) {
 
 impl Render for Element {
     fn render(&mut self, path: &Path) -> Option<String> {
-        let inside = self
+        let mut inside = self
             .elements
             .iter()
             .map(|e| e.clone().render(path).expect("This should not fail"))
@@ -272,6 +272,8 @@ impl Render for Element {
             ),
             Kind::CustomElement(_c) => {
                 if let Ok(mut t) = Template::try_from(&self.to_owned()) {
+                    // Remove already rendered elements
+                    inside = String::new();
                     let html = t.render(path)?;
                     self.asset_list.append(&mut t.asset_list);
                     (html, Default::default())

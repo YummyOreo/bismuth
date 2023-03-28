@@ -29,15 +29,16 @@ impl BlogList {
         let mut output_files = vec![];
         for file in files {
             if file.is_some() {
+                // TODO: make it so /x/ matches w/ /x
                 let file = file.unwrap();
-                if file
+                let mut file_path = file
                     .metadata
                     .frontmatter
                     .get_path()
                     .cloned()
-                    .unwrap_or_default()
-                    == self.dir
-                {
+                    .unwrap_or_default();
+                file_path.push('/');
+                if file_path == self.dir {
                     output_files.push(file);
                 }
             }
@@ -55,7 +56,7 @@ impl BlogList {
             let title = frontmatter.get_value("title").unwrap();
             let date = frontmatter.get_value("date").unwrap();
 
-            let full_path = format!("{path}{html_title}.html");
+            let full_path = format!("{path}/{html_title}.html");
 
             // make custom
             let mut custom = CustomElm::new();

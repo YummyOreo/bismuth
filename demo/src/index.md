@@ -6,3 +6,4 @@ This is a test
 ![e](assets/example.png)
 [test page](nottest/test.html)
 [test page 2](test-path/test.html)
+[blogs?](bloglist/index.html)

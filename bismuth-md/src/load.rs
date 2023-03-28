@@ -18,9 +18,7 @@ pub fn load_from_dir(path: &Path, dir: &Path) -> Result<Vec<MarkdownFile>, Markd
         let file_path = &mut file.unwrap().path();
 
         if file_path.is_dir() {
-            let mut file_dir = file_path.clone();
-            file_dir.pop();
-            if let Ok(mut m) = load_from_dir(file_path, &file_dir) {
+            if let Ok(mut m) = load_from_dir(file_path, &dir) {
                 files.append(&mut m)
             }
         } else if file_path.is_file() {
