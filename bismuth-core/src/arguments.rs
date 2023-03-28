@@ -10,7 +10,11 @@ pub struct CliArguments {
 #[derive(Debug, Subcommand)]
 pub enum Commands {
     /// Builds the app in the current directory
-    Build,
+    Build {
+        /// Do not confirm to destory the bulid directory
+        #[arg(short, long)]
+        noconfirm: bool
+    },
     /// Inits a new project
     Init {
         /// Name of the project to create

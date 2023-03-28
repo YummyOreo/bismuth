@@ -15,7 +15,7 @@ pub mod builtin;
 /// Elements: Will be replaced at {elements}
 #[derive(Debug, PartialEq)]
 pub struct Template<'a> {
-    template: &'a str,
+    template: String,
     values: &'a HashMap<String, String>,
     body: Option<&'a String>,
     pub elements: &'a Vec<Element>,
@@ -32,7 +32,7 @@ impl<'a> TryFrom<&'a Element> for Template<'a> {
         if let Kind::CustomElement(c) = &elm.kind {
             if let Some(t) = &c.template {
                 return Ok(Self {
-                    template: t,
+                    template: t.to_string(),
                     values: &c.values,
                     body: c.body.as_ref(),
                     elements: &elm.elements,
@@ -46,7 +46,7 @@ impl<'a> TryFrom<&'a Element> for Template<'a> {
 
 impl<'a> Template<'a> {
     pub fn new(
-        template_str: &'a str,
+        template_str: String,
         values: &'a HashMap<String, String>,
         body: Option<&'a String>,
         elements: &'a Vec<Element>,
@@ -60,13 +60,13 @@ impl<'a> Template<'a> {
         }
     }
 
-    pub fn get_template(name: &str) -> Option<&str> {
+    pub fn get_template(name: &str) -> Option<String> {
         // TODO: Redo this when plugins/templates exists
         // + add new templates
         // Some of these should be included in the bstd
         match name.to_lowercase().as_str() {
-            "test" => Some(builtin::TEST),
-            "default" => Some(builtin::DEFAULT),
+            "test" => Some(builtin::TEST.to_string()),
+            "default" => Some(builtin::DEFAULT.replace('\r', "")),
             _ => None,
         }
     }
@@ -176,7 +176,7 @@ mod test {
                 - another_value: test another value
             ",
         );
-        let mut template = init_template!(parser, &String::from("test:\n {elements}"), None);
+        let mut template = init_template!(parser, String::from("test:\n {elements}"), None);
 
         let s = template.render(&PathBuf::new()).unwrap();
         snapshot!(s);
@@ -192,7 +192,7 @@ mod test {
                 - another_value: test another value
             ",
         );
-        let mut template = init_template!(parser, &String::from("test:\n {elements}"), None);
+        let mut template = init_template!(parser, String::from("test:\n {elements}"), None);
 
         let s = template.render(&PathBuf::new()).unwrap();
         snapshot!(s);

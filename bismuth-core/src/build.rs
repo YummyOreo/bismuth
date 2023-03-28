@@ -47,7 +47,7 @@ pub fn run_parser(files: Vec<Lexer>) -> Vec<Parser> {
         .collect::<Vec<Parser>>()
 }
 
-pub fn build(dir: String) {
+pub fn build(dir: String, noconfirm: bool) {
     let path = Path::new(&dir).canonicalize().unwrap();
 
     let _config = Config::new(&path);
@@ -64,7 +64,7 @@ pub fn build(dir: String) {
     let parsers = run_parser(tokenized_file);
     println!("---");
 
-    if PathBuf::from("./build/").exists() {
+    if PathBuf::from("./build/").exists() && !noconfirm {
         let mut check_remove_dir = YesNo::new(
             String::from("Warning! ./build/ dir will be removed! Would you like to proceed (Y/n):"),
             String::from("Warning! All the contents in the ./build dir will be removed"),
@@ -72,6 +72,7 @@ pub fn build(dir: String) {
         );
         check_remove_dir.run();
         if let Some(true) = check_remove_dir.result {
+            println!("Run with `--noconfirm` to auto accept this message");
             println!("Removing dir...");
             std::fs::remove_dir_all(PathBuf::from("./build/")).unwrap();
         } else {

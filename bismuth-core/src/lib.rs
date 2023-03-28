@@ -7,7 +7,7 @@ pub fn entry(dir: String) {
     let args = arguments::parse_args();
 
     match args.command {
-        arguments::Commands::Build => build::build(dir),
+        arguments::Commands::Build { noconfirm } => build::build(dir, noconfirm),
         arguments::Commands::Init { name } => {
             init::init_folder(&name).unwrap();
         }
