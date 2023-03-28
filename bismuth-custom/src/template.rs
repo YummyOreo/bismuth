@@ -5,8 +5,6 @@ pub struct Template {
 
 impl Template {
     pub fn new(content: String) -> Self {
-        Template {
-            content
-        }
+        Template { content }
     }
 }

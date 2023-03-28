@@ -4,6 +4,12 @@ use std::collections::HashMap;
 
 pub const NAME: &str = "navbar";
 
+pub const WRAPPER_NAME: &str = "bismuth_navbar_wrapper";
+pub const WRAPPER: &str = include_str!("../../data/navbar_wrapper.html");
+
+pub const ITEM_NAME: &str = "bismuth_navbar_item";
+pub const ITEM: &str = include_str!("../../data/navbar_item.html");
+
 #[derive(Debug, Default)]
 pub struct Navbar {
     pub values: HashMap<String, String>,

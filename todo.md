@@ -7,7 +7,7 @@
 - Footer (Customizable + auto added)
     - simmilar to navbar
 - Blog List
-    - pass through a path, dirs = blog series
+    - pass through a path, dirs = blog series (DONE)
 - Blog series
 
 <!-- # Add \[link\](1) ... \[1\](link thing) ~ -->

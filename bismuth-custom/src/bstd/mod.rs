@@ -9,12 +9,16 @@ pub fn match_template(name: &str) -> Option<Template> {
         footer::NAME => Some(Template {
             content: "<h1>Test template</h1>".to_string(),
         }),
-        bloglist::BLOGITEM_NAME => Some(Template::new(
-            bloglist::BLOGITEM.to_string().replace('\r', ""),
+
+        // Wrapper
+        bloglist::ITEM_NAME => Some(Template::new(bloglist::ITEM.to_string().replace('\r', ""))),
+        bloglist::WRAPPER_NAME => Some(Template::new(
+            bloglist::WRAPPER.to_string().replace('\r', ""),
         )),
-        bloglist::BLOGWRAPPER_NAME => Some(Template::new(
-            bloglist::BLOGWRAPPER.to_string().replace('\r', ""),
-        )),
+
+        // Navbar
+        navbar::ITEM_NAME => Some(Template::new(navbar::ITEM.to_string().replace('\r', ""))),
+        navbar::WRAPPER_NAME => Some(Template::new(navbar::WRAPPER.to_string().replace('\r', ""))),
         _ => None,
     }
 }

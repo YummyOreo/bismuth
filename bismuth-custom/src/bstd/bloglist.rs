@@ -8,11 +8,11 @@ pub const NAME1: &str = "blog list";
 pub const NAME2: &str = "blogs";
 pub const NAME3: &str = "bloglist";
 
-pub const BLOGITEM_NAME: &str = "builtin_blogitem";
-pub const BLOGITEM: &str = include_str!("../../data/blogitem.html");
+pub const ITEM_NAME: &str = "builtin_blogitem";
+pub const ITEM: &str = include_str!("../../data/blog_item.html");
 
-pub const BLOGWRAPPER_NAME: &str = "builtin_blogwrapper";
-pub const BLOGWRAPPER: &str = include_str!("../../data/blogwrapper.html");
+pub const WRAPPER_NAME: &str = "builtin_blog_wrapper";
+pub const WRAPPER: &str = include_str!("../../data/blog_wrapper.html");
 
 #[derive(Debug, Default)]
 pub struct BlogList {
@@ -61,7 +61,7 @@ impl BlogList {
 
             // make custom
             let mut custom = CustomElm::new();
-            custom.name = BLOGITEM_NAME.to_string();
+            custom.name = ITEM_NAME.to_string();
             custom.values.insert("title".to_string(), title.to_string());
             custom.values.insert("date".to_string(), date.to_string());
             custom
@@ -94,7 +94,7 @@ impl Plugin for BlogList {
         let mut customs = self.gen_templates(&posts);
 
         let mut wrapper = CustomElm::new();
-        wrapper.name = BLOGWRAPPER_NAME.to_string();
+        wrapper.name = WRAPPER_NAME.to_string();
         let mut wrapper_elm = Element::new(Kind::CustomElement(wrapper));
         wrapper_elm.elements.append(&mut customs);
 

@@ -13,7 +13,7 @@ pub enum Commands {
     Build {
         /// Do not confirm to destory the bulid directory
         #[arg(short, long)]
-        noconfirm: bool
+        noconfirm: bool,
     },
     /// Inits a new project
     Init {
