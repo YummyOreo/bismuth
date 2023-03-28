@@ -1,5 +1,3 @@
-use std::collections::HashMap;
-
 pub mod bloglist;
 pub mod footer;
 pub mod navbar;
@@ -8,34 +6,24 @@ use crate::{plugin::Plugin, template::Template};
 
 pub fn match_template(name: &str) -> Option<Template> {
     match name {
-        navbar::NAME => {}
-        footer::NAME => {
-            return Some(Template {
-                content: "<h1>Test template</h1>".to_string(),
-            });
-        }
-        bloglist::NAME1 | bloglist::NAME2 | bloglist::NAME3 => {}
-        _ => {}
+        footer::NAME => Some(Template {
+            content: "<h1>Test template</h1>".to_string(),
+        }),
+        bloglist::BLOGITEM_NAME => Some(Template::new(bloglist::BLOGITEM.to_string())),
+        bloglist::BLOGWRAPPER_NAME => Some(Template::new(bloglist::BLOGWRAPPER.to_string())),
+        _ => None,
     }
-    None
 }
 
 pub fn match_plugin(name: &str) -> Option<Box<dyn Plugin>> {
     match name {
-        navbar::NAME => {
-            return Some(Box::new(navbar::Navbar {
-                values: HashMap::new(),
-                id: 0,
-            }));
-        }
-        footer::NAME => {}
+        #[allow(clippy::box_default)]
+        navbar::NAME => Some(Box::new(navbar::Navbar::default())),
+
+        #[allow(clippy::box_default)]
         bloglist::NAME1 | bloglist::NAME2 | bloglist::NAME3 => {
-            return Some(Box::new(bloglist::BlogList {
-                values: HashMap::new(),
-                id: 0,
-            }));
+            Some(Box::new(bloglist::BlogList::default()))
         }
-        _ => {}
+        _ => None,
     }
-    None
 }

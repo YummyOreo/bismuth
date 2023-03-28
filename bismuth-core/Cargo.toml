@@ -22,4 +22,4 @@ insta = "1.26.0"
 
 [features]
 default = ["bstd"]
-bstd = ["bismuth-custom/bstd"]
+bstd = ["bismuth-custom/bstd", "bismuth-html/bstd"]

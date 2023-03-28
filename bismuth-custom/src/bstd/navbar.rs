@@ -4,7 +4,7 @@ use std::collections::HashMap;
 
 pub const NAME: &str = "navbar";
 
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct Navbar {
     pub values: HashMap<String, String>,
     pub id: u32,

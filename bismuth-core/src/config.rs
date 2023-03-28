@@ -131,13 +131,13 @@ impl<'a> Config<'a> {
 
     fn gen_colors(&self) -> String {
         let base_css = r":root {
-    --background_1: {background_1};
-    --background_2: {background_2};
-    --background_3: {background_3};
-    --text_1: {text_1};
-    --text_2: {text_2};
+    --background-1: {background_1};
+    --background-2: {background_2};
+    --background-3: {background_3};
+    --text-1: {text_1};
+    --text-2: {text_2};
     --link: {link};
-    --link_hover: {link_hover};
+    --link-hover: {link_hover};
 }";
         let base_css = replace_css!(base_css, self.theme, background_1);
         let base_css = replace_css!(base_css, self.theme, background_2);
@@ -240,13 +240,13 @@ std = true
 
         let expected = String::from(
             r":root {
-    --background_1: #282828;
-    --background_2: #3c3836;
-    --background_3: #1d2021;
-    --text_1: #ebdbb2;
-    --text_2: #d5c4a1;
+    --background-1: #282828;
+    --background-2: #3c3836;
+    --background-3: #1d2021;
+    --text-1: #ebdbb2;
+    --text-2: #d5c4a1;
     --link: #fe8018;
-    --link_hover: #d65d0e;
+    --link-hover: #d65d0e;
 }",
         );
         assert_eq!(expected, result)

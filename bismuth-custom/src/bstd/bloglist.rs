@@ -1,3 +1,4 @@
+#![allow(dead_code)]
 use crate::plugin::Plugin;
 use bismuth_parser::custom::CustomElm;
 use bismuth_parser::tree::{Element, Kind};
@@ -7,15 +8,23 @@ pub const NAME1: &str = "blog list";
 pub const NAME2: &str = "blogs";
 pub const NAME3: &str = "bloglist";
 
-#[derive(Debug)]
+pub const BLOGITEM_NAME: &str = "builtin_blogitem";
+pub const BLOGITEM: &str = include_str!("../../data/blogitem.html");
+
+pub const BLOGWRAPPER_NAME: &str = "builtin_blogwrapper";
+pub const BLOGWRAPPER: &str = include_str!("../../data/blogwrapper.html");
+
+#[derive(Debug, Default)]
 pub struct BlogList {
     pub values: HashMap<String, String>,
+    pub dir: String,
     pub id: u32,
 }
 
 impl Plugin for BlogList {
     fn pre_load(&mut self, _: &bismuth_parser::Parser, custom: &crate::Custom) {
         self.values = custom.data.clone();
+        self.dir = self.values.get("dir").cloned().unwrap_or_default();
         self.id = custom.id;
     }
 
