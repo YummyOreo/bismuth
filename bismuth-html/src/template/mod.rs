@@ -61,6 +61,9 @@ impl<'a> Template<'a> {
     }
 
     pub fn get_template(name: &str) -> Option<&str> {
+        // TODO: Redo this when plugins/templates exists
+        // + add new templates
+        // Some of these should be included in the bstd
         match name.to_lowercase().as_str() {
             "test" => Some(builtin::TEST),
             "default" => Some(builtin::DEFAULT),

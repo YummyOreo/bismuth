@@ -30,6 +30,7 @@ pub fn make_config(dir: &Path) -> Result<(), std::io::Error> {
 #[derive(Deserialize, Default, Debug, PartialEq)]
 pub struct WebsiteConfig {
     name: String,
+    std: bool,
 }
 
 #[allow(dead_code)]
@@ -78,6 +79,7 @@ pub struct Config<'a> {
     pub theme: Theme,
     pub addons: Addons,
     pub directory: &'a Path,
+    pub bstd: bool,
 }
 
 macro_rules! replace_css {
@@ -115,6 +117,7 @@ impl<'a> Config<'a> {
             name: toml_config.website.name,
             addons: toml_config.addons.unwrap_or_default(),
             theme: toml_config.theme.unwrap_or_default(),
+            bstd: toml_config.website.std,
         }
     }
 
@@ -154,11 +157,13 @@ mod tests {
         let content = r#"
 [website]
 name = "test"
+std = true
 "#;
 
         let expected = TomlConfig {
             website: WebsiteConfig {
                 name: String::from("test"),
+                std: true,
             },
             ..Default::default()
         };
@@ -171,6 +176,7 @@ name = "test"
         let content = r####"
 [website]
 name = "test"
+std = true
 
 [theme]
 background_1 = "#fefefe"
@@ -192,6 +198,7 @@ text_1 = "#fefefe"
         let expected = TomlConfig {
             website: WebsiteConfig {
                 name: String::from("test"),
+                std: true,
             },
             theme: Some(theme),
             ..Default::default()
@@ -216,6 +223,7 @@ text_1 = "#fefefe"
         let content = r#"
 [website]
 name = "test"
+std = true
 "#;
 
         let toml = Config::new_toml_config(&content);
@@ -226,6 +234,7 @@ name = "test"
             theme,
             addons: Default::default(),
             directory: &path,
+            bstd: true,
         }
         .gen_colors();
 

@@ -1,2 +1,3 @@
 [website]
 name = "demo"
+std = true

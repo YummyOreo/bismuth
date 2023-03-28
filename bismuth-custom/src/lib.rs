@@ -6,7 +6,8 @@ use bismuth_parser::{
     Parser,
 };
 
-mod builtin;
+#[cfg(feature = "bstd")]
+mod bstd;
 pub mod plugin;
 pub mod template;
 
@@ -37,14 +38,26 @@ impl Custom {
         Self::new(elm.name.clone(), elm.values.clone(), elm.body.clone(), id)
     }
 
-    fn find_plugin(&mut self) -> Option<Box<dyn plugin::Plugin>> {
-        // REDO THIS WHEN YOU IMPLEMENT PLUGINS
-        builtin::match_plugin(&self.name)
+    #[cfg(not(feature = "bstd"))]
+    fn find_plugin(&self) -> Option<Box<dyn plugin::Plugin>> {
+        None
     }
 
+    #[cfg(feature = "bstd")]
+    fn find_plugin(&mut self) -> Option<Box<dyn plugin::Plugin>> {
+        // REDO THIS WHEN YOU IMPLEMENT PLUGINS
+        bstd::match_plugin(&self.name)
+    }
+
+    #[cfg(feature = "bstd")]
     fn find_template(&mut self) -> Option<template::Template> {
         // REDO THIS WHEN YOU IMPLEMENT TEMPLATE
-        builtin::match_template(&self.name)
+        bstd::match_template(&self.name)
+    }
+
+    #[cfg(not(feature = "bstd"))]
+    fn find_template(&mut self) -> Option<template::Template> {
+        None
     }
 
     fn pre_load(&mut self, target: &Parser) {
