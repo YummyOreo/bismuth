@@ -18,6 +18,7 @@ pub enum Commands {
     /// Inits a new project
     Init {
         /// Name of the project to create
+        #[arg(short, long)]
         name: String,
     },
 }

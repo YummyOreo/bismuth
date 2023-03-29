@@ -173,7 +173,13 @@ impl Render for Element {
                 if num.parse::<i8>().unwrap_or_default() > 6_i8 {
                     num = String::from("6");
                 }
-                (format!("<h{num}>"), format!("</h{num}>"))
+                let rg = regex::Regex::new(r"\s+").unwrap();
+                let pre_text = html_escape::encode_text(inside.trim());
+                let text = rg.replace_all(&pre_text, "-").to_lowercase();
+                (
+                    format!(r##"<h{num} id="{text}"><a href="#{text}">"##),
+                    format!("</a></h{num}>"),
+                )
             }
             Kind::Text => (self.text.clone().unwrap_or_default(), Default::default()),
 

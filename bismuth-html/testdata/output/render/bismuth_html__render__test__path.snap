@@ -14,23 +14,23 @@ expression: snapshot(&content)
 </head>
 
 <body>
-    <h1> h1 Heading 8-</h1>
+    <h1> id="h1-heading"><a href="#h1-heading"> h1 Heading</h1>
 <br>
-<h2> h2 Heading</h2>
+<h2> id="h2-heading"><a href="#h2-heading"> h2 Heading</h2>
 <br>
-<h3> h3 Heading</h3>
+<h3> id="h3-heading"><a href="#h3-heading"> h3 Heading</h3>
 <br>
-<h4> h4 Heading</h4>
+<h4> id="h4-heading"><a href="#h4-heading"> h4 Heading</h4>
 <br>
-<h5> h5 Heading</h5>
+<h5> id="h5-heading"><a href="#h5-heading"> h5 Heading</h5>
 <br>
-<h6> h6 Heading</h6>
-<br>
-
+<h6> id="h6-heading"><a href="#h6-heading"> h6 Heading</h6>
 <br>
 
 <br>
-<h2> Horizontal Rules</h2>
+
+<br>
+<h2> id="horizontal-rules"><a href="#horizontal-rules"> Horizontal Rules</h2>
 <br>
 
 <br>
@@ -48,7 +48,7 @@ expression: snapshot(&content)
 <br>
 
 <br>
-<h2> Emphasis</h2>
+<h2> id="emphasis"><a href="#emphasis"> Emphasis</h2>
 <br>
 
 <br>
@@ -68,7 +68,7 @@ expression: snapshot(&content)
 <br>
 
 <br>
-<h2> Blockquotes</h2>
+<h2> id="blockquotes"><a href="#blockquotes"> Blockquotes</h2>
 <br>
 
 <br>
@@ -80,7 +80,7 @@ expression: snapshot(&content)
 <br>
 
 <br>
-<h2> Lists</h2>
+<h2> id="lists"><a href="#lists"> Lists</h2>
 <br>
 
 <br>
@@ -132,7 +132,7 @@ expression: snapshot(&content)
 <br>
 
 <br>
-<h2> Code</h2>
+<h2> id="code"><a href="#code"> Code</h2>
 <br>
 
 <br>
@@ -168,7 +168,7 @@ expression: snapshot(&content)
 <br>
 
 <br>
-<h2> Links</h2>
+<h2> id="links"><a href="#links"> Links</h2>
 <br>
 
 <br>
@@ -180,7 +180,7 @@ expression: snapshot(&content)
 <br>
 
 <br>
-<h2> Images</h2>
+<h2> id="images"><a href="#images"> Images</h2>
 <br>
 
 <br>
@@ -194,13 +194,13 @@ expression: snapshot(&content)
 <br>
 
 <br>
-<h2> Custom stuff:</h2>
+<h2> id="custom-stuff:"><a href="#custom-stuff:"> Custom stuff:</h2>
 <br>
 
 <br>
 
 <br>
-<h3> Tex:</h3>
+<h3> id="tex:"><a href="#tex:"> Tex:</h3>
 <br>
 
 <br>
