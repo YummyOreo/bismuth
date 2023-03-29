@@ -11,37 +11,33 @@ expression: "snapshot(\"# hearder\\n- 1\\n    - 2\\n1. list item\\nthis is a *__
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
     <meta name="head:count" content="4">
     <link rel="stylesheet" href="/assets/css/colors.css">
+    <link rel="stylesheet" href="/assets/css/base.css">
     <title>test</title>
-
-    <style>
-        * {
-            color: var(--text-1);
-        }
-
-        body {
-            background-color: var(--background-1);
-        }
-    </style>
 </head>
 
 <body>
-    <h1 id="hearder"><a href="#hearder"> hearder</a></h1>
-<br>
-<li class="item">	 1</li>
-<br>
-<li class="item">		 2</li>
-<br>
-<li class="num-list">	1. list item</li>
-<br>
-<p>this is a <i><b>good test</b></i>!! </p>
-<br>
-<p> <div class="inline-code">inline?</div></p>
-<br>
-<hr>
-<br>
-<blockquote> blockquote</blockquote>
-<br>
+    <div class="content">
+        <div class="inner">
+            <h1 id="hearder"><a href="#hearder"> hearder</a></h1>
 
+<li class="item">	 1</li>
+
+<li class="item">		 2</li>
+
+<li class="num-list">	1. list item</li>
+
+<p>this is a <i><b>good test</b></i>!! </p>
+
+<p> <div class="inline-code">inline?</div></p>
+
+<hr>
+
+<blockquote> blockquote</blockquote>
+
+
+
+        </div>
+    </div>
 </body>
 
 </html>

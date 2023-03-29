@@ -1,4 +1,7 @@
-use bismuth_html::{render_list, write::utils::write_css};
+use bismuth_html::{
+    render_list,
+    write::{move_css_folder, utils::write_css},
+};
 use bismuth_lexer::Lexer;
 use bismuth_md::MarkdownFile;
 use bismuth_parser::Parser;
@@ -88,5 +91,7 @@ pub fn build(dir: String, noconfirm: bool) {
         r.write().unwrap();
     }
     write_css(&config.gen_colors(), "colors").unwrap();
+    move_css_folder().unwrap();
+
     println!("Site built!");
 }

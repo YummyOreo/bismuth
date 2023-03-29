@@ -99,8 +99,20 @@ impl Render for Renderer {
 
         self.output = template.render(&self.path)?;
 
-        let rg_double_br = regex::Regex::new(r"(<br>(\n)?)+").unwrap();
-        self.output = rg_double_br.replace_all(&self.output, "<br>\n").to_string();
+        // --- HORRIBLE PLS REPLACE WITH GOOD STUFF ---
+        // replace all double br's + w/ <double br>
+        let replace_double_br = Regex::new(r"(<br>\n*){2}").unwrap();
+        self.output = replace_double_br
+            .replace_all(&self.output, "<double br>\n")
+            .to_string();
+
+        // Remove all other br's
+        let remove_br = Regex::new(r"<br>\n?").unwrap();
+        self.output = remove_br.replace_all(&self.output, "\n").to_string();
+
+        // Replace all double br's w/ single br's
+        let replace_br = Regex::new(r"<double br>\n").unwrap();
+        self.output = replace_br.replace_all(&self.output, "<br>\n").to_string();
 
         self.asset_list.append(&mut template.asset_list);
         Some(self.output.clone())

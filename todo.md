@@ -10,13 +10,7 @@
     - pass through a path, dirs = blog series (DONE)
 - Blog series
 
-<!-- # Add \[link\](1) ... \[1\](link thing) ~ -->
-<!-- ~ see the markdown thing ~ -->
-<!-- NOT PLANNED -->
-
-<!-- # Add \\ support -->
-
-# Move premade assest (such as css)
+# Move premade assest (such as css) [1/2 Done](The framework is there)
 
 # Make header links things [Done]
 like the thing that shows a # next to the header, then click it and it takes you to a link

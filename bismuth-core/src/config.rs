@@ -52,7 +52,7 @@ impl Theme {
             background_2: Some(self.background_2.unwrap_or(String::from("#3c3836"))),
             background_3: Some(self.background_3.unwrap_or(String::from("#1d2021"))),
             text_1: Some(self.text_1.unwrap_or(String::from("#ebdbb2"))),
-            text_2: Some(self.text_2.unwrap_or(String::from("#d5c4a1"))),
+            text_2: Some(self.text_2.unwrap_or(String::from("#a89984"))),
             link: Some(self.link.unwrap_or(String::from("#fe8018"))),
             link_hover: Some(self.link_hover.unwrap_or(String::from("#d65d0e"))),
         }
@@ -245,7 +245,7 @@ std = true
     --background-2: #3c3836;
     --background-3: #1d2021;
     --text-1: #ebdbb2;
-    --text-2: #d5c4a1;
+    --text-2: #a89984;
     --link: #fe8018;
     --link-hover: #d65d0e;
 }",

@@ -11,149 +11,90 @@ expression: snapshot(&content)
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
     <meta name="head:count" content="4">
     <link rel="stylesheet" href="/assets/css/colors.css">
+    <link rel="stylesheet" href="/assets/css/base.css">
     <title>test</title>
-
-    <style>
-        * {
-            color: var(--text-1);
-        }
-
-        body {
-            background-color: var(--background-1);
-        }
-    </style>
 </head>
 
 <body>
-    <h1 id="h1-heading"><a href="#h1-heading"> h1 Heading</a></h1>
-<br>
+    <div class="content">
+        <div class="inner">
+            <h1 id="h1-heading"><a href="#h1-heading"> h1 Heading</a></h1>
+
 <h2 id="h2-heading"><a href="#h2-heading"> h2 Heading</a></h2>
-<br>
+
 <h3 id="h3-heading"><a href="#h3-heading"> h3 Heading</a></h3>
-<br>
+
 <h4 id="h4-heading"><a href="#h4-heading"> h4 Heading</a></h4>
-<br>
+
 <h5 id="h5-heading"><a href="#h5-heading"> h5 Heading</a></h5>
-<br>
+
 <h6 id="h6-heading"><a href="#h6-heading"> h6 Heading</a></h6>
 <br>
 
-<br>
-
-<br>
 <h2 id="horizontal-rules"><a href="#horizontal-rules"> Horizontal Rules</a></h2>
-<br>
-
 <br>
 <hr>
 <br>
-
-<br>
 <p>!!!!!! ???? ,,  -- ---</p>
-<br>
-
 <br>
 <p>"Smartypants, double quotes" and 'single quotes'</p>
 <br>
 
-<br>
-
-<br>
 <h2 id="emphasis"><a href="#emphasis"> Emphasis</a></h2>
 <br>
-
+<b>This is bold text</b>
 <br>
 <b>This is bold text</b>
 <br>
-
-<br>
-<b>This is bold text</b>
-<br>
-
-<br>
 <i>This is italic text</i>
 <br>
-
-<br>
 <i>This is italic text</i>
-<br>
-
 <br>
 <h2 id="blockquotes"><a href="#blockquotes"> Blockquotes</a></h2>
 <br>
 
-<br>
-
-<br>
 <blockquote> Blockquote...</blockquote>
 <br>
 
-<br>
-
-<br>
 <h2 id="lists"><a href="#lists"> Lists</a></h2>
-<br>
-
 <br>
 <p>Unordered</p>
 <br>
-
-<br>
 <li class="item">	 Sub-lists are made by indenting 2 spaces:</li>
-<br>
-<li class="item">		 Marker character change forces new list start:</li>
-<br>
-<li class="item">			 Facilisis in pretium nisl aliquet</li>
-<br>
-<li class="item">			 Nulla volutpat aliquam velit</li>
-<br>
-<li class="item">	 Very easy!</li>
-<br>
 
+<li class="item">		 Marker character change forces new list start:</li>
+
+<li class="item">			 Facilisis in pretium nisl aliquet</li>
+
+<li class="item">			 Nulla volutpat aliquam velit</li>
+
+<li class="item">	 Very easy!</li>
 <br>
 <p>Ordered</p>
 <br>
-
-<br>
 <li class="num-list">	1. Lorem ipsum dolor sit amet</li>
-<br>
+
 <li class="num-list">	2. Consectetur adipiscing elit</li>
-<br>
+
 <li class="num-list">	3. Integer molestie lorem at massa</li>
 <br>
 
-<br>
-
-<br>
 <li class="num-list">	1. You can use sequential numbers...</li>
-<br>
-<li class="num-list">	1. ...or keep all the numbers as <div class="inline-code">1.</div></li>
-<br>
 
+<li class="num-list">	1. ...or keep all the numbers as <div class="inline-code">1.</div></li>
 <br>
 <p>Start numbering with offset:</p>
 <br>
-
-<br>
 <li class="num-list">	57. foo</li>
-<br>
+
 <li class="num-list">	1. bar</li>
 <br>
 
-<br>
-
-<br>
 <h2 id="code"><a href="#code"> Code</a></h2>
-<br>
-
 <br>
 <p>Inline <div class="inline-code">code</div></p>
 <br>
-
-<br>
 <p>Block code "fences"</p>
-<br>
-
 <br>
 <pre style="background-color:#ffffff;">
 <span style="color:#323232;">
@@ -161,11 +102,7 @@ expression: snapshot(&content)
 </span></pre>
 
 <br>
-
-<br>
 <p>Syntax highlighting</p>
-<br>
-
 <br>
 <pre style="background-color:#ffffff;">
 <span style="color:#323232;">
@@ -177,54 +114,36 @@ expression: snapshot(&content)
 </span></pre>
 
 <br>
-
-<br>
 <h2 id="links"><a href="#links"> Links</a></h2>
-<br>
-
 <br>
 <a href="/test">link text</a>
 <br>
-
-<br>
 <a href="example.com" target="_blank">link with title</a>
-<br>
-
 <br>
 <h2 id="images"><a href="#images"> Images</a></h2>
 <br>
-
-<br>
 <img src="/assets/test.png" alt="Minion">
-<br>
+
 <img src="example.com" alt="Stormtroopocat">
 <br>
-
-<br>
 <p>Like links, Images also have a footnote style syntax</p>
-<br>
-
 <br>
 <h2 id="custom-stuff:"><a href="#custom-stuff:"> Custom stuff:</a></h2>
 <br>
 
-<br>
-
-<br>
 <h3 id="tex:"><a href="#tex:"> Tex:</a></h3>
-<br>
-
 <br>
 <p>inline <span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>T</mi><mi>e</mi><mi>x</mi></mrow><annotation encoding="application/x-tex">Tex</annotation></semantics></math></span></p>
 <br>
 
-<br>
 <div class="latex"><span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mi>N</mi><mi>o</mi><mi>n</mi><mi>e</mi><mi>i</mi><mi>n</mi><mi>l</mi><mi>i</mi><mi>n</mi><mi>e</mi></mrow><annotation encoding="application/x-tex">None inline</annotation></semantics></math></span>
 </div>
 <br>
 
-<br>
 
+
+        </div>
+    </div>
 </body>
 
 </html>

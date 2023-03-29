@@ -11,26 +11,20 @@ expression: "snapshot(\"this is a test for block latex using katex:\\n$$E = mc^2
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
     <meta name="head:count" content="4">
     <link rel="stylesheet" href="/assets/css/colors.css">
+    <link rel="stylesheet" href="/assets/css/base.css">
     <title>test</title>
-
-    <style>
-        * {
-            color: var(--text-1);
-        }
-
-        body {
-            background-color: var(--background-1);
-        }
-    </style>
 </head>
 
 <body>
-    <p>this is a test for block latex using katex:</p>
+    <div class="content">
+        <div class="inner">
+            <p>this is a test for block latex using katex:</p>
 <br>
 <div class="latex"><span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mi>E</mi><mo>=</mo><mi>m</mi><msup><mi>c</mi><mn>2</mn></msup></mrow><annotation encoding="application/x-tex">E = mc^2</annotation></semantics></math></span>
 </div>
 <br>
-
+        </div>
+    </div>
 </body>
 
 </html>

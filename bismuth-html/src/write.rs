@@ -7,6 +7,8 @@ const BUILD_ASSETS: &str = "./build/assets";
 const BUILD_ASSETS_CSS: &str = "./build/assets/css";
 const ASSETS: &str = "./assets";
 
+const CSS: &[(&str, &str)] = &[(include_str!("../data/css/base.css"), "base")];
+
 pub mod utils {
     use super::*;
     use std::{
@@ -94,6 +96,13 @@ pub mod utils {
         let path = PathBuf::from(format!("{BUILD_ASSETS_CSS}/{name}.css"));
         fs::write(path, content)
     }
+}
+
+pub fn move_css_folder() -> Result<(), Error> {
+    for (css, name) in CSS {
+        utils::write_css(css, name)?;
+    }
+    Ok(())
 }
 
 pub fn move_assets(assets: &[PathBuf]) -> Result<(), Error> {

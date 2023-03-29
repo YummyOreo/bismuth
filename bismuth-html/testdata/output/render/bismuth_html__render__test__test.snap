@@ -11,22 +11,15 @@ expression: "snapshot(\"test *test* \\n```rust\\nfn test() {\\n\\tprintln!(\\\"t
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
     <meta name="head:count" content="4">
     <link rel="stylesheet" href="/assets/css/colors.css">
+    <link rel="stylesheet" href="/assets/css/base.css">
     <title>test</title>
-
-    <style>
-        * {
-            color: var(--text-1);
-        }
-
-        body {
-            background-color: var(--background-1);
-        }
-    </style>
 </head>
 
 <body>
-    <p>test <i>test</i> </p>
-<br>
+    <div class="content">
+        <div class="inner">
+            <p>test <i>test</i> </p>
+
 <pre style="background-color:#ffffff;">
 <span style="color:#323232;">
 </span><span style="font-weight:bold;color:#a71d5d;">fn </span><span style="font-weight:bold;color:#795da3;">test</span><span style="color:#323232;">() {
@@ -34,8 +27,11 @@ expression: "snapshot(\"test *test* \\n```rust\\nfn test() {\\n\\tprintln!(\\\"t
 </span><span style="color:#323232;">}
 </span></pre>
 
-<br>
 
+
+
+        </div>
+    </div>
 </body>
 
 </html>
