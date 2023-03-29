@@ -1,4 +1,4 @@
-use bismuth_html::render_list;
+use bismuth_html::{render_list, write::utils::write_css};
 use bismuth_lexer::Lexer;
 use bismuth_md::MarkdownFile;
 use bismuth_parser::Parser;
@@ -50,7 +50,7 @@ pub fn run_parser(files: Vec<Lexer>) -> Vec<Parser> {
 pub fn build(dir: String, noconfirm: bool) {
     let path = Path::new(&dir).canonicalize().unwrap();
 
-    let _config = Config::new(&path);
+    let config = Config::new(&path);
 
     let mut src_path = path.clone();
     src_path.push("src/");
@@ -87,5 +87,6 @@ pub fn build(dir: String, noconfirm: bool) {
     for r in renderers {
         r.write().unwrap();
     }
+    write_css(&config.gen_colors(), &"colors").unwrap();
     println!("Site built!");
 }

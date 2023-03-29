@@ -74,6 +74,7 @@ pub struct TomlConfig {
     addons: Option<Addons>,
 }
 
+#[derive(Debug)]
 pub struct Config<'a> {
     pub name: String,
     pub theme: Theme,
@@ -123,13 +124,11 @@ impl<'a> Config<'a> {
 
     fn new_toml_config(content: &str) -> TomlConfig {
         let mut config: TomlConfig = toml::from_str(content).unwrap();
-        if let Some(theme) = config.theme {
-            config.theme = Some(theme.fill_default());
-        }
+        config.theme = Some(config.theme.unwrap_or_default().fill_default());
         config
     }
 
-    fn gen_colors(&self) -> String {
+    pub fn gen_colors(&self) -> String {
         let base_css = r":root {
     --background-1: {background_1};
     --background-2: {background_2};

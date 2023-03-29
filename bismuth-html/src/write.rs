@@ -4,6 +4,7 @@ use std::path::PathBuf;
 
 const BUILD: &str = "./build";
 const BUILD_ASSETS: &str = "./build/assets";
+const BUILD_ASSETS_CSS: &str = "./build/assets/css";
 const ASSETS: &str = "./assets";
 
 pub mod utils {
@@ -44,6 +45,16 @@ pub mod utils {
         Ok(())
     }
 
+    pub fn make_css() -> Result<(), Error> {
+        make_build_assets()?;
+
+        let css = Path::new(BUILD_ASSETS_CSS);
+        if !css.exists() {
+            fs::create_dir_all(css)?
+        }
+        Ok(())
+    }
+
     /// Writes a html file to the `./build/` folder
     /// The path should not have a . in the begining
     pub fn write_html_file(content: &str, path: &Path, name: &String) -> Result<(), Error> {
@@ -76,6 +87,13 @@ pub mod utils {
 
         fs::copy(old_full, new_path).map(|_| ())
     }
+
+    pub fn write_css(content: &str, name: &str) -> Result<(), Error> {
+        make_css()?;
+
+        let path = PathBuf::from(format!("{BUILD_ASSETS_CSS}/{name}.css"));
+        fs::write(path, content)
+    }
 }
 
 pub fn move_assets(assets: &[PathBuf]) -> Result<(), Error> {
@@ -84,6 +102,3 @@ pub fn move_assets(assets: &[PathBuf]) -> Result<(), Error> {
     }
     Ok(())
 }
-
-#[cfg(test)]
-mod tests {}
