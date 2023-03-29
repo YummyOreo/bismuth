@@ -122,34 +122,19 @@ impl Render for Renderer {
 /// Returns (Html, File to move)
 fn handle_file_url(url: &str, text: &str, _path: &Path) -> (String, Option<PathBuf>) {
     let valid_url = Regex::new(URL_CHECK).expect("Should be valid regex");
+    let video_rg = Regex::new(r"^.+\.(webm|mp4)$").expect("Should be valid regex");
 
-    if valid_url.is_match(url) {
-        return (format!(r#"<img src="{url}" alt="{text}">"#), None);
+    let begining = if video_rg.is_match(url) {
+        format!(
+            r#"<video src="{url}" controls="controls" muted="muted" class="pt-3" style="max-height:440px;"></video>"#
+        )
     } else {
-        let picture_rg = Regex::new(r"^.+\.(png|jpeg|apng|avif|gif|jpg|jfif|pjpeg|pjp|svg|webp)$")
-            .expect("Should be valid regex");
-        let video_rg = Regex::new(r"^.+\.(webm|mp4)$").expect("Should be valid regex");
-
-        if picture_rg.is_match(url) {
-            return (
-                format!(r#"<img src="{url}" alt="{text}">"#),
-                Some(PathBuf::from(url)),
-            );
-        } else if video_rg.is_match(url) {
-            let format = video_rg
-                .captures_iter(url)
-                .next()
-                .expect("Should have 2 capture groups")
-                .get(1)
-                .expect("Should have 1 capture")
-                .as_str();
-            return (
-                format!(r#"<source src="{url}" type="video/{format}">"#),
-                Some(PathBuf::from(url)),
-            );
-        }
+        format!(r#"<img src="{url}" alt="{text}">"#)
+    };
+    if valid_url.is_match(url) {
+        return (begining, None);
     }
-    Default::default()
+    (begining, Some(PathBuf::from(url)))
 }
 
 /// This will be relitive to the base dir
