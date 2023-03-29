@@ -87,6 +87,6 @@ pub fn build(dir: String, noconfirm: bool) {
     for r in renderers {
         r.write().unwrap();
     }
-    write_css(&config.gen_colors(), &"colors").unwrap();
+    write_css(&config.gen_colors(), "colors").unwrap();
     println!("Site built!");
 }

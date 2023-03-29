@@ -159,11 +159,13 @@ name = "test"
 std = true
 "#;
 
+        let theme = Theme::default().fill_default();
         let expected = TomlConfig {
             website: WebsiteConfig {
                 name: String::from("test"),
                 std: true,
             },
+            theme: Some(theme),
             ..Default::default()
         };
         let result = Config::new_toml_config(&content);

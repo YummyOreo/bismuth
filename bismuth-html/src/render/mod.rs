@@ -98,6 +98,10 @@ impl Render for Renderer {
         let mut template = Template::new_from_name(kind, &values, None, elements)?;
 
         self.output = template.render(&self.path)?;
+
+        let rg_double_br = regex::Regex::new(r"(<br>(\n)?)+").unwrap();
+        self.output = rg_double_br.replace_all(&self.output, "<br>\n").to_string();
+
         self.asset_list.append(&mut template.asset_list);
         Some(self.output.clone())
     }
