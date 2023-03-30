@@ -86,7 +86,12 @@ impl Navbar {
                 is_current,
             });
         }
+        info.sort_by(|a, b| a.order.cmp(&b.order));
         info
+    }
+
+    fn gen_elements(&self) {
+        todo!()
     }
 }
 
