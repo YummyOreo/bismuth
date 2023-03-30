@@ -10,8 +10,8 @@
     - pass through a path, dirs = blog series (DONE)
 - Blog series
 
-# Move premade assest (such as css) [1/2 Done](The framework is there)
+# Move premade assest (such as css) [2/2 Done](The framework is there)
 
 # Make header links things [Done]
 like the thing that shows a # next to the header, then click it and it takes you to a link
-## Allow links to headers
+## Allow links to headers [Done]
