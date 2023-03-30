@@ -1,7 +1,10 @@
 #![allow(dead_code)]
 use crate::plugin::Plugin;
-use bismuth_parser::custom::CustomElm;
-use bismuth_parser::tree::{Element, Kind};
+use bismuth_parser::{
+    custom::CustomElm,
+    tree::{Element, Kind},
+    Parser,
+};
 use std::collections::HashMap;
 
 pub const NAME1: &str = "blog list";
@@ -22,10 +25,7 @@ pub struct BlogList {
 }
 
 impl BlogList {
-    fn get_posts<'a>(
-        &self,
-        files: &[Option<&'a bismuth_parser::Parser>],
-    ) -> Vec<&'a bismuth_parser::Parser> {
+    fn get_posts<'a>(&self, files: &[Option<&'a Parser>]) -> Vec<&'a bismuth_parser::Parser> {
         let mut output_files = vec![];
         for file in files {
             if file.is_some() {
@@ -47,47 +47,47 @@ impl BlogList {
         output_files
     }
 
-    fn gen_templates(&self, files: &[&bismuth_parser::Parser]) -> Vec<Element> {
-        let mut customs = vec![];
-        for file in files {
-            // get info
-            let frontmatter = &file.metadata.frontmatter;
-            let html_title = frontmatter.get_title().unwrap();
-            let path = frontmatter.get_path().unwrap();
-            let title = frontmatter.get_value("title").unwrap();
-            let date = frontmatter.get_value("date").unwrap();
+    fn gen_templates(&self, files: &[&Parser]) -> Vec<Element> {
+        let customs = files
+            .iter()
+            .map(|file| {
+                // get info
+                let frontmatter = &file.metadata.frontmatter;
+                let html_title = frontmatter.get_title().unwrap();
+                let path = frontmatter.get_path().unwrap();
+                let title = frontmatter.get_value("title").unwrap();
+                let date = frontmatter.get_value("date").unwrap();
 
-            let full_path = format!("{path}/{html_title}.html");
+                let full_path = format!("{path}/{html_title}.html");
 
-            // make custom
-            let mut custom = CustomElm::new();
-            custom.name = ITEM_NAME.to_string();
-            custom.values.insert("title".to_string(), title.to_string());
-            custom.values.insert("date".to_string(), date.to_string());
-            custom
-                .values
-                .insert("url".to_string(), full_path.to_string());
+                // make custom
+                let mut custom = CustomElm::new();
+                custom.name = String::from(ITEM_NAME);
+                custom
+                    .values
+                    .insert(String::from("title"), String::from(title));
+                custom
+                    .values
+                    .insert(String::from("date"), String::from(date));
+                custom
+                    .values
+                    .insert(String::from("url"), String::from(full_path));
 
-            let element = Element::new(Kind::CustomElement(custom));
-
-            customs.push(element);
-        }
+                Element::new(Kind::CustomElement(custom))
+            })
+            .collect::<Vec<Element>>();
         customs
     }
 }
 
 impl Plugin for BlogList {
-    fn pre_load(&mut self, _: &bismuth_parser::Parser, custom: &crate::Custom) {
+    fn pre_load(&mut self, _: &Parser, custom: &crate::Custom) {
         self.values = custom.data.clone();
         self.dir = self.values.get("dir").cloned().unwrap_or_default();
         self.id = custom.id;
     }
 
-    fn run(
-        &mut self,
-        target: &mut bismuth_parser::Parser,
-        files: &[Option<&bismuth_parser::Parser>],
-    ) {
+    fn run(&mut self, target: &mut Parser, files: &[Option<&Parser>]) {
         let mod_element = target.ast.find_mut(self.id).unwrap();
 
         let posts = self.get_posts(files);

@@ -1,5 +1,9 @@
 use crate::plugin::Plugin;
-use bismuth_parser::tree::{Element, Kind};
+use bismuth_parser::{
+    custom::CustomElm,
+    tree::{Element, Kind},
+    Parser,
+};
 use std::collections::HashMap;
 
 pub const NAME: &str = "navbar";
@@ -12,7 +16,7 @@ pub const ITEM: &str = include_str!("../../data/navbar_item.html");
 
 #[derive(Debug)]
 pub struct PageInfo<'a> {
-    pub dir: &'a String,
+    pub path: String,
     pub title: &'a String,
     pub order: i32,
     pub is_current: bool,
@@ -26,11 +30,7 @@ pub struct Navbar {
 }
 
 impl Navbar {
-    fn get_pages<'a>(
-        &self,
-        page: &'a bismuth_parser::Parser,
-        pages: &[Option<&'a bismuth_parser::Parser>],
-    ) -> Vec<&'a bismuth_parser::Parser> {
+    fn get_pages<'a>(&self, page: &'a Parser, pages: &[Option<&'a Parser>]) -> Vec<&'a Parser> {
         let mut output_files = vec![];
         for file in pages {
             if file.is_some() {
@@ -61,7 +61,7 @@ impl Navbar {
         output_files
     }
 
-    fn get_info<'a>(&self, pages: &[&'a bismuth_parser::Parser]) -> Vec<PageInfo<'a>> {
+    fn get_info<'a>(&self, pages: &[&'a Parser]) -> Vec<PageInfo<'a>> {
         let mut info: Vec<PageInfo<'a>> = vec![];
         for page in pages {
             let frontmatter = &page.metadata.frontmatter;
@@ -78,10 +78,14 @@ impl Navbar {
                     .get_value("title")
                     .unwrap_or(frontmatter.get_title().unwrap()),
             );
-            let path = frontmatter.get_path().unwrap();
+            let path = format!(
+                "{}/{}.html",
+                frontmatter.get_path().unwrap(),
+                frontmatter.get_title().unwrap()
+            );
             info.push(PageInfo {
                 title,
-                dir: path,
+                path,
                 order,
                 is_current,
             });
@@ -90,19 +94,35 @@ impl Navbar {
         info
     }
 
-    fn gen_elements(&self) {
-        todo!()
+    fn gen_elements<'a>(&self, pages: &[&'a PageInfo<'a>]) -> Vec<Element> {
+        let customs = pages
+            .iter()
+            .map(|page| {
+                let title = page.title.clone();
+                let url = page.path.clone();
+                let enabled = page.is_current.clone().to_string();
+
+                let mut custom = CustomElm::new();
+                custom.name = String::from(ITEM_NAME);
+                custom.values.insert(String::from("title"), title);
+                custom.values.insert(String::from("enabled"), enabled);
+                custom.values.insert(String::from("url"), url);
+
+                Element::new(Kind::CustomElement(custom))
+            })
+            .collect::<Vec<Element>>();
+        customs
     }
 }
 
 impl Plugin for Navbar {
-    fn pre_load(&mut self, page: &bismuth_parser::Parser, custom: &crate::Custom) {
+    fn pre_load(&mut self, page: &Parser, custom: &crate::Custom) {
         self.values = custom.data.clone();
         self.path = page.metadata.frontmatter.get_path().cloned().unwrap();
         self.id = custom.id;
     }
 
-    fn run(&mut self, target: &mut bismuth_parser::Parser, _: &[Option<&bismuth_parser::Parser>]) {
+    fn run(&mut self, target: &mut Parser, _: &[Option<&Parser>]) {
         let mod_element = target.ast.find_mut(self.id).unwrap();
         let mut values = self.values.iter().collect::<Vec<(&String, &String)>>();
         values.sort();

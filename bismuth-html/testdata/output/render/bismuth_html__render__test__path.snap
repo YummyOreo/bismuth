@@ -32,6 +32,8 @@ expression: snapshot(&content)
 <br>
 
 <h2 id="horizontal-rules"><a href="#horizontal-rules"> Horizontal Rules</a></h2>
+
+<blockquote> This is cool</blockquote>
 <br>
 <hr>
 <br>
