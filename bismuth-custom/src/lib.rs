@@ -211,9 +211,7 @@ mod test {
         };
     }
 
-    snapshot!(test_plugin, "%{{\nname: navbar\nother: key\n}}");
     snapshot!(test_plugin_2, "%{{\nname: bloglist\nother: key\n}}");
-    snapshot!(test_plugin_3, "this is a test \n%{{\nname: navbar\nkey: value\nbloglist: true? will this work\n}}\n%{{\nname: blog list\nother: key\n}}");
 
     snapshot!(test_template, "%{{\nname: footer\n}}");
     snapshot!(

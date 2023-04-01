@@ -98,18 +98,18 @@ impl Render for Template<'_> {
             })
             .collect::<String>();
         let e_rg = Regex::new(r"\{(?i)elements\}").expect("Should be valid regex");
-        output = e_rg.replace(&output, elements_str).to_string();
+        output = e_rg.replace_all(&output, elements_str).to_string();
 
         // Next do the body
         let b_rg = Regex::new(r"\{(?i)body\}").expect("Should be valid regex");
         output = b_rg
-            .replace(&output, self.body.cloned().unwrap_or_default())
+            .replace_all(&output, self.body.cloned().unwrap_or_default())
             .to_string();
 
         // next do each value
         for (key, value) in self.values {
             let rg = Regex::new(&format!(r"\{{(?i){}\}}", key)).expect("Should be valid");
-            output = rg.replace(&output, value).to_string();
+            output = rg.replace_all(&output, value).to_string();
         }
         Some(output)
     }

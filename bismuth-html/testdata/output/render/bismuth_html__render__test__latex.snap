@@ -24,6 +24,9 @@ expression: "snapshot(\"this is a test for inline latex using katex: $E = mc^2$\
 
         </div>
     </div>
+    
+    
+    
 </body>
 
 </html>

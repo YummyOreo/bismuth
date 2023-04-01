@@ -2,6 +2,6 @@
 source: bismuth-html/src/render/code.rs
 expression: html
 ---
-<pre style="background-color:#ffffff;">
-<span style="font-weight:bold;color:#a71d5d;">let</span><span style="color:#323232;"> test </span><span style="font-weight:bold;color:#a71d5d;">= </span><span style="color:#0086b3;">10</span></pre>
+<pre style="background-color:#3b3228;">
+<span style="color:#a89bb9;">let</span><span style="color:#d0c8c6;"> test = </span><span style="color:#d28b71;">10</span></pre>
 

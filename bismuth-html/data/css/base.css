@@ -6,7 +6,47 @@
 }
 
 .inner {
-    width: 25%;
+    font-size: 1.2rem;
+    margin: 0 auto;
+    max-width: calc(min(760px, 100%));
+}
+
+h1, h2, h3, h4, h5, h6 {
+    text-decoration: none !important;
+    margin: 1rem auto;
+}
+
+h1 a, h2 a, h3 a, h4 a, h5 a, h6 a {
+    text-decoration: none !important;
+    color: var(--text)
+}
+h1 a:hover, h2 a:hover, h3 a:hover, h4 a:hover, h5 a:hover, h6 a:hover {
+    text-decoration: none !important;
+    color: var(--text-1)
+}
+
+h1 {
+    font-size: 2.4rem;
+}
+
+h2 {
+    font-size: 2rem;
+}
+
+h3 {
+    font-size: 2.8rem;
+}
+
+h4 {
+    font-size: 1.7rem;
+}
+
+h5 {
+    font-size: 1.6rem;
+}
+
+h6 {
+    font-size: 1.4rem;
 }
 
 * {
@@ -14,6 +54,56 @@
     margin: 0;
 }
 
+img, video {
+    display: block;
+    margin: 0 auto;
+    max-width: calc(min(2200px, 80vw));
+}
+
 body {
+    font-size: 20px;
     background-color: var(--background-1);
+    width: 100%;
+}
+
+a {
+    color: var(--link);
+}
+
+a:hover {
+    color: var(--link-hover);
+}
+
+.code {
+    overflow: scroll;
+    border-color: var(--link);
+    border-radius: 10px;
+    border-width: 3px;
+    padding: 0 1rem 1rem 1rem;
+}
+.code::-webkit-scrollbar {
+    display: none;
+}
+
+.code::-webkit-scrollbar-track {
+    display: none;
+}
+
+.code::-webkit-scrollbar-thumb {
+    display: none;
+}
+
+html::-webkit-scrollbar {
+    width: 10px;
+}
+
+html::-webkit-scrollbar-track {
+    border-radius: 8px;
+    background-color: var(--background-3);
+    border: 1px solid var(--background-2);
+}
+
+html::-webkit-scrollbar-thumb {
+    border-radius: 8px;
+    background-color: var(--background-2);
 }

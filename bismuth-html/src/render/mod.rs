@@ -3,8 +3,8 @@ use bismuth_parser::{
     Parser,
 };
 use regex::Regex;
-use std::convert::TryFrom;
 use std::path::{Path, PathBuf};
+use std::convert::TryFrom;
 
 mod code;
 use crate::render::code::highlight;
@@ -238,14 +238,17 @@ impl Render for Element {
                 String::from("</div>"),
             ),
             Kind::BlockCode => (
-                highlight(
-                    self.get_attr("lang")
-                        .cloned()
-                        .unwrap_or(String::from("plaintext")),
-                    self.text.clone().unwrap_or_default(),
-                )
-                .unwrap(),
-                Default::default(),
+                format!(
+                    r#"<div class="code">{}"#,
+                    highlight(
+                        self.get_attr("lang")
+                            .cloned()
+                            .unwrap_or(String::from("plaintext")),
+                        self.text.clone().unwrap_or_default(),
+                    )
+                    .unwrap()
+                ),
+                String::from("</div>"),
             ),
 
             Kind::HorizontalRule => (String::from("<hr>"), Default::default()),

@@ -1,10 +1,11 @@
-use crate::plugin::Plugin;
 use bismuth_parser::{
     custom::CustomElm,
     tree::{Element, Kind},
     Parser,
 };
 use std::collections::HashMap;
+
+use crate::plugin::Plugin;
 
 pub const NAME: &str = "navbar";
 
@@ -48,6 +49,7 @@ impl Navbar {
                 }
             }
         }
+        println!("{:?}", self.values);
         if self
             .values
             .get("navbar_include")
@@ -58,6 +60,7 @@ impl Navbar {
         {
             output_files.push(page);
         }
+        // println!("{output_files:?}\n---\n");
         output_files
     }
 
@@ -65,7 +68,7 @@ impl Navbar {
         let mut info: Vec<PageInfo<'a>> = vec![];
         for page in pages {
             let frontmatter = &page.metadata.frontmatter;
-            let is_current = frontmatter.get_path().cloned().unwrap() == self.path;
+            let is_current = frontmatter.get_path().cloned().unwrap() != self.path;
 
             let order = frontmatter
                 .get_value("navbar_order")
@@ -78,11 +81,12 @@ impl Navbar {
                     .get_value("title")
                     .unwrap_or(frontmatter.get_title().unwrap()),
             );
-            let path = format!(
-                "{}/{}.html",
-                frontmatter.get_path().unwrap(),
-                frontmatter.get_title().unwrap()
-            );
+
+            let mut path = frontmatter.get_path().unwrap().clone();
+            if path.starts_with('/') {
+                path.remove(0);
+            }
+            let path = format!("{}/{}.html", path, frontmatter.get_title().unwrap());
             info.push(PageInfo {
                 title,
                 path,
@@ -94,11 +98,12 @@ impl Navbar {
         info
     }
 
-    fn gen_elements<'a>(&self, pages: &[&'a PageInfo<'a>]) -> Vec<Element> {
+    fn gen_elements<'a>(&self, pages: &'a [PageInfo<'a>]) -> Vec<Element> {
         let customs = pages
             .iter()
             .map(|page| {
                 let title = page.title.clone();
+                println!("{title}");
                 let url = page.path.clone();
                 let enabled = page.is_current.clone().to_string();
 
@@ -117,19 +122,24 @@ impl Navbar {
 
 impl Plugin for Navbar {
     fn pre_load(&mut self, page: &Parser, custom: &crate::Custom) {
-        self.values = custom.data.clone();
+        self.values = page.metadata.frontmatter.get_values().unwrap();
         self.path = page.metadata.frontmatter.get_path().cloned().unwrap();
         self.id = custom.id;
     }
 
-    fn run(&mut self, target: &mut Parser, _: &[Option<&Parser>]) {
+    fn run(&mut self, target: &mut Parser, pages: &[Option<&Parser>]) {
+        let page = target.clone();
         let mod_element = target.ast.find_mut(self.id).unwrap();
-        let mut values = self.values.iter().collect::<Vec<(&String, &String)>>();
-        values.sort();
-        for (key, value) in values {
-            let mut element = Element::new(Kind::Text);
-            element.text = Some(format!("{}: {}", key, value));
-            mod_element.elements.push(element);
-        }
+
+        let pages = self.get_pages(&page, pages);
+        let infos = self.get_info(&pages);
+        let mut elements = self.gen_elements(&infos);
+
+        let mut wrapper = CustomElm::new();
+        wrapper.name = WRAPPER_NAME.to_string();
+        let mut wrapper_elm = Element::new(Kind::CustomElement(wrapper));
+        wrapper_elm.elements.append(&mut elements);
+
+        mod_element.elements.push(wrapper_elm);
     }
 }

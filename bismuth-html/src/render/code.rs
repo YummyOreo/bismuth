@@ -12,12 +12,6 @@ fn init() -> (SyntaxSet, ThemeSet) {
     (ps, ts)
 }
 
-// #[derive(Error, Debug)]
-// #[error("Could not find lang: `{lang}`")]
-// pub struct FindLangError {
-//     lang: String,
-// }
-
 #[derive(Debug, Error)]
 pub enum HighlightError {
     #[error("Internal error {0}")]
@@ -30,7 +24,7 @@ pub fn highlight(lang: String, code: String) -> Result<String, HighlightError> {
         .find_syntax_by_token(&lang)
         .unwrap_or_else(|| ps.find_syntax_plain_text());
 
-    highlighted_html_for_string(&code, &ps, syntax, &ts.themes["InspiredGitHub"])
+    highlighted_html_for_string(&code, &ps, syntax, &ts.themes["base16-mocha.dark"])
         .map_err(HighlightError::Internal)
 }
 

@@ -69,9 +69,7 @@ impl BlogList {
                 custom
                     .values
                     .insert(String::from("date"), String::from(date));
-                custom
-                    .values
-                    .insert(String::from("url"), String::from(full_path));
+                custom.values.insert(String::from("url"), full_path);
 
                 Element::new(Kind::CustomElement(custom))
             })
