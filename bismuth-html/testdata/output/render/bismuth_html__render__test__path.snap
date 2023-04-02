@@ -98,23 +98,21 @@ expression: snapshot(&content)
 <br>
 <p>Block code "fences"</p>
 <br>
-<div class="code"><pre style="background-color:#3b3228;">
-<span style="color:#d0c8c6;">
-</span><span style="color:#d0c8c6;">Sample text here...
+<div class="code"><div class="code-inside"><pre style="background-color:#3b3228;">
+<span style="color:#d0c8c6;">Sample text here...
 </span></pre>
-</div>
+</div></div>
 <br>
 <p>Syntax highlighting</p>
 <br>
-<div class="code"><pre style="background-color:#3b3228;">
-<span style="color:#d0c8c6;">
-</span><span style="color:#a89bb9;">var </span><span style="color:#8ab3b5;">foo </span><span style="color:#d0c8c6;">= </span><span style="color:#a89bb9;">function </span><span style="color:#d0c8c6;">(bar) {
+<div class="code"><div class="code-inside"><pre style="background-color:#3b3228;">
+<span style="color:#a89bb9;">var </span><span style="color:#8ab3b5;">foo </span><span style="color:#d0c8c6;">= </span><span style="color:#a89bb9;">function </span><span style="color:#d0c8c6;">(bar) {
 </span><span style="color:#d0c8c6;">  </span><span style="color:#a89bb9;">return </span><span style="color:#cb6077;">bar</span><span style="color:#d0c8c6;">++;
 </span><span style="color:#d0c8c6;">};
 </span><span style="color:#d0c8c6;">
 </span><span style="color:#d0c8c6;">console.</span><span style="color:#7bbda4;">log</span><span style="color:#d0c8c6;">(</span><span style="color:#8ab3b5;">foo</span><span style="color:#d0c8c6;">(</span><span style="color:#d28b71;">5</span><span style="color:#d0c8c6;">));
 </span></pre>
-</div>
+</div></div>
 <br>
 <h2 id="links"><a href="#links"> Links</a></h2>
 <br>

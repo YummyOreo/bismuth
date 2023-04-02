@@ -239,7 +239,7 @@ impl Render for Element {
             ),
             Kind::BlockCode => (
                 format!(
-                    r#"<div class="code">{}"#,
+                    r#"<div class="code"><div class="code-inside">{}"#,
                     highlight(
                         self.get_attr("lang")
                             .cloned()
@@ -248,7 +248,7 @@ impl Render for Element {
                     )
                     .unwrap()
                 ),
-                String::from("</div>"),
+                String::from("</div></div>"),
             ),
 
             Kind::HorizontalRule => (String::from("<hr>"), Default::default()),

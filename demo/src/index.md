@@ -35,4 +35,8 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor i
 fn test() -> String {
     String::from("This is some good tests")
 }
+
+fn main() {
+    // This is a very long comment, lets see how my css will handle this very long comment. Will it wrap? will it scroll, or will it just flat out break
+}
 ```

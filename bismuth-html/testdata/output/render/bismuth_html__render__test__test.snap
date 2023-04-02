@@ -20,13 +20,12 @@ expression: "snapshot(\"test *test* \\n```rust\\nfn test() {\\n\\tprintln!(\\\"t
         <div class="inner">
             <p>test <i>test</i> </p>
 
-<div class="code"><pre style="background-color:#3b3228;">
-<span style="color:#d0c8c6;">
-</span><span style="color:#a89bb9;">fn </span><span style="color:#8ab3b5;">test</span><span style="color:#d0c8c6;">() {
+<div class="code"><div class="code-inside"><pre style="background-color:#3b3228;">
+<span style="color:#a89bb9;">fn </span><span style="color:#8ab3b5;">test</span><span style="color:#d0c8c6;">() {
 </span><span style="color:#d0c8c6;">	println!(&quot;</span><span style="color:#beb55b;">test</span><span style="color:#d0c8c6;">&quot;)
 </span><span style="color:#d0c8c6;">}
 </span></pre>
-</div>
+</div></div>
 
 
 

@@ -19,6 +19,7 @@ pub enum HighlightError {
 }
 
 pub fn highlight(lang: String, code: String) -> Result<String, HighlightError> {
+    let code = code.replacen('\n', "", 1);
     let (ps, ts) = init();
     let syntax = ps
         .find_syntax_by_token(&lang)

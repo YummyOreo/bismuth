@@ -3,7 +3,6 @@ source: bismuth-html/src/render/code.rs
 expression: html
 ---
 <pre style="background-color:#3b3228;">
-<span style="color:#a89bb9;">fn </span><span style="color:#8ab3b5;">test</span><span style="color:#d0c8c6;">() {
-</span><span style="color:#d0c8c6;">	</span><span style="color:#a89bb9;">let</span><span style="color:#d0c8c6;"> a = </span><span style="color:#d28b71;">10</span><span style="color:#d0c8c6;">;
+<span style="color:#a89bb9;">fn </span><span style="color:#8ab3b5;">test</span><span style="color:#d0c8c6;">() {	</span><span style="color:#a89bb9;">let</span><span style="color:#d0c8c6;"> a = </span><span style="color:#d28b71;">10</span><span style="color:#d0c8c6;">;
 </span><span style="color:#d0c8c6;">}</span></pre>
 

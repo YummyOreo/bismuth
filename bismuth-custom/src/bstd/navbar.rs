@@ -49,7 +49,6 @@ impl Navbar {
                 }
             }
         }
-        println!("{:?}", self.values);
         if self
             .values
             .get("navbar_include")
@@ -60,7 +59,6 @@ impl Navbar {
         {
             output_files.push(page);
         }
-        // println!("{output_files:?}\n---\n");
         output_files
     }
 
@@ -103,7 +101,6 @@ impl Navbar {
             .iter()
             .map(|page| {
                 let title = page.title.clone();
-                println!("{title}");
                 let url = page.path.clone();
                 let enabled = page.is_current.clone().to_string();
 
