@@ -3,8 +3,8 @@ use bismuth_parser::{
     Parser,
 };
 use regex::Regex;
-use std::path::{Path, PathBuf};
 use std::convert::TryFrom;
+use std::path::{Path, PathBuf};
 
 mod code;
 use crate::render::code::highlight;

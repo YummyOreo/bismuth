@@ -4,7 +4,7 @@
 - Navbar (Customizable + auto added)
     - Can customize this by plugin override or toml file
     - Toml file: pass through list of (end) paths
-- Footer (Customizable + auto added)
+- Footer (Customizable + auto added) [Somewhat done](The autoadding needs to be there)
     - simmilar to navbar
 - Blog List
     - pass through a path, dirs = blog series (DONE)
@@ -15,3 +15,14 @@
 # Make header links things [Done]
 like the thing that shows a # next to the header, then click it and it takes you to a link
 ## Allow links to headers [Done]
+
+# Allow to change the title without changing the name of the file
+useful for index
+
++ rethink how to do stuff like this
+possibly for fm:
+title/name
+filename
+
+this would allow for speficifation of filename vs title/name
+title/name should fall back on filename
