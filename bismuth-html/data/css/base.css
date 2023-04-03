@@ -8,7 +8,7 @@
 .inner {
     font-size: 1.2rem;
     margin: 0 auto;
-    max-width: calc(min(760px, 100%));
+    max-width: calc(min(760px, 90%));
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -87,7 +87,7 @@ a:hover {
 }
 
 .code *::-webkit-scrollbar {
-    display: none;
+    height: 5px;
 }
 
 .code *::-webkit-scrollbar-track {
@@ -95,7 +95,9 @@ a:hover {
 }
 
 .code *::-webkit-scrollbar-thumb {
-    display: none;
+    /* height: 5px; */
+    border-radius: 6px;
+    background-color: var(--background-2);
 }
 
 html::-webkit-scrollbar {
@@ -111,4 +113,8 @@ html::-webkit-scrollbar-track {
 html::-webkit-scrollbar-thumb {
     border-radius: 8px;
     background-color: var(--background-2);
+}
+
+::-webkit-scrollbar-corner {
+  background: rgba(0,0,0,0);
 }
