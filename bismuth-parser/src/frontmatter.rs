@@ -6,6 +6,7 @@ use std::path::Path;
 #[derive(Default, Deserialize, Debug, Clone)]
 pub struct FrontMatter {
     title: Option<String>,
+    name: Option<String>,
     path: Option<String>,
 
     kind: Option<String>,
@@ -66,9 +67,17 @@ impl FrontMatter {
         self.title.as_ref()
     }
 
+    pub fn get_name(&self) -> Option<&String> {
+        self.name.as_ref()
+    }
+
     fn fill_defaults(&mut self) {
         if self.kind.is_none() {
             self.kind = Some(String::from("default"));
+        }
+
+        if self.name.is_none() {
+            self.name = self.title.clone();
         }
     }
 
@@ -86,6 +95,13 @@ impl FrontMatter {
             let t = Some(t);
             if self.title != t {
                 self.title = t
+            }
+        }
+
+        if let Some(n) = updated_fm.name {
+            let n = Some(n);
+            if self.name != n {
+                self.name = n
             }
         }
 
