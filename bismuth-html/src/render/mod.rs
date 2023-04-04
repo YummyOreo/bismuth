@@ -71,7 +71,7 @@ impl Renderer {
                 .parser
                 .metadata
                 .frontmatter
-                .get_title()
+                .get_file_name()
                 .cloned()
                 .unwrap(),
         )
@@ -90,6 +90,9 @@ impl Render for Renderer {
             .frontmatter
             .get_values()
             .unwrap_or_default();
+        if let Some(file_name) = self.parser.metadata.frontmatter.get_file_name().cloned() {
+            values.insert(String::from("file_name"), file_name);
+        }
         if let Some(title) = self.parser.metadata.frontmatter.get_title().cloned() {
             values.insert(String::from("title"), title);
         }

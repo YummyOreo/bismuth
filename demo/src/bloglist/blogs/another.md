@@ -1,5 +1,5 @@
 ---
-title: test
+file_name: test
 values:
     - title: Cool Bloglist
     - date: now

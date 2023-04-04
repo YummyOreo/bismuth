@@ -3,9 +3,10 @@ source: bismuth-parser/src/lib.rs
 expression: "snapshot_str(\"test\\n\\n---\\n\")"
 ---
 FrontMatter {
-    title: Some(
+    file_name: Some(
         "test",
     ),
+    title: None,
     path: Some(
         "/test",
     ),

@@ -3,9 +3,10 @@ source: bismuth-custom/src/lib.rs
 expression: "snapshot(\"%{{\\nname: bloglist\\nother: key\\n}}\")"
 ---
 FrontMatter {
-    title: Some(
+    file_name: Some(
         "test",
     ),
+    title: None,
     path: Some(
         "/test",
     ),

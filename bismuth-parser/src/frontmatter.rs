@@ -5,8 +5,8 @@ use std::path::Path;
 
 #[derive(Default, Deserialize, Debug, Clone)]
 pub struct FrontMatter {
+    file_name: Option<String>,
     title: Option<String>,
-    name: Option<String>,
     path: Option<String>,
 
     kind: Option<String>,
@@ -26,7 +26,7 @@ impl FrontMatter {
         path.pop();
 
         FrontMatter {
-            title: Some(title),
+            file_name: Some(title),
             path: Some(path.to_string_lossy().to_string()),
             kind: Some(String::from("default")),
             ..Default::default()
@@ -63,12 +63,12 @@ impl FrontMatter {
         self.path.as_ref()
     }
 
-    pub fn get_title(&self) -> Option<&String> {
-        self.title.as_ref()
+    pub fn get_file_name(&self) -> Option<&String> {
+        self.file_name.as_ref()
     }
 
-    pub fn get_name(&self) -> Option<&String> {
-        self.name.as_ref()
+    pub fn get_title(&self) -> Option<&String> {
+        self.title.as_ref()
     }
 
     fn fill_defaults(&mut self) {
@@ -76,8 +76,8 @@ impl FrontMatter {
             self.kind = Some(String::from("default"));
         }
 
-        if self.name.is_none() {
-            self.name = self.title.clone();
+        if self.title.is_none() {
+            self.title = self.file_name.clone();
         }
     }
 
@@ -91,17 +91,17 @@ impl FrontMatter {
             }
         }
 
-        if let Some(t) = updated_fm.title {
+        if let Some(t) = updated_fm.file_name {
             let t = Some(t);
-            if self.title != t {
-                self.title = t
+            if self.file_name != t {
+                self.file_name = t
             }
         }
 
-        if let Some(n) = updated_fm.name {
+        if let Some(n) = updated_fm.title {
             let n = Some(n);
-            if self.name != n {
-                self.name = n
+            if self.title != n {
+                self.title = n
             }
         }
 

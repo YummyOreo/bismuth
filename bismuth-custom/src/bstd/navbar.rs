@@ -77,14 +77,14 @@ impl Navbar {
             let title = frontmatter.get_value("navbar_title").unwrap_or(
                 frontmatter
                     .get_value("title")
-                    .unwrap_or(frontmatter.get_title().unwrap()),
+                    .unwrap_or(frontmatter.get_file_name().unwrap()),
             );
 
             let mut path = frontmatter.get_path().unwrap().clone();
             if path.starts_with('/') {
                 path.remove(0);
             }
-            let path = format!("{}/{}.html", path, frontmatter.get_title().unwrap());
+            let path = format!("{}/{}.html", path, frontmatter.get_file_name().unwrap());
             info.push(PageInfo {
                 title,
                 path,

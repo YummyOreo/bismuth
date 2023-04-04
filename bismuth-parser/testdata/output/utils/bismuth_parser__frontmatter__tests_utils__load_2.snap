@@ -3,6 +3,7 @@ source: bismuth-parser/src/frontmatter.rs
 expression: "run_snapshot(fm,\n    \"\n        title: this is a title\n        values:\n            - value-1: test\n            - value-2: test 2\n        \")"
 ---
 FrontMatter {
+    file_name: None,
     title: Some(
         "this is a title",
     ),

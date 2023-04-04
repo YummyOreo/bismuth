@@ -3,9 +3,10 @@ source: bismuth-parser/src/lib.rs
 expression: "snapshot_str(\"## header\\n> blockquote\\n- list\\n\\t- item\\n        - level _**two??**_\")"
 ---
 FrontMatter {
-    title: Some(
+    file_name: Some(
         "test",
     ),
+    title: None,
     path: Some(
         "/test",
     ),

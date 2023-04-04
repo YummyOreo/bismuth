@@ -3,6 +3,7 @@ source: bismuth-parser/src/frontmatter.rs
 expression: "run_snapshot(fm,\n    \"\n        title: Test\n        path: /test\n        kind: test\n        values:\n            - test: te\n        \")"
 ---
 FrontMatter {
+    file_name: None,
     title: Some(
         "Test",
     ),

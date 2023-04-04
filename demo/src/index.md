@@ -1,4 +1,5 @@
 ---
+title: Home
 values:
     - navbar_include: true
     - navbar_title: Home

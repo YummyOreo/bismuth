@@ -53,7 +53,7 @@ impl BlogList {
             .map(|file| {
                 // get info
                 let frontmatter = &file.metadata.frontmatter;
-                let html_title = frontmatter.get_title().unwrap();
+                let html_title = frontmatter.get_file_name().unwrap();
                 let path = frontmatter.get_path().unwrap();
                 let title = frontmatter.get_value("title").unwrap();
                 let date = frontmatter.get_value("date").unwrap();

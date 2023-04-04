@@ -3,9 +3,10 @@ source: bismuth-parser/src/lib.rs
 expression: "snapshot_str(\"test $e = mc^2$ \\n $$e = mc^3$$\")"
 ---
 FrontMatter {
-    title: Some(
+    file_name: Some(
         "test",
     ),
+    title: None,
     path: Some(
         "/test",
     ),

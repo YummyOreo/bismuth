@@ -3,6 +3,9 @@ source: bismuth-parser/src/lib.rs
 expression: "snapshot_path(\"./testdata/tests/test1.md\")"
 ---
 FrontMatter {
+    file_name: Some(
+        "test1",
+    ),
     title: Some(
         "Blog post about cats",
     ),

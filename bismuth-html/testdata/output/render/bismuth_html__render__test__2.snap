@@ -12,7 +12,7 @@ expression: "snapshot(\"# hearder\\n- 1\\n    - 2\\n1. list item\\nthis is a *__
     <meta name="head:count" content="4">
     <link rel="stylesheet" href="/assets/css/colors.css">
     <link rel="stylesheet" href="/assets/css/base.css">
-    <title>test</title>
+    <title>{title}</title>
 </head>
 
 <body>
