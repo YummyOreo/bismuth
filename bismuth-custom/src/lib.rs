@@ -5,6 +5,7 @@ use bismuth_parser::{
     tree::{Element, Kind},
     Parser,
 };
+use bstd::navbar::add_navbar;
 
 #[cfg(feature = "bstd")]
 mod bstd;
@@ -126,13 +127,28 @@ fn run_customs(target: &mut Parser, others: &[Option<&Parser>], custom_elms: &[u
 }
 
 pub fn parse_custom(mut target: Parser, others: &[Option<&Parser>]) -> Parser {
-    if !target.has_custom {
-        return target;
-    }
+    // if !target.has_custom {
+    //     return target;
+    // }
     let mut old_elms: Vec<u32> = vec![];
 
     loop {
-        let new_elms = get_customs(target.ast.elements.clone(), vec![]);
+        let mut new_elms = get_customs(target.ast.elements.clone(), vec![]);
+        #[cfg(feature = "bstd")]
+        match new_elms.first() {
+            Some(e) => {
+                let element = target.ast.find(*e).unwrap();
+                match &element.kind {
+                    Kind::CustomElement(e) => {
+                        if e.name.to_lowercase() != bstd::navbar::NAME {
+                            new_elms.push(add_navbar(&mut target));
+                        }
+                    }
+                    _ => new_elms.push(add_navbar(&mut target)),
+                }
+            }
+            None => new_elms.push(add_navbar(&mut target)),
+        }
 
         if new_elms == old_elms {
             break;

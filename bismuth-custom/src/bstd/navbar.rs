@@ -15,6 +15,15 @@ pub const WRAPPER: &str = include_str!("../../data/navbar_wrapper.html");
 pub const ITEM_NAME: &str = "bismuth_navbar_item";
 pub const ITEM: &str = include_str!("../../data/navbar_item.html");
 
+pub fn add_navbar(target: &mut Parser) -> u32 {
+    let mut customelm = CustomElm::new();
+    customelm.name = String::from(NAME);
+    let element = Element::new(Kind::CustomElement(customelm));
+    let id = element.get_id();
+    target.ast.elements.insert(0, element);
+    id
+}
+
 #[derive(Debug)]
 pub struct PageInfo<'a> {
     pub path: String,
@@ -81,8 +90,8 @@ impl Navbar {
             );
 
             let mut path = frontmatter.get_path().unwrap().clone();
-            if path.starts_with('/') {
-                path.remove(0);
+            if path == String::from("/") {
+                path = String::new();
             }
             let path = format!("{}/{}.html", path, frontmatter.get_file_name().unwrap());
             info.push(PageInfo {
@@ -119,8 +128,13 @@ impl Navbar {
 
 impl Plugin for Navbar {
     fn pre_load(&mut self, page: &Parser, custom: &crate::Custom) {
-        self.values = page.metadata.frontmatter.get_values().unwrap();
-        self.path = page.metadata.frontmatter.get_path().cloned().unwrap();
+        self.values = page.metadata.frontmatter.get_values().unwrap_or_default();
+        self.path = page
+            .metadata
+            .frontmatter
+            .get_path()
+            .cloned()
+            .unwrap_or_default();
         self.id = custom.id;
     }
 

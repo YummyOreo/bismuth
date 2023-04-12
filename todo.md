@@ -16,7 +16,7 @@
 like the thing that shows a # next to the header, then click it and it takes you to a link
 ## Allow links to headers [Done]
 
-# Allow to change the title without changing the name of the file
+# Allow to change the title without changing the name of the file [Done]
 useful for index
 
 + rethink how to do stuff like this
