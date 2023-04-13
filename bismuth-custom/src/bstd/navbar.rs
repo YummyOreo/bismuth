@@ -75,13 +75,20 @@ impl Navbar {
         let mut info: Vec<PageInfo<'a>> = vec![];
         for page in pages {
             let frontmatter = &page.metadata.frontmatter;
-            let is_current = frontmatter.get_path().cloned().unwrap() != self.path;
 
             let order = frontmatter
                 .get_value("navbar_order")
                 .unwrap()
                 .parse::<i32>()
                 .unwrap();
+
+            let is_current = self
+                .values
+                .get("navbar_order")
+                .unwrap()
+                .parse::<i32>()
+                .unwrap()
+                != order;
 
             let title = frontmatter.get_value("navbar_title").unwrap_or(
                 frontmatter
@@ -129,12 +136,7 @@ impl Navbar {
 impl Plugin for Navbar {
     fn pre_load(&mut self, page: &Parser, custom: &crate::Custom) {
         self.values = page.metadata.frontmatter.get_values().unwrap_or_default();
-        self.path = page
-            .metadata
-            .frontmatter
-            .get_path()
-            .cloned()
-            .unwrap_or_default();
+        self.path = page.metadata.frontmatter.get_path().cloned().unwrap();
         self.id = custom.id;
     }
 

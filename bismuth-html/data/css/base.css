@@ -8,6 +8,7 @@
 .inner {
     font-size: 1.2rem;
     margin: 0 auto;
+    padding-top: 1rem;
     max-width: calc(min(760px, 90%));
 }
 
