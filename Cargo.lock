@@ -45,7 +45,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "bismuth-core"
+name = "bismuth"
 version = "0.1.0"
 dependencies = [
  "bismuth-custom",

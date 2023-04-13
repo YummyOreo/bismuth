@@ -1,4 +1,4 @@
-use bismuth_core::entry;
+use bismuth::entry;
 
 fn main() {
     entry("./".to_string())
